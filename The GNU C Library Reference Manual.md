@@ -1,0 +1,198 @@
+这是The GNU C Library Reference Manual，版本2.43。
+
+Copyright © 1993–2026 Free Software Foundation, Inc.
+
+遵守the terms of the GNU Free Documentation License, Version 1.3 or any later version published by the Free Software Foundation时，以下内容是许可的，复制，分发，修改这个文档；不能修改“Free Software Needs Free Documentation” and “GNU Lesser General Public License”章节，封面文字必须是“A GNU Manual”，封底文字必须是下面(a)的内容。本许可证的副本包含在题为“GNU Free Documentation License”的章节中。
+
+(a) The FSF’s Back-Cover Text is: “You have the freedom to copy and modify this GNU manual. Buying copies from the FSF supports it in developing GNU and promoting software freedom.”
+
+# 1  介绍
+
+C语言内置的功能不提供输入/输出，内存管理，字符串操作等简单的操作。这些功能都定义在标准库中，你需要编译并同你的程序链接。
+
+The GNU C Library定义了所有ISO C标准指定的函数，并同时满足POSIX和其他Unix操作系统衍生系统特有的功能，还有GNU系统特有的扩展。
+
+这个手册的目的是告诉你他和使用the GNU C Library的功能。文档中会指出哪些特性属于哪些标准，以帮助你鉴别哪些内容可能无法移植到其他系统。但是这个手册的重点不是严格的可移植性。
+
+## 1.1  入门
+
+这个手册的内容是假设你已经了解了类似C语言的语言和基本的编程概念。具体而言，是ISO标准C，而不是其他的C。
+
+The GNU C Library包含几个头文件，分别提供相关功能的定义和声明；运行你的程序时，你的编译器会用到这些信息。比如，stdio.h头文件声明了输入和输出的功能，string.h头文件声明了字符操作的功能。这个手册的组织会遵循和头文件同样的分类。
+
+如果你第一次看这个手册，你应该看所有的引言或基础介绍，并快速浏览所有章节。the GNU C Library中有很多函数，记住每个函数是怎么用是不现实的。重要的是对the library提供的功能有整体的概念，这样写程序的时候你能知道什么时候使用library的函数，这个手册可以找到关于他们的更多信息。
+
+## 1.2  不同的标准和可移植性
+
+这个章节讨论the GNU C Library基于的不同的标准和其他的资源。这些资源包括ISO C标准和POSIX标准，以及System  Unix的实现。
+
+这个手册的主要焦点是告诉你如何高效的使用the GNU C Library的功能。但是如果你关心你的程序是否符合这些标准，或者移植到GNU以外的操作系统，这会影响你如何使用the library。这个章节概况了这些标准，所以当你在手册其他地方看到他们时，你知道他们是什么。
+
+浏览Summary of Library Facilities（附录B），字母排序的the library提供的函数和其他符号列表。这个列表也标出了各个函数和符号出自什么标准。
+
+- ISO C
+- POSIX (The Portable Operating System Interface)
+- Berkeley Unix
+- SVID (The System V Interface Description)
+- XPG (The X/Open Portability Guide)
+- Linux (The Linux Kernel)
+
+### 1.2.1  ISO C标准
+
+The GNU C Library兼容the American National Standards Institute (ANSI)采纳的C标准：American National Standard X3.159-1989—“ANSI C”，和后来被the International Standardization Organization (ISO)采纳的C标准：ISO/IEC 9899:1990, “Programming languages—C”。我们在本文中将其统称为ISO C，因为在采纳层面上，它是一个更为通用的标准。the GNU C Library的头文件和库方法是ISO C指定的那内容的超集。
+
+如果你非常在意是否严格遵守ISO C标准，在使用GNU C编译器编译程序时，你应该加上-ansi选项。这会告诉编译器，只定义头文件中符合ISO标准的特性，除非你显式的指定了其他特性。浏览Feature Test Macros（1.3.4），以了解更多。
+
+能够限制库仅包含 ISO C 标准的功能非常重要，因为 ISO C 对库实现可以定义的标识符（名称）有严格的限制，而 GNU 扩展并不符合这些限制。浏览Reserved Names（1.3.3），以了解更多。
+
+手册不会尝试给你完整的细节关于ISO C和其他的区别。手册会给你可移植性高的写法建议，但不会追求完美。
+
+### 1.2.2  POSIX (The Portable Operating System Interface)
+
+The GNU C Library同时兼容ISO POSIX系列标准，更正式的说法是the Portable Operating System Interface for Computer Environments (ISO/IEC 9945)。他们也出版了ANSI/IEEE Std 1003。POSIX标准主要衍生自各种版本的Unix操作系统。
+
+POSIX标准指定的功能是ISO C标准的超集；POSIX对ISO C标准的函数指定了额外的特性，也制定了新函数。总的来说，POSIX定义额外的需求和功能是为了给一些系统环境提供底层支持，而不是像通用编程语言，能在不同的操作系统上运行。
+
+The GNU C Library实现了ISO/IEC 9945-1:1996指定的所有功能，即the POSIX System Application Program Interface，简称为POSIX.1。在ISO C标准功能上的主要扩展包括 file system interface primitives (see File System Interface 第14章)，device-specific terminal control functions (see Low-Level Terminal Interface 第17章)，and process control functions (see Processes 第27章)。
+
+the GNU C Library也实现了ISO/IEC 9945-2:1993和the POSIX Shell and Utilities standard (POSIX.2)中的有些功能。这些包括正则表达式和其他的条件匹配功能(see Pattern Matching 第10章)。
+
+#### 1.2.2.1  POSIX安全概念
+
+手册记录了GNU C Library功能的各种安全属性，这些属性通常标注在函数原型下方，格式如下：
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |
+
+这些安全属性是依据 POSIX 标准中针对线程安全（Thread- -Safety）、异步信号安全（Async-Signal- -Safety）和异步取消安全（Async-Cancel- -Safety）等安全场景所制定的评估标准来进行评定的。下面是对这些属性的直观解释，旨在帮助理解标准定义中的确切含义。
+
+- MT-Safe或Thread-Safe函数可在有其他线程存在时安全调用。MT，意味着Multi Thread。
+
+  线程安全不意味着函数是原子操作，也不意味着它使用了POSIX提供给用户的任何内存同步机制。甚至调用一系列线程安全的函数的组合是线程不安全的。比如，一个线程调用两个线程安全的函数一个紧接着另一个，这样并不保证这个组合是原子化执行的，因为其他线程中的并发调用可能会以破坏性的方式产生干扰。
+
+  全程序优化可能会跨库接口进行函数内联，这可能暴露出不安全的指令重排问题，因此不建议对the GNU C Library接口执行跨接口内联。在全程序优化下，文档中记录的线程安全不保证。但是，不过，定义在用户可见头文件中的函数在设计上已确保可安全地进行内联。
+
+- AS-Safe或Async-Signal-Safe的函数可以从异步信号处理程序中安全的调用。AS，意味着Asynchronous Signal。
+
+  许多异步信号安全的函数会设置errno，或修改浮点环境，但这并不妨碍他们在信号处理程序中安全使用。然而，如果异步信号处理程序修改了这种线程局部状态，程序可能会出现异常行为，并且不能指望虚拟号处理机制自动保存和恢复该状态。因此，调用可能会使用errno或修改浮点环境的函数的信号处理程序，必须保持他们原来的值，并在退出前保存。
+
+- AC-Safe或Async-Cancel-Safe函数可以安全的调用，当异步取消是开启的。AC，意味着Asynchronous Cancellation。
+
+  POSIX标准只定义了3个异步取消安全函数，pthread\_cancel，pthread\_setcancelstate和pthread\_setcanceltype。目前，the GNU C Library除了这3个函数之外，不提供如何其他异步取消安全保证，但确实文档化了当前哪些函数是异步取消安全的。这个文档是给the GNU C Library开发者的。
+
+  就像信号处理函数，取消清除步骤会自行配置他们徐奥的浮点环境。步骤不确保任何浮点环境，特别是异步取消开启时。假如浮点环境的配置不是原子化的，那么遇到的环境可能出现内部不一致的情况。
+
+- MT-Unsafe, AS-Unsafe, AC-Unsafe函数无法安全的调用上述的内容。在这样的背景下调用他们包含未定义的行为。
+
+  文档中没有显示标注安全的函数，在安全的背景下应该被视为不安全的。
+
+- Preliminary安全属性也被记录，指示了未来可能没有的属性。
+
+  Preliminary指出的属性是现在实现的表现评估后的结果，而不是现在或未来锁规定和允许的内容。
+
+  尽管我们力求遵循相关标准，但在某些情况下，即使标准未作安全要求，我们的实现仍然是安全的；而在另一些情况下，我们的实现则未能满足标准规定的安全要求。后者多数是bugs；前者，Preliminary标记了，应该不被期望，未来标准会改变，可能会不兼容。
+
+  此外，POSIX标准不提供安全的定义。我们假设POSIX所谓的“安全的调用”是指，只要程序未引发未定义的行为，那么“安全的调用”的函数就是好的，同时不影响其他函数的好的行为。我们选择使用更松弛的安全定义，不是因为他们是最好的定义，而是手册可以与POSIX更和谐。
+
+  请记住preliminary定义和注释，某些层面的定义仍在讨论，可能会进一步澄清或被改变。
+
+  随着时间的推移，我们计划将这些初步的安全说明逐步发展为稳定的承诺，其稳定性将与我们的接口承诺保持一致。到时候，我们会移除Preliminary标签。然而，只要该关键字仍然存在，它们就不应被视为对未来行为的承诺。
+
+其他关键字出现在安全标注中的，定义在后面的章节。
+
+#### 1.2.2.2  不安全的特性
+
+在某些情况下不安全的函数，被标注了关键字以提示什么是不安全的。AS-Unsafe特性在这个章节指的是异步信号开启时函数永远不安全的。AC-Unsafe特性指的是异步取消开启时函数是永远不安全的。本章没有MT-Unsafe标记。
+
+- lock
+
+  标记lock的函数意味着有AS-Unsafe特性，在持有非递归锁期间可能会被信号中断。如果型号处理程序调用了其他持有相同锁的函数，就会死锁。
+
+  标记lock的函数，如果被异步取消，可能会释放不了锁，而锁应该被释放。一旦锁处于被持有状态，后续获取该锁的尝试将会无限期阻塞。
+
+- corrupt
+
+  标记corrupt的函数意味着有AS-Unsafe特性，可能会破坏数据结构，被打断后发生异常行为。不像lock，这些可以拿递归锁来规避MT-Safety问题，但这仍不足以防止信号处理程序观察到更新了一半的数据结构。此外，如果被中断的函数未能察觉到信号处理程序所做的更新，还可能引发进一步的数据损坏。
+
+  标记corrupt的函数可能会遗留损坏的数据，只更新一半的状态。接下来使用这些数据可能会发生意料之外的行为。
+
+- heap
+
+  标记heap的函数可能会调用malloc/free系列函数的堆内存管理函数，因此它们的安全性完全取决于这些内存管理函数。这个标记等价于：
+
+  | AS-Unsafe lock | AC-Unsafe lock fd mem |
+
+- dlopen（Dynamic Loading Open）
+
+  标记dlopen的函数只用动态装载器来将共享库加载到当前的执行映像中。这涉及了打开文件，映射到内存，分配额外的内存，解析符号，应用重定位等操作，而所有这些操作都是在持有动态加载器内部锁的情况下执行的。
+
+  这些锁本身就足以使这些函数成为 AS-Unsafe 和 AC-Unsafe 的，但还可能引发其他问题。目前这是由dlopen引起的所有可能的安全问题的占位符。
+
+- plugin
+
+  标记plugin的函数可能以插件的形式运行the GNU C Library之外的代码。插件函数大概率是MT-Safe，AS-Unsafe和AC-Unsafe。比如，栈展开库（stack unwinding libraries），名字服务切换（name service switch (NSS)）和字符集转换（character set conversion (iconv)）后端。
+
+  尽管上述作为示例的插件均通过 dlopen 加载，但“plugin”这一关键词本身并不意味着直接涉及动态链接器或 libdl 接口——这些内容已归入 dlopen 条目下讨论。比如，一个函数加载一个模块并查询这个模块某些函数的地址，而另一个函数仅仅调用这些已经解决的函数，前者会标记为dlopen，后者会标记为plugin。当一个函数有这两种行为，那么会被两者都标记。
+
+- il8n
+
+  标记il8n的函数可能调用gettext系列的国际化函数，其安全性与这些被调用的函数保持一致。这个标记等价于：
+
+  | MT-Safe env | AS-Unsafe corrupt heap dlopen | AC-Unsafe corrupt |
+
+- timer
+
+  标记timer的函数会使用alarm函数，或类似给系统设置超时回调，或一个长时间运行的操作。在多线程程序中，超时信号可能会送到其他线程上，导致无法关闭正确的线程。除了MT-Unsafe，这些函数总是AS-Unsafe，因为信号处理器中调用他们可能会干扰到被中断代码中设置的定时器，还有AC-Unsafe，因为无法保证先设置的定时器会不会被一个异步取消重置。
+
+#### 1.2.2.3  条件下的安全特性
+
+对于某些导致函数在特定上下文中调用不安全的特性，除了完全避免调用该函数之外，还存在已知的规避方法。下面的关键字用来指代他们，定义中指出了程序应该怎么约束的写来规避关键字指出的安全问题。只有所有让函数不安全的因素被处理了，按照文档中要求的那样，函数才能安全的调用。
+
+- init
+
+  标记init的函数意味着MT-Unsafe，在第一次调用时。
+
+  在单线程模式调用这种函数，就能消除MT-Unsafe。当没有其他MT-Unsafe存在，那么程序就可以安全的多线程。
+
+  因init而AS-或AC-Unsafe的函数使用了内部的libc\_once机制或者类似的机制初始化内部数据结构。
+
+  如果一个信号处理程序中断了这种初始化器，然后调用任意使用libc\_once初始化器，如果线程库已经加载，则会导致死锁。
+
+  此外，如果初始化器被一个需要相同的初始化过程的信号处理程序中断，有些或者全部的初始化器可能会运行多次，导致资源泄露甚至数据损坏。
+
+  因init而AS-或AC-Unsafe的函数应该在配置信号处理程序或启用取消之前，这样因libc\_once导致的AS-和AC-Unsafe就不会发生。
+
+- race
+
+  带有race的函数有MT-Safety，操作对象时会导致数据竞争或并发运行时导致类似形式的数据损坏。有些情况下，操作的对象是用户传入的；有些是返回值；有些内容并不会被用户看到。
+
+  我们认为对参数的操作方式应该是避免导致数据竞争的。这个避免应该是调用者的责任。我们不会标记一个函数是MT-Unsafe或AS-Unsafe，如果是调用者没有避免传入参数有数据竞争的可能性。一般而言，如果函数文档说明该函数会读取或修改以引用方式传入的对象，用户就应当使用内存同步底层调用来避免数据竞争，就如同他们不通过调用库函数而是亲自执行这些访问时所做的那样。文件流是例外，POSIX规定库在许多操作这种特定不透明类型对象的函数中，必须防范数据竞争。我们把这个当成方便送给用户，而非一项应将其预期推广至其他类型的普遍要求。
+
+  为了提醒用户保护某个参数是他们的责任，我们会标注接收某些类型的参数的函数。对于用户传入的对象，我们划定的界限如下：凡是类型对用户公开、且预期由用户直接访问的对象,如内存缓冲区、字符串及各种用户可见的结构体类型，均不构成将函数标注为race的理由。这样做不仅会产生大量干扰信息，而且与前述一般要求相重复；此外，当库在访问那些用户本可直接访问的对象时未提供内部同步保护，也不会令太多人感到意外。
+
+  至于透明或者透明相关的，因为他们只能传到库函数中操作（比如FILE，DIR，obstack，iconv\_t），库可能对其内部访问协调有额外的要求。如果某个函数接受此类对象作为参数，但默认情况下并不负责同步对其的访问，我们将使用race后跟冒号及相应参数名的方式对其进行标注。例如，针对文件流的无锁版本函数将会被标注；而那些默认对文件流执行隐式加锁的函数则不会被标注，即使这种隐式加锁机制可以按单个流进行禁用。
+
+  无论如何，用户提供的对象没有保证访问方式合理，我们不会认为哪些可能会不安全的访问用户提供对象的函数是MT-Unsafe。普遍观念是，用户需要避免提供给库的对象有数据竞争。
+
+  然而，对于库自己控制的对象，比如内部对象，用来返回数据给用户的静态缓存，就与用户无关。当库不保护他们的并发使用时，这种情况就会被视为MT-Unsafe和AS-Unsafe（尽管race标记在AS-Unsafe中回避当作重复省略，因为MT-Unsafe中有了）。至于用户可以接触到的对象，这个标记后面可能会接一个冒号和标识符。标识符将操作某一个未保护的对象的所有函数分为一组；用户可以创建一个与该标识符相关的非递归的互斥锁，并在调用任何带有该竞态标识符的函数时始终持有该互斥锁，来规避未保护访问内部对象的MT-Unsafe问题，和用户可操作对象时相同。非递归互斥锁避免了MT-Safe问题，但是他换到了一个AS-Safe问题，因此在异步信号处理程序中使用此类函数的行为仍然是未定义的。
+
+  当该标识符与存放返回值的静态缓冲区有关时，调用者必须在整个静态缓冲区的生命周期中持有互斥锁。许多返回静态缓冲区的指针的函数都提供了可重入版本，这些版本把返回值保存到用户提供的缓冲区中。有些情况下，比如tmpname，这个可重入版本不是通过写一个新的函数入口实现，比如tmpname\_r，而是通过传入一个保存返回值的非空指针实现的。这些可重入版本优先，在多线程程序中，虽然有些不是MT-Safe，因为使用了其他内部缓冲区，文档也标注了race。
+
+- const
+
+  标记const的函数意味着MT-Safe的问题，他们以非原子方式修改内部对象，但这些应该是常量，因为相当一部分函数访问这些对象时未进行同步。不像race，这个标记只会影响写。写还是有MT-和AS-Unsafe，但是他们修改的对象随后保持不变，这让写变得MT-Safe和AS-Safe（只要没其他问题）。
+
+  读的安全说明说，const标记后的标识符将单独出现。写的时候若想规避安全问题，可以使用一个与标识符有关的非递归的读写锁。锁解决了MT-Safety问题，但是带来了一个AS-Safety问题，所以在异步信号处理中运行仍是未定义的。
+
+- sig
+
+  标记sig的函数意味着有MT-Safety问题（也有相同的AS-Safety问题，为了简洁而省略）可能会因为内部目的临时安装信号处理器，从而干扰该信号的其他用途，受影响的信号会在冒号后列出。
+
+  调用期间，若信号没有其他用途，就没有安全问题。建议，在使用同一个临时信号的所有函数上加一把非递归的互斥锁；并在调用前阻塞该信号，调用后在重置其信号处理程序。
+
+  在发生异步取消时，无法保证原始信号处理程序可以恢复，所以标记的函数也是AC-Unsafe。
+
+  除了为规避MT-和AS-Safety问题而建议的措施外，为避免取消问题，还建议禁用异步取消，并安装一个清理处理程序，用户将信号恢复至预期状态以及释放互斥锁。
+
+- term
+
+  标记term的函数意味着MT-Safety问题，可能
