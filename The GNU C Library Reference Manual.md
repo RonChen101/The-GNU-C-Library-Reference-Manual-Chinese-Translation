@@ -6,7 +6,7 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 
 (a) The FSF’s Back-Cover Text is: “You have the freedom to copy and modify this GNU manual. Buying copies from the FSF supports it in developing GNU and promoting software freedom.”
 
-# 1  介绍
+# 1 介绍
 
 C语言内置的功能不提供输入/输出，内存管理，字符串操作等简单的操作。这些功能都定义在标准库中，你需要编译并同你的程序链接。
 
@@ -14,7 +14,7 @@ The GNU C Library定义了所有ISO C标准指定的函数，并同时满足POSI
 
 这个手册的目的是告诉你他和使用the GNU C Library的功能。文档中会指出哪些特性属于哪些标准，以帮助你鉴别哪些内容可能无法移植到其他系统。但是这个手册的重点不是严格的可移植性。
 
-## 1.1  入门
+## 1.1 入门
 
 这个手册的内容是假设你已经了解了类似C语言的语言和基本的编程概念。具体而言，是ISO标准C，而不是其他的C。
 
@@ -22,7 +22,7 @@ The GNU C Library包含几个头文件，分别提供相关功能的定义和声
 
 如果你第一次看这个手册，你应该看所有的引言或基础介绍，并快速浏览所有章节。the GNU C Library中有很多函数，记住每个函数是怎么用是不现实的。重要的是对the library提供的功能有整体的概念，这样写程序的时候你能知道什么时候使用library的函数，这个手册可以找到关于他们的更多信息。
 
-## 1.2  不同的标准和可移植性
+## 1.2 不同的标准和可移植性
 
 这个章节讨论the GNU C Library基于的不同的标准和其他的资源。这些资源包括ISO C标准和POSIX标准，以及System  Unix的实现。
 
@@ -37,7 +37,7 @@ The GNU C Library包含几个头文件，分别提供相关功能的定义和声
 - XPG (The X/Open Portability Guide)
 - Linux (The Linux Kernel)
 
-### 1.2.1  ISO C标准
+### 1.2.1 ISO C标准
 
 The GNU C Library兼容the American National Standards Institute (ANSI)采纳的C标准：American National Standard X3.159-1989—“ANSI C”，和后来被the International Standardization Organization (ISO)采纳的C标准：ISO/IEC 9899:1990, “Programming languages—C”。我们在本文中将其统称为ISO C，因为在采纳层面上，它是一个更为通用的标准。the GNU C Library的头文件和库方法是ISO C指定的那内容的超集。
 
@@ -47,7 +47,7 @@ The GNU C Library兼容the American National Standards Institute (ANSI)采纳的
 
 手册不会尝试给你完整的细节关于ISO C和其他的区别。手册会给你可移植性高的写法建议，但不会追求完美。
 
-### 1.2.2  POSIX (The Portable Operating System Interface)
+### 1.2.2 POSIX (The Portable Operating System Interface)
 
 The GNU C Library同时兼容ISO POSIX系列标准，更正式的说法是the Portable Operating System Interface for Computer Environments (ISO/IEC 9945)。他们也出版了ANSI/IEEE Std 1003。POSIX标准主要衍生自各种版本的Unix操作系统。
 
@@ -57,7 +57,7 @@ The GNU C Library实现了ISO/IEC 9945-1:1996指定的所有功能，即the POSI
 
 the GNU C Library也实现了ISO/IEC 9945-2:1993和the POSIX Shell and Utilities standard (POSIX.2)中的有些功能。这些包括正则表达式和其他的条件匹配功能(see Pattern Matching 第10章)。
 
-#### 1.2.2.1  POSIX安全概念
+#### 1.2.2.1 POSIX安全概念
 
 手册记录了GNU C Library功能的各种安全属性，这些属性通常标注在函数原型下方，格式如下：
 
@@ -99,7 +99,7 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
 其他关键字出现在安全标注中的，定义在后面的章节。
 
-#### 1.2.2.2  不安全的特性
+#### 1.2.2.2 不安全的特性
 
 在某些情况下不安全的函数，被标注了关键字以提示什么是不安全的。AS-Unsafe特性在这个章节指的是异步信号开启时函数永远不安全的。AC-Unsafe特性指的是异步取消开启时函数是永远不安全的。本章没有MT-Unsafe标记。
 
@@ -143,7 +143,7 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
   标记timer的函数会使用alarm函数，或类似给系统设置超时回调，或一个长时间运行的操作。在多线程程序中，超时信号可能会送到其他线程上，导致无法关闭正确的线程。除了MT-Unsafe，这些函数总是AS-Unsafe，因为信号处理器中调用他们可能会干扰到被中断代码中设置的定时器，还有AC-Unsafe，因为无法保证先设置的定时器会不会被一个异步取消重置。
 
-#### 1.2.2.3  条件下的安全特性
+#### 1.2.2.3 条件下的安全特性
 
 对于某些导致函数在特定上下文中调用不安全的特性，除了完全避免调用该函数之外，还存在已知的规避方法。下面的关键字用来指代他们，定义中指出了程序应该怎么约束的写来规避关键字指出的安全问题。只有所有让函数不安全的因素被处理了，按照文档中要求的那样，函数才能安全的调用。
 
@@ -203,7 +203,7 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
   除了为规避MT-和AS-Safety问题而建议的措施外，为了避免取消问题，还建议禁用异步取消，并安装一个清理处理程序，将终端设置恢复至原来的状态以及释放互斥锁。
 
-####  1.2.2.4  其他安全标记
+#### 1.2.2.4 其他安全标记
 
 函数还可能有其他关键字，指出不会导致函数调用不安全的特性，但是但是在特定类型的程序中可能需要加以考虑。
 
@@ -245,4 +245,103 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
   这个问题和文件描述符很像：不存在一种原子接口，能够在不禁用异步取消的情况下，用来分配内存并保存地址到清理处理程序的参数中，或既释放其内存并移除其地址从清理处理程序的参数中；而这些还是本身不会禁用异步取消。
 
-  
+  这个标记本身不能让某个函数被视为AC-Unsafe。然而，此类泄露的积累效应可能会对某些程序造成严重影响，如果确实存在这种情况，建议在调用此类函数期间暂停异步取消。
+
+- cwd
+
+  标记cwd的函数有MT-Safety问题，在执行期间可能会临时修改当前工作目录（current working directory），这可能会导致相对路径以非预期的解析，在其他线程中，或在异步信号处理和异步取消程序中。
+
+  这个原因不足以让一个程序被视为MT-或AS-Unsafe，但是该行为是可选功能时（比如nftw函数中的FTW_CHDIR选项），避免使用该选项往往是一个不错的替代方案，可免去使用绝对路径名或基于文件描述符的相对路径系统调用（如openat）的麻烦。
+
+- !posix
+
+  当这个标记作为函数的MT-，AS-或AC-Safety说明出现时，表示该函数的实际安全状态与POSIX标准中规定的状态存在差异。比如POSIX不需要某个函数是安全的，但我们的实现是安全的，反之亦然。
+
+  目前而言，就算没有标记!posix，也不意味着我们文档的安全属性和POSIX对应函数的要求完全一致。
+
+- :identifier
+
+  注释有时后面会附带标识符，其用途一是将若干函数归为一组，比如，那些以不安全方式访问数据结构的函数，如race和const，二是提供更具体的信息，比如，在标记为sig的函数中指明具体的信号名称。预计将来这一机制也可能应用与lock和corrupt。
+
+  在大多数情况下，标识符用于命名一组函数，但也用于全局对象或函数参数，或与他们相关的可识别属性或逻辑组件，比如：buf(arg)用来表示与参数arg关联的缓冲区，或:tcattr(fd)用来表示文件描述服fd的终端属性。
+
+  标识符最常见的用法是提供函数和参数的逻辑分组，这些函数和参数需要相同的同步原语保护，以保证在特定的环境下的安全操作。
+
+- /condition
+
+  有些安全注释可能是有条件的，当一个包含参数，全局变量或底层内核的布尔表达式为真时才起作用。比如，/hurd或/!linux!bsd分别表示当底层内核为HURD时，或当内核既不是Linux，也不是BSD时，/hurd或/!linux!bsd前面的标记才起作用。/!ps和/one_per_line表示前面的标记只有在ps为NULL，或全局变量one_per_line是非零的才起作用。
+
+  当函数所有不安全标记都附加了条件，并且这些条件都不成立时，函数被视为安全的。
+
+### 1.2.3 Berkeley Unix（Berkeley是专有名词）
+
+The GNU C Library定义了一些功能，这些功能设施并不是标准，来自4.2 BSD，4.3 BSD和4.4 BSD Unix系统（也就是Berkeley Unix），还有SunOS（一个受欢迎的4.2 BSD的衍生版本，包含一些Unix System V的功能）。这些系统支持大多数ISO C和POSIX功能，4.4BSD和更新的SunOS系统事实上完全支持。
+
+BSD功能包括符号链接（参考 Symbolic Links），select函数（参考Waiting for Input or Output），BSD信号函数（参考BSD Signal Handling），sockets（参考Sockets）。
+
+### 1.2.4 SVID (The System V Interface Description)
+
+The System V Interface Description (SVID)是一份描述AT&T Unix System V操作系统的文档。他一定程度是POSIX的超集（全职猎人POSIX (The Portable Operating System Interface)）。
+
+The GNU C Library为了兼容System V Unix和其他Unix系统（比如SunOS）定义了大部分SVID要求的功能，但不包含ISO C或POSIX中已经有的部分。然而，许多较为冷门且实用性不强的功能并未包含。（事实上，Unix System V本身也未完全提供这些功能。）
+
+System V中支持的功能有，进程间通信与内存共享，hsearch和drand48系列函数，fmtmsg和若干数学函数。
+
+### 1.2.5 XPG (The X/Open Portability Guide)
+
+The X/Open Portability Guide，由X/Open有限公司出版，是一个比POSIX更广泛的标准。X/Open拥有Unix版权，XPG明确了想要称为Unix系统所需要的东西。
+
+The GNU C Library遵循X/Open Portability Guide，第4.2版，还有XSI (X/Open System Interface)兼容系统所共用的扩展功能，以及全部X/Open UNIX的扩展功能。
+
+在POSIX基础之上新增的功能，主要是System V和BSD系统已有的特性衍生出来的。不过，System V中真正的错误已经被修正。因为满足XPG标准和Unix扩展是活的Unix品牌认证的前提条件，这些功能大概率也会出现在商业Unix系统上。
+
+### 1.2.6 Linux (The Linux Kernel)
+
+The GNU C Library援引收录了Linux手册页6.9.1版本文档，记录了Linux内核的系统调用的用法。仅供参考，最新的Linux手册项目文档可以在Linux内核官网访问。若某一系统调用在本手册中有更具体的文档，则以更具体的文档为准。
+
+在本手册中，当提到手册页时，比如：
+
+&nbsp;&nbsp;&nbsp;&nbsp;sendmsg(2)参考Linux (The Linux Kernel)。
+
+我们此处提及的手册页，主要指上文标注的特定版本（即“规范”版），通常，在安装了该版本的系统上，可以通过命令（比如）man 2 sendmsg访问。为方便起见，我们也会提供最新版在线手册，但请注意，在线版几乎总是比“规范”版更新，因此内容也会有所差异。
+
+有关Linux系统调用接口的更多内容，可在System Calls（26.6）查看。
+
+## 1.3 使用库
+
+本节描述了在使用the GNU C Library涉及的一些实际问题。
+
+- Header Files
+- Macro Definitions of Functions
+- Reserved Names
+- Feature Test Macros
+
+### 1.3.1 头文件
+
+C程序调用的库由两部分构成：一，定义类型和宏，声明变量和函数的头文件；二，实际库文件，或归档文件，包含变量和函数的定义。
+
+（回顾一下，在C语言中，声明只是提供函数或变量存在的信息，并给出他们的类型。关于函数的声明，他的参数的类型也会提供。声明的作用是让编译器正确的处理这些变量和函数的引用。定义则不同，定义确实的给变量分配了空间，或者给出了函数的具体内容。）
+
+为了使用the GNU C Library中的功能，你应该确保你的源文件包含正确的头文件。这样编译器就可以访问这些功能的声明，并且可以正确的处理他们的引用。当你的程序被编译，链接器会解析引用到归档文件（实际的库文件）提供的定义上。
+
+头文件通过“#include”预处理指令引入到源文件中。C语言支持两种这种指令的形式；第一种，
+```c
+#include "header"
+```
+通常用于引入你自己写的头文件；这个会包含你的项目的各个部分的接口之间的定义和声明。对应的，
+```c
+#include<file.h>
+```
+通常用于引入标注库的头文件file.h，包含了定义和声明。这个文件一般被系统管理员安装到标准目录中。你应该使用第二种形式来引用C标准库的头文件。
+
+通常，“#include”指令应该放在源文件顶部，在所有代码之前。如果你的源文件在开头放了一些解释这个文件中有什么代码的注释（好习惯），将“#include”指令紧跟在后面，并跟在功能测试宏定义后面（参考Feature Test Macros（1.3.4））。
+
+有关使用头文件和“#include”指令的更多信息，请参考The GNU C Preprocessor Manual中的Header Files章节。
+
+The GNU C Library提供多个头文件，每个都包含了与一组相关功能有关的类型和宏定义，变量和函数的声明。这意味着你的程序可能需要引入多个头文件，取决于你具体要使用哪些功能。
+
+有些库头文件自动引入了其他库头文件。然而，从编程风格角度，你不应该以来这个；最好显式引用你所使用的功能需要的所有的头文件。The GNU C Library头文件也是这样写的，不过不小心引用了多次相同的头文件没什么关系；第二次引用相同的头文件没有任何作用。同理，当你的程序需要使用引用多个不同头文件，引用他们的顺序并不重要。
+
+兼容性说明：在任何ISO C实现中，按任何顺序引用任何标准头文件，引用任意次数，都能正常运行。然而，传统上并非如此，在一些老的C实现中。
+
+严格来说，你没必要为了使用一个头文件中声明的函数去引用那个头文件；你可以自己显式的声明那个函数，根据规范。但是，通常，更建议引用头文件，因为头文件可能定义了类型和宏，而其他地方没有，又，头文件可能给某些函数定义了更高效的宏替代版本。使用头文件也是一种确保声明无误的做法。
