@@ -445,3 +445,72 @@ In addition, some individual header files reserve names beyond those that they a
 
 这套机制的存在，是为了使库兼容多个标准。虽然不同的标准总是被描述为彼此的超集，他们通常互不兼容，因为大的标准需要的函数名，较小的标准把他们保留给客户使用了。这并非吹毛求疵——在实际应用中确实层引发过问题。例如，一些非GNU程序定义了名为getline，和本库函数中的getline毫无关系。如果不加区分的启用所有功能，这些程序将无法通过编译。
 
+这不应被用来验证程序是否符合某个标准。这不能达到这个目的，因为他无法保护你引入标准之外的头文件，或者依赖标准未定义的语意。
+
+宏：_POSIX_SOURCE
+
+<div style="margin: 0 0 0 3em;">
+如果你定义了这个宏，POSIX.1标准和ISO C标准的功能都支持。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+如果你将宏_POSIX_C_SOURCE定义为一个正数，_POSIX_SOURCE的状态无关紧要。
+</div>
+
+宏：_POSIX_C_SOURCE
+
+<div style="margin: 0 0 0 3em;">
+将此宏定义为一个正数，以控制哪些POSIX功能可用。数值越大，可用的功能就越多。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+大于等于1时，1990版POSIX.1标准。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+大于等于2时，1992版POSIX.2标准。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+大于等于199309L时，1993版POSIX.1b标准。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+大于等于199506L时，1995版POSIX.1c标准。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+大于等于200112L时，2001版POSIX标准。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+大于等于200809L时，2008版POSIX标准。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+大于等于202405L时，2024版POSIX标准。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+更大的_POSIX_C_SOURCE值将启用未来的扩展。POSIX标准会根据需要，定义这些值，在他们成为标准后的一段时间后，the GNU C Library应该会支持他们。1996版POSIX.1标准规定，如果将_POSIX_C_SOURCE定义为大于或等于199506L的值，即可启用1996版的功能。一般来说，在the GNU C Library中，对标准的bug修复会包含在对应的版本中；比如，200112L包含了POSIX.1-2004的内容。
+</div>
+
+宏：_XOPEN_SOURCE
+
+宏：_XOPEN_SOURCE_EXTENDED
+
+<div style="margin: 0 0 0 3em;">
+如果你定义了这个宏，XPG（X/Open Portability Guide）的功能将会被引入。这是POSIX.1和POSIX.2功能的超集，事实上，_POSIX_SOURCE和_POSIX_C_SOURCE会自动定义。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+作为对所有Unix系统的统一，该宏还包含了仅在BSD和SVID中可用的功能。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+如果_XOPEN_SOURCE_EXTENDED也被定义了，会有更多可用的函数。这使X/Open Unix品牌认证所需要的所有功能函数都可用了。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+If the macro _XOPEN_SOURCE has the value 500 this includes all functionality described so far plus some new definitions from the Single Unix Specification, version 2. The value 600 (corresponding to the sixth revision) includes definitions from SUSv3, and using 700 (the seventh revision) includes definitions from SUSv4. The value 800 includes definitions from POSIX.1-2024.
+</div>
