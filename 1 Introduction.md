@@ -31,10 +31,15 @@ The GNU C Library包含几个头文件，分别提供相关功能的定义和声
 参考Summary of Library Facilities（附录B），字母排序的the library提供的函数和其他符号列表。这个列表也标出了各个函数和符号出自什么标准。
 
 - ISO C
+
 - POSIX (The Portable Operating System Interface)
+
 - Berkeley Unix
+
 - SVID (The System V Interface Description)
+
 - XPG (The X/Open Portability Guide)
+
 - Linux (The Linux Kernel)
 
 ### 1.2.1 ISO C标准
@@ -511,6 +516,264 @@ In addition, some individual header files reserve names beyond those that they a
 如果_XOPEN_SOURCE_EXTENDED也被定义了，会有更多可用的函数。这使X/Open Unix品牌认证所需要的所有功能函数都可用了。
 </div>
 
-<div style="margin: 0 0 0 3em;">
-If the macro _XOPEN_SOURCE has the value 500 this includes all functionality described so far plus some new definitions from the Single Unix Specification, version 2. The value 600 (corresponding to the sixth revision) includes definitions from SUSv3, and using 700 (the seventh revision) includes definitions from SUSv4. The value 800 includes definitions from POSIX.1-2024.
+<div style="margin: 0 0 1em 3em;">
+如果宏_XOPEN_SOURCE的值为500，则包含迄今为止描述的所有功能，以及来自单一Unix规范，第2版的一些新定义。值600（对应第6次修订）包含SUSv3的定义，值700（对应第7次修订）包含SUSv4的定义。值800包含POSIX.1-2024的定义。
 </div>
+
+宏：_LARGEFILE_SOURCE
+
+<div style="margin: 0 0 0 3em;">
+如果这个宏被定义了，一些额外的函数就可用了，这些函数弥补了以往所有标准中的一些不足。具体的，fseeko和ftello函数将会变得可用。若缺少这些函数，ISO C接口（fseek，ftell）和底层POSIX接口（lseek）之间的差异将会引发问题。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+这个宏是作为大文件支持扩展（LFS）的一部分而引入的。
+</div>
+
+宏：_LARGEFILE64_SOURCE
+
+<div style="margin: 0 0 0 3em;">
+如果你定义了这个宏，一组额外的函数将可用，使32位系统能够使用大小超过2GB的文件，而通常是限制2GB以内的。如果系统不支持那么大的文件，那么这个接口就没用。在自然文件大小限制大于2GB的系统上（比如，64位系统），新的函数和被代替的函数完全等价。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+新的功能通过一组新的类型和函数提供，用以代替现有的。这些新对象的名字包含64，表明其用途，例如，off_t和off64_t，fseeko和fseeko64。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+这个宏是作为大文件支持扩展（LFS）的一部分而引入的。他是一个过渡性接口，适用于64位偏移量尚未被普遍常用的时期（参考_FILE_OFFSET_BITS）。
+</div>
+
+宏：_FILE_OFFSET_BITS
+
+<div style="margin: 0 0 0 3em;">
+这个宏决定了使用哪些文件系统接口，即一种接口替代另一种接口。_LARGEFILE64_SOURCE是将64位接口作为附加接口提供，而_FILE_OFFSET_BITS则允许64位接口直接取代旧接口。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+如果_FILE_OFFSET_BITS定义为32，将启用32位接口，off_t类型将会有32位，在32位系统上。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+如果宏定义为64，则大文件接口将替代旧接口。也就是说，这些函数不会以不同的名称提供（比如_LARGEFILE64_SOURCE那样）。相反，旧的函数名现在指向新的函数，例如，现在调用fseeko实际上调用fseeko64。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+如果这个宏没有被定义，就目前来说，则他的默认值为32，但这个默认值的改变已经在准备了，因为为了Y2038安全需要更新time_t，因此程序不应该依赖默认值。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+This macro should only be selected if the system provides mechanisms for handling large files. On 64 bit systems this macro has no effect since the *64 functions are identical to the normal functions.只有系统提供了处理大文件处理机制时，才应定义此宏。在64位系统上，*64函数（以64结尾的函数）和普通函数完全相同，所以这个宏完全没用。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+这个宏是作为大文件支持扩展（LFS）的一部分而引入的。
+</div>
+
+宏：_TIME_BITS
+
+<div style="margin: 0 0 0 3em;">
+定义这个宏可以控制time_t的位宽，还有所有time_t衍生类型的位宽，还有所有相关函数的原型。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+
+1. 如果_TIME_BITS未定义，time_t的位宽取决于具体架构。目前，在多数架构中，默认为64位。然而，在一些传统架构上（i686，ARM），默认为32位，这个装备修改了，程序不应该依赖默认值。
+
+2. 如果_TIME_BITS定义为64，time_t将被定义为64位整数。在time_t为32位的传统平台上，对相关的系统调用取决于系统所运行的Linux内核版本。Linux内核版本5.1以上的，使用支持64位时间的系统调用。否则，将使用基于旧式（即32位）系统调用的回退代码。
+
+    在此类平台中，the GNU C Library将会同时定义__USE_TIME64_REDIRECTS来指明是否会被替换为其他形式（通过重定义符号名称或使用符号别名来实现）。比如，clock_gettime可能会被替换为__clock_gettime64。
+
+3. 如果_TIME_BITS被定义为32，time_t就会被定义为32位整数，如果支持的话。但这并不推荐，因为32位的time_t会在2038年停止工作。
+
+4. 对于任何其他使用场景，都会产生编译时错误。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+只有_FILE_OFFSET_BITS=64时，_TIME_BITS=64才有用。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+通过使用此宏，某些移植版本能够获得64位时间支持，从而免受2038年问题的影响。
+</div>
+
+宏：_ISOC99_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则会包含ISO C99的特性。由于这些特性默认包含，因此该宏主要在编译器使用较早的语言版本时才有实际意义。
+</div>
+
+宏：_ISOC11_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了这个宏，则会包含ISO C11对ISO C99的扩展特性。
+</div>
+
+宏：_ISOC23_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则包含ISO C23对ISO C11的扩展。the GNU C Library仅支持该草案标准中的部分特性。同时也支持旧的名称_ISOC2X_SOURCE。
+</div>
+
+宏：_ISOC2Y_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将包含ISO C2Y对ISO C23的扩展。the GNU C Library仅支持该草案标准中的部分特性。
+</div>
+
+宏：__STDC_WANT_LIB_EXT2__
+
+<div style="margin: 0 0 1em 3em;">
+如果将此宏定义为1，则将启用ISO/IEC TR 24731-2:2010（动态分配函数(Dynamic Allocation Functions)）中的特性。the GNU C Library仅支持该技术报告（Technical Report，TR）中的部分特性。
+</div>
+
+宏：__STDC_WANT_IEC_60559_BFP_EXT__
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将启用ISO/IEC TS 18661-1:2014（C语言浮点扩展：二进制浮点算数(Floating-point extensions for C: Binary floating-point arithmetic)）中的特性。the GNU C Library仅支持该技术规范（Technical Specification，TS）中的部分特性。
+</div>
+
+宏：__STDC_WANT_IEC_60559_FUNCS_EXT__
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将启用ISO/IEC TS 18661-4:2015（C 语言浮点扩展：补充函数(Floating-point extensions for C: Supplementary functions)）中的特性。the GNU C Library仅支持该技术规范（Technical Specification，TS）中的部分特性。
+</div>
+
+宏：__STDC_WANT_IEC_60559_TYPES_EXT__
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将启用ISO/IEC TS 18661-3:2015（C语言浮点扩展：交换类型与扩展类型(Floating-point extensions for C: Interchange and extended types)）中的特性。the GNU C Library仅支持该技术规范（Technical Specification，TS）中的部分特性。
+</div>
+
+宏：__STDC_WANT_IEC_60559_EXT__
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将启用附录F中定义的ISO C23特性。这会影响totalorder函数以及与NaN有效载荷相关的函数的声明。
+</div>
+
+宏：_GNU_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将包含所有特性：ISO C89、ISO C99、POSIX.1、POSIX.2、BSD、SVID、X/Open、LFS以及GNU扩展。当POSIX.1与BSD的定义发生冲突时，以POSIX.1的定义为准。
+</div>
+
+宏：_DEFAULT_SOURCE
+
+<div style="margin: 0 0 0 3em;">
+如果定义了此宏，则将包含大多数特性，除了X/Open，LFS和GNU扩展：其作用是启用POSIX 2008版中的特性，以及某些BSD和SVID特性，且无需通过单独的特性测试宏来控制他们。
+</div>
+
+<div style="margin: 0 0 0 3em;">
+请注意，编译器选项也会影响所包含的特性：
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+- 如果你使用了严格一致性选项（strict conformance option），那么超出编译器语言版本范围的特性将被禁用，不过仍可通过特性测试宏来启用他们。
+
+- 由编译器选项启用的特性不会被特性测试宏覆盖。
+</div>
+
+宏：_ATFILE_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将包含额外的*at接口。
+</div>
+
+宏：_FORTIFY_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果将此宏定义为1，则会为多个库函数添加安全加固机制。如果定义为2，则会应用更严格的检查。如果定义为3，the GNU C Library还可能启用会带来额外性能开销的检查。参考D.2 Fortification of function calls。
+</div>
+
+宏：_DYNAMIC_STACK_SIZE_SOURCE
+
+<div style="margin: 0 0 1em 3em;">
+如果定义了此宏，则将定义正确的（但不是编译期常量）的MINSIGSTKSZ、SIGSTKSZ 和 PTHREAD_STACK_MIN。
+</div>
+
+宏：_REENTRANT
+
+宏：_THREAD_SAFE
+
+<div style="margin: 0 0 1em 3em;">
+这些宏已过时。他们的效果等同于将_POSIX_C_SOURCE定义为199506L。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+一些古老的C语言库需要这两个宏中其中一个被定义，以使基本功能（例如getchar）具备线程安全性。
+</div>
+
+我们推荐你在新程序中使用_GNU_SOURCE。如果你不指定GCC的“-ansi”选项，或者其他一致性选项，比如-std=c99，并且不显式定义上面的任何宏，则其效果等同于将_DEFAULT_SOURCE定义为1。
+
+当你定义了一个功能测试宏以请求更大范围的功能时，再定义一个功能测试宏以请求这些功能的子集时无害的。比如，你定义了_POSIX_C_SOURCE，再定义_POSIX_SOURCE则没有影响。又或者，你定义了_GNU_SOURCE，那么定义_POSIX_SOURCE或者_POSIX_C_SOURCE也没用。
+
+## 1.4 手册路线图
+
+这里是这个手册中剩余其他章节内容的总览。
+
+- 2 Error Reporting，描述了库检测到的错误是如何报告的。
+
+- 3 Virtual Memory Allocation And Paging，描述了the GNU C Library的管理和使用虚拟和物理内存的功能，包括虚拟内存的动态分配。如果你事先不知道程序需要多少内存，可以选择动态分配内存，并通过指针对其进行操作。
+
+- 4 Character Handling，包含有关字符分类函数（如isspace）以及大小写转换函数的信息。
+
+- 5 String and Array Utilities，描述了操作字符串（以空字符结尾的字符数组）和通用字节数组的函数，包括复制和比较等操作。
+
+- 6 Character Set Handling，包含有关使用超过常规char类型容纳范围的更大字符集来操作字符和字符串的信息。
+
+- 7 Locales and Internationalization，描述了如何选择特定的国家或语言来影响库的行为。例如，区域设置会影响字符串的排序规则以及货币值的格式化方式。
+
+- 9 Searching and Sorting，包含关于数组搜索和排序函数的信息。通过提供适当的比较函数，你可以再任何类型的数组中使用这些函数。
+
+- 10 Pattern Matching，介绍了用于匹配正则表达式和shell文件名模式的函数，以及实现类似shell单词展开功能（这个有点类似语法糖的意思，比如*.c，代表的是该文件夹下所有c文件）的函数。
+
+- 11 Input/Output Overview，提供库中输入和输出功能的一个总览，还包含了一些基础概念的信息，比如文件名。
+
+- 12 Input/Output on Streams，表述了涉及流（也可以说FILE *对象）的I/O操作。这些是stdio.h中的标准C库函数。
+
+- 13 Low-Level Input/Output（底层输入/输出），包含关于对文件描述符的I/O操作的信息。文件描述符是Unix系列操作系统上特有的底层机制。
+
+- 14 File System Interface，描述了对整个文件系统进行的操作，比如删除和重命名，还有新建文件夹。这个章节还包含了你该如何获取文件的属性，比如拥有者和文件保护模式，的方法。
+
+- 15 Pipes and FIFOs，介绍了简单进程间通信机制。Pipes允许两个相关进程之间的通信（比如父子），而FIFOs允许在同一台机器上共享同一个文件系统的不同进程之间进行通信。
+
+- 16 Sockets，描述了一种更复杂的进程间通信机制，这允许不同机器上允许的进程可以通过网络进行通信。这个章节也包含了互联网主机寻址以及如何使用系统网络数据库（这不是后端开发中的数据库，这里的想表达的意思只是可以通过一些函数直接获取系统网络的数据，而不用手动去读文件）。
+
+- 17 Low-Level Terminal Interface，描述了可以如何修改终端设备的属性。例如，你想关闭用户输入字符的反馈，那就去读这个章节。
+
+- 19 Mathematics，包含了数学库函数的信息。例如，随机数生成器，整数取余函数，浮点数三角函数和指数函数。
+
+- 20 Low-Level Arithmetic Functions，描述了基本算数运算，浮点数值分析，以及从字符串中解析数字的函数。
+
+- 22 Date and Time，描述了衡量日期和CPU时间的函数，以及设置闹钟和定时器的函数。
+
+- 24 Non-Local Exits，描述了setjmp和longjmp函数。这些函数提供了一种类似goto的功能，可以从一个函数跳转到另一个。
+
+- 25 Signal Handling，介绍了signal的全部——他们是什么，怎么创建一个信号处理器，以及如何在程序的关键代码段中屏蔽信号以防止其干扰。
+
+- 26 The Basic Program/System Interface，介绍了你的程序怎么访问他们的命令行参数和系统变量。
+
+- 27 Processes，介绍了如何开启新线程和运行程序。
+
+- 29 Job Control，描述了用于操作进程组和控制终端的函数。这部分内容可以能仅对编写shell或其他需要专门处理作业控制的程序的开发者有参考价值。
+
+- 30 System Databases and Name Service Switch，ented so that contributors can design their own services.描述了可用于查询系统数据库中名称的各类服务，如何确定个数据库所使用的具体服务，以及这些服务是专门实现的，以便贡献者能够设计自己的服务。
+
+- 31.13 User Database，31.14 Group Database，介绍了如何访问系统用户和组数据库。
+
+- 32 System Management, describes functions for controlling and getting information about the hardware and software configuration your program is executing under.描述了控制和获取有关于你的程序所运行在的硬件和软件的配置信息的函数。
+
+- 33 System Configuration Parameters，介绍了如何获取各种操作系统限制的相关信息。许多相关参数是为了POSIX的兼容性提供的。
+
+- 附录A C Language Facilities in the Library，contains information about library support for standard parts of the C language, including things like the sizeof operator and the symbolic constant NULL, how to write functions accepting variable numbers of arguments, and constants describing the ranges and other properties of the numerical types. There is also a simple debugging mechanism which allows you to put assertions in your code, and have diagnostic messages printed if the tests fail.提到了有关C语言标准库的支持信息，包括sizeof操作符和符号常量NULL，如何写出参量数量可变的函数，以及描述数值类型的取值范围和数值类型的其他属性的常量。还提到了一种基本的debug机制，允许你在代码中插入断言，并在检查失败时输出诊断信息。
+
+- 附录B Summary of Library Facilities, gives a summary of all the functions, variables, and macros in the library, with complete data types and function prototypes, and says what standard or system each is derived from.给出了库中所有函数，变量，宏的概览，以及完整的数据类型和函数原型，并说明了每一项所来自的标准或系统。
+
+- 附录C Installing the GNU C Library，介绍了如何在你的系统上构建和安装the GNU C Library，以及如何反馈bug。
+
+- 附录D Library Maintenance，介绍了如何增加新函数，或将此库移植到新系统。
+
+如果你已经知道你感兴趣的功能的名称，你可以在附录B Summary of Library Facilities中查找。该附录提供相关语法的概览，以及哪里可以找到更详细的描述。当你只想知道参数的顺序和类型时，该附录尤为实用。该附录还介绍了每一个函数，变量，或宏所来自的标准或系统。
+
+这是The GNU C Library Reference Manual，版本2.44。
