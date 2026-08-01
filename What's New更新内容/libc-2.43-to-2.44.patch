@@ -1,0 +1,2088 @@
+--- 2.43/html_mono/libc.html	2026-08-01 10:09:38.728291900 +0800
++++ 2.44/html_mono/libc.html	2026-08-01 10:09:39.188737100 +0800
+@@ -5,7 +5,7 @@
+ <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+ <!-- This is
+ The GNU C Library Reference Manual, for version
+-2.43.
++2.44.
+ 
+ Copyright © 1993-2026 Free Software Foundation, Inc.
+ 
+@@ -91,7 +91,7 @@
+ 
+ <p>This is
+ <cite class="cite">The GNU C Library Reference Manual</cite>, for version
+-2.43.
++2.44.
+ </p>
+ <p>Copyright &copy; 1993&ndash;2026 Free Software Foundation, Inc.
+ </p>
+@@ -230,14 +230,15 @@
+       <ul class="toc-numbered-mark">
+         <li><a id="toc-Basic-Memory-Allocation" href="#Basic-Allocation">3.2.3.1 Basic Memory Allocation</a></li>
+         <li><a id="toc-Examples-of-malloc" href="#Malloc-Examples">3.2.3.2 Examples of <code class="code">malloc</code></a></li>
+-        <li><a id="toc-Freeing-Memory-Allocated-with-malloc" href="#Freeing-after-Malloc">3.2.3.3 Freeing Memory Allocated with <code class="code">malloc</code></a></li>
+-        <li><a id="toc-Changing-the-Size-of-a-Block" href="#Changing-Block-Size">3.2.3.4 Changing the Size of a Block</a></li>
+-        <li><a id="toc-Allocating-Cleared-Space" href="#Allocating-Cleared-Space">3.2.3.5 Allocating Cleared Space</a></li>
+-        <li><a id="toc-Allocating-Aligned-Memory-Blocks" href="#Aligned-Memory-Blocks">3.2.3.6 Allocating Aligned Memory Blocks</a></li>
+-        <li><a id="toc-Malloc-Tunable-Parameters" href="#Malloc-Tunable-Parameters">3.2.3.7 Malloc Tunable Parameters</a></li>
+-        <li><a id="toc-Heap-Consistency-Checking" href="#Heap-Consistency-Checking">3.2.3.8 Heap Consistency Checking</a></li>
+-        <li><a id="toc-Statistics-for-Memory-Allocation-with-malloc" href="#Statistics-of-Malloc">3.2.3.9 Statistics for Memory Allocation with <code class="code">malloc</code></a></li>
+-        <li><a id="toc-Summary-of-malloc_002dRelated-Functions" href="#Summary-of-Malloc">3.2.3.10 Summary of <code class="code">malloc</code>-Related Functions</a></li>
++        <li><a id="toc-Portable-Memory-Allocation" href="#Portable-Allocation">3.2.3.3 Portable Memory Allocation</a></li>
++        <li><a id="toc-Freeing-Memory-Allocated-with-malloc" href="#Freeing-after-Malloc">3.2.3.4 Freeing Memory Allocated with <code class="code">malloc</code></a></li>
++        <li><a id="toc-Changing-the-Size-of-a-Block" href="#Changing-Block-Size">3.2.3.5 Changing the Size of a Block</a></li>
++        <li><a id="toc-Allocating-Cleared-Space" href="#Allocating-Cleared-Space">3.2.3.6 Allocating Cleared Space</a></li>
++        <li><a id="toc-Allocating-Aligned-Memory-Blocks" href="#Aligned-Memory-Blocks">3.2.3.7 Allocating Aligned Memory Blocks</a></li>
++        <li><a id="toc-Malloc-Tunable-Parameters" href="#Malloc-Tunable-Parameters">3.2.3.8 Malloc Tunable Parameters</a></li>
++        <li><a id="toc-Heap-Consistency-Checking" href="#Heap-Consistency-Checking">3.2.3.9 Heap Consistency Checking</a></li>
++        <li><a id="toc-Statistics-for-Memory-Allocation-with-malloc" href="#Statistics-of-Malloc">3.2.3.10 Statistics for Memory Allocation with <code class="code">malloc</code></a></li>
++        <li><a id="toc-Summary-of-malloc_002dRelated-Functions" href="#Summary-of-Malloc">3.2.3.11 Summary of <code class="code">malloc</code>-Related Functions</a></li>
+       </ul></li>
+       <li><a id="toc-Allocation-Debugging" href="#Allocation-Debugging">3.2.4 Allocation Debugging</a>
+       <ul class="toc-numbered-mark">
+@@ -1193,12 +1194,18 @@
+     <ul class="toc-numbered-mark">
+       <li><a id="toc-Querying-information-for-loaded-objects" href="#Querying-information-for-loaded-objects">37.3.1 Querying information for loaded objects</a></li>
+     </ul></li>
+-    <li><a id="toc-Avoiding-Unexpected-Issues-With-Dynamic-Linking" href="#Dynamic-Linker-Hardening">37.4 Avoiding Unexpected Issues With Dynamic Linking</a>
++    <li><a id="toc-Indirect-Functions" href="#Indirect-Functions">37.4 Indirect Functions</a>
+     <ul class="toc-numbered-mark">
+-      <li><a id="toc-Restricted-Dynamic-Linker-Features" href="#Restricted-Dynamic-Linker-Features">37.4.1 Restricted Dynamic Linker Features</a></li>
+-      <li><a id="toc-Producing-Matching-Binaries" href="#Producing-Matching-Binaries">37.4.2 Producing Matching Binaries</a></li>
+-      <li><a id="toc-Checking-Binaries" href="#Checking-Binaries">37.4.3 Checking Binaries</a></li>
+-      <li><a id="toc-Run_002dtime-Considerations" href="#Run_002dtime-Considerations">37.4.4 Run-time Considerations</a></li>
++      <li><a id="toc-IFUNC-Resolver-Calling-Conventions" href="#IFUNC-Resolver-Calling-Conventions">37.4.1 IFUNC Resolver Calling Conventions</a></li>
++      <li><a id="toc-When-IFUNC-Resolvers-Run" href="#When-IFUNC-Resolvers-Run">37.4.2 When IFUNC Resolvers Run</a></li>
++      <li><a id="toc-Supported-Functionality-in-IFUNC-Resolvers" href="#Supported-Functionality-in-IFUNC-Resolvers">37.4.3 Supported Functionality in IFUNC Resolvers</a></li>
++    </ul></li>
++    <li><a id="toc-Avoiding-Unexpected-Issues-With-Dynamic-Linking" href="#Dynamic-Linker-Hardening">37.5 Avoiding Unexpected Issues With Dynamic Linking</a>
++    <ul class="toc-numbered-mark">
++      <li><a id="toc-Restricted-Dynamic-Linker-Features" href="#Restricted-Dynamic-Linker-Features">37.5.1 Restricted Dynamic Linker Features</a></li>
++      <li><a id="toc-Producing-Matching-Binaries" href="#Producing-Matching-Binaries">37.5.2 Producing Matching Binaries</a></li>
++      <li><a id="toc-Checking-Binaries" href="#Checking-Binaries">37.5.3 Checking Binaries</a></li>
++      <li><a id="toc-Run_002dtime-Considerations" href="#Run_002dtime-Considerations">37.5.4 Run-time Considerations</a></li>
+     </ul></li>
+   </ul></li>
+   <li><a id="toc-Internal-probes" href="#Internal-Probes">38 Internal probes</a>
+@@ -1208,13 +1215,15 @@
+   </ul></li>
+   <li><a id="toc-Tunables" href="#Tunables">39 Tunables</a>
+   <ul class="toc-numbered-mark">
+-    <li><a id="toc-Tunable-names" href="#Tunable-names">39.1 Tunable names</a></li>
+-    <li><a id="toc-Memory-Allocation-Tunables" href="#Memory-Allocation-Tunables">39.2 Memory Allocation Tunables</a></li>
+-    <li><a id="toc-Dynamic-Linking-Tunables" href="#Dynamic-Linking-Tunables">39.3 Dynamic Linking Tunables</a></li>
+-    <li><a id="toc-POSIX-Thread-Tunables" href="#POSIX-Thread-Tunables">39.4 POSIX Thread Tunables</a></li>
+-    <li><a id="toc-Hardware-Capability-Tunables" href="#Hardware-Capability-Tunables">39.5 Hardware Capability Tunables</a></li>
+-    <li><a id="toc-Memory-Related-Tunables" href="#Memory-Related-Tunables">39.6 Memory Related Tunables</a></li>
+-    <li><a id="toc-gmon-Tunables" href="#gmon-Tunables">39.7 gmon Tunables</a></li>
++    <li><a id="toc-System_002dwide-Tunables" href="#System_002dwide-Tunables">39.1 System-wide Tunables</a></li>
++    <li><a id="toc-Tunable-names" href="#Tunable-names">39.2 Tunable names</a></li>
++    <li><a id="toc-Memory-Allocation-Tunables" href="#Memory-Allocation-Tunables">39.3 Memory Allocation Tunables</a></li>
++    <li><a id="toc-Dynamic-Linking-Tunables" href="#Dynamic-Linking-Tunables">39.4 Dynamic Linking Tunables</a></li>
++    <li><a id="toc-POSIX-Thread-Tunables" href="#POSIX-Thread-Tunables">39.5 POSIX Thread Tunables</a></li>
++    <li><a id="toc-Hardware-Capability-Tunables" href="#Hardware-Capability-Tunables">39.6 Hardware Capability Tunables</a></li>
++    <li><a id="toc-Memory-Related-Tunables" href="#Memory-Related-Tunables">39.7 Memory Related Tunables</a></li>
++    <li><a id="toc-gmon-Tunables" href="#gmon-Tunables">39.8 gmon Tunables</a></li>
++    <li><a id="toc-ELF-Tunables" href="#ELF-Tunables">39.9 ELF Tunables</a></li>
+   </ul></li>
+   <li><a id="toc-C-Language-Facilities-in-the-Library" href="#Language-Features">Appendix A C Language Facilities in the Library</a>
+   <ul class="toc-numbered-mark">
+@@ -2774,9 +2783,13 @@
+ call to <code class="code">fseeko</code> now indeed calls <code class="code">fseeko64</code>.
+ </p>
+ <p>If the macro is not defined it currently defaults to <code class="code">32</code>, but
+-this default is planned to change due to a need to update
+-<code class="code">time_t</code> for Y2038 safety, and applications should not rely on
+-the default.
++this default is planned to change in the future.  This is because
++<code class="code">_TIME_BITS=64</code> (required for <code class="code">time_t</code> Y2038 safety) can
++only be used together with <code class="code">_FILE_OFFSET_BITS=64</code>.  When systems
++migrate to 64-bit <code class="code">time_t</code> by default, <code class="code">_FILE_OFFSET_BITS</code>
++will also need to default to <code class="code">64</code>, even for applications that
++do not handle large files.  Applications should not rely on the
++current default.
+ </p>
+ <p>This macro should only be selected if the system provides mechanisms for
+ handling large files.  On 64&nbsp;bit<!-- /@w --> systems this macro has no effect
+@@ -3229,11 +3242,18 @@
+ reserved names.  See <a class="xref" href="#Reserved-Names">Reserved Names</a>.
+ </p>
+ <p>The error code values are all positive integers and are all distinct,
+-with one exception: <code class="code">EWOULDBLOCK</code> and <code class="code">EAGAIN</code> are the same.
+-Since the values are distinct, you can use them as labels in a
+-<code class="code">switch</code> statement; just don&rsquo;t use both <code class="code">EWOULDBLOCK</code> and
+-<code class="code">EAGAIN</code>.  Your program should not make any other assumptions about
++so they can be used as labels in a <code class="code">switch</code> statement.
++Your program should not make any other assumptions about
+ the specific values of these symbolic constants.
++There are two exceptions to this rule:
++</p><ul class="itemize mark-bullet">
++<li>The values of <code class="code">EAGAIN</code> and <code class="code">EWOULDBLOCK</code> are
++equal on every supported operating system.
++</li><li>The values of <code class="code">ENOTSUP</code> and <code class="code">EOPNOTSUPP</code> are equal
++on some supported operating systems, for example GNU/Linux.
++</li></ul>
++<p>To make your program portable, you should check for both codes and
++treat them the same.
+ </p>
+ <p>The value of <code class="code">errno</code> doesn&rsquo;t necessarily have to correspond to any
+ of these macros, since some library functions might return other error
+@@ -3602,8 +3622,7 @@
+ <a class="index-entry-id" id="index-Resource-temporarily-unavailable"></a>
+ <p>&ldquo;Resource temporarily unavailable.&rdquo;
+ The call might work if you try again
+-later.  The macro <code class="code">EWOULDBLOCK</code> is another name for <code class="code">EAGAIN</code>;
+-they are always the same in the GNU C Library.
++later.
+ </p>
+ <p>This error can happen in a few different situations:
+ </p>
+@@ -3613,12 +3632,6 @@
+ until some external condition makes it possible to read, write, or
+ connect (whatever the operation).  You can use <code class="code">select</code> to find out
+ when the operation will be possible; see <a class="pxref" href="#Waiting-for-I_002fO">Waiting for Input or Output</a>.
+-
+-<p><strong class="strong">Portability Note:</strong> In many older Unix systems, this condition
+-was indicated by <code class="code">EWOULDBLOCK</code>, which was a distinct error code
+-different from <code class="code">EAGAIN</code>.  To make your program portable, you should
+-check for both codes and treat them the same.
+-</p>
+ </li><li>A temporary resource shortage made an operation impossible.  <code class="code">fork</code>
+ can return this error.  It indicates that the shortage is expected to
+ pass, so your program can try the call again later and it may succeed.
+@@ -3628,7 +3641,11 @@
+ so usually an interactive program should report the error to the user
+ and return to its command loop.
+ </li></ul>
+-</dd></dl>
++
++<p><strong class="strong">Portability Note:</strong> In the GNU C Library,
++<code class="code">EAGAIN</code> and <code class="code">EWOULDBLOCK</code> are equal.
++Portable code should check for both errors and treat them the same.
++</p></dd></dl>
+ 
+ <dl class="first-deftypevr def-block">
+ <dt class="deftypevr def-line" id="index-EWOULDBLOCK"><span class="category-def">Macro: </span><span><code class="def-type">int</code> <strong class="def-name">EWOULDBLOCK</strong><a class="copiable-link" href="#index-EWOULDBLOCK"> &para;</a></span></dt>
+@@ -3636,10 +3653,6 @@
+ <a class="index-entry-id" id="index-Operation-would-block"></a>
+ <p>&ldquo;Operation would block.&rdquo;
+ In the GNU C Library, this is another name for <code class="code">EAGAIN</code> (above).
+-The values are always the same, on every operating system.
+-</p>
+-<p>C libraries in many older Unix systems have <code class="code">EWOULDBLOCK</code> as a
+-separate error code.
+ </p></dd></dl>
+ 
+ <dl class="first-deftypevr def-block">
+@@ -3729,6 +3742,10 @@
+ error can happen for many calls when the object does not support the
+ particular operation; it is a generic indication that the server knows
+ nothing to do for that call.
++</p>
++<p><strong class="strong">Portability Note:</strong> Depending on the operating system, the
++values of <code class="code">EOPNOTSUPP</code> and <code class="code">ENOTSUP</code> may be equal.
++Portable code should check for both errors and treat them the same.
+ </p></dd></dl>
+ 
+ <dl class="first-deftypevr def-block">
+@@ -4082,6 +4099,10 @@
+ </p>
+ <p>If the entire function is not available at all in the implementation,
+ it returns <code class="code">ENOSYS</code> instead.
++</p>
++<p><strong class="strong">Portability Note:</strong> Depending on the operating system, the
++values of <code class="code">EOPNOTSUPP</code> and <code class="code">ENOTSUP</code> may be equal.
++Portable code should check for both errors and treat them the same.
+ </p></dd></dl>
+ 
+ <dl class="first-deftypevr def-block">
+@@ -5510,13 +5531,14 @@
+ <ul class="mini-toc">
+ <li><a href="#Basic-Allocation" accesskey="1">Basic Memory Allocation</a></li>
+ <li><a href="#Malloc-Examples" accesskey="2">Examples of <code class="code">malloc</code></a></li>
+-<li><a href="#Freeing-after-Malloc" accesskey="3">Freeing Memory Allocated with <code class="code">malloc</code></a></li>
+-<li><a href="#Changing-Block-Size" accesskey="4">Changing the Size of a Block</a></li>
+-<li><a href="#Allocating-Cleared-Space" accesskey="5">Allocating Cleared Space</a></li>
+-<li><a href="#Aligned-Memory-Blocks" accesskey="6">Allocating Aligned Memory Blocks</a></li>
+-<li><a href="#Malloc-Tunable-Parameters" accesskey="7">Malloc Tunable Parameters</a></li>
+-<li><a href="#Heap-Consistency-Checking" accesskey="8">Heap Consistency Checking</a></li>
+-<li><a href="#Statistics-of-Malloc" accesskey="9">Statistics for Memory Allocation with <code class="code">malloc</code></a></li>
++<li><a href="#Portable-Allocation" accesskey="3">Portable Memory Allocation</a></li>
++<li><a href="#Freeing-after-Malloc" accesskey="4">Freeing Memory Allocated with <code class="code">malloc</code></a></li>
++<li><a href="#Changing-Block-Size" accesskey="5">Changing the Size of a Block</a></li>
++<li><a href="#Allocating-Cleared-Space" accesskey="6">Allocating Cleared Space</a></li>
++<li><a href="#Aligned-Memory-Blocks" accesskey="7">Allocating Aligned Memory Blocks</a></li>
++<li><a href="#Malloc-Tunable-Parameters" accesskey="8">Malloc Tunable Parameters</a></li>
++<li><a href="#Heap-Consistency-Checking" accesskey="9">Heap Consistency Checking</a></li>
++<li><a href="#Statistics-of-Malloc">Statistics for Memory Allocation with <code class="code">malloc</code></a></li>
+ <li><a href="#Summary-of-Malloc">Summary of <code class="code">malloc</code>-Related Functions</a></li>
+ </ul>
+ <hr>
+@@ -5584,7 +5606,7 @@
+ <div class="subsubsection-level-extent" id="Malloc-Examples">
+ <div class="nav-panel">
+ <p>
+-Next: <a href="#Freeing-after-Malloc" accesskey="n" rel="next">Freeing Memory Allocated with <code class="code">malloc</code></a>, Previous: <a href="#Basic-Allocation" accesskey="p" rel="prev">Basic Memory Allocation</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++Next: <a href="#Portable-Allocation" accesskey="n" rel="next">Portable Memory Allocation</a>, Previous: <a href="#Basic-Allocation" accesskey="p" rel="prev">Basic Memory Allocation</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+ <h4 class="subsubsection" id="Examples-of-malloc"><span>3.2.3.2 Examples of <code class="code">malloc</code><a class="copiable-link" href="#Examples-of-malloc"> &para;</a></span></h4>
+ 
+@@ -5592,7 +5614,7 @@
+ You should check the value of <em class="emph">every</em> call to <code class="code">malloc</code>.  It is
+ useful to write a subroutine that calls <code class="code">malloc</code> and reports an
+ error if the value is a null pointer, returning only if the value is
+-nonzero.  This function is conventionally called <code class="code">xmalloc</code>.  Here
++non-null.  This function is conventionally called <code class="code">xmalloc</code>.  Here
+ it is:
+ <a class="index-entry-id" id="index-xmalloc-function"></a>
+ </p>
+@@ -5600,10 +5622,10 @@
+ <pre class="example-preformatted">void *
+ xmalloc (size_t size)
+ {
+-  void *value = malloc (size);
+-  if (value == 0)
++  void *p = malloc (size);
++  if (p == NULL)
+     fatal (&quot;virtual memory exhausted&quot;);
+-  return value;
++  return p;
+ }
+ </pre></div>
+ 
+@@ -5615,18 +5637,23 @@
+ <div class="group"><pre class="example-preformatted">char *
+ savestring (const char *ptr, size_t len)
+ {
+-  char *value = xmalloc (len + 1);
+-  value[len] = '\0';
+-  return memcpy (value, ptr, len);
++  char *p = xmalloc (len + 1);
++  p[len] = '\0';
++  return memcpy (p, ptr, len);
+ }
+ </pre></div></div>
+ 
+-<p>The block that <code class="code">malloc</code> gives you is guaranteed to be aligned so
+-that it can hold any type of data.  On GNU systems, the address is
+-always a multiple of eight on 32-bit systems, and a multiple of 16 on
+-64-bit systems.  Only rarely is any higher boundary (such as a page
++<p>In the current release of the GNU C Library, the block that <code class="code">malloc</code> gives you is
++aligned so that its address is a multiple of
++<code class="code">alignof (max_align_t)</code>, so that it can hold object types
++with any fundamental alignment and without stricter alignment specifiers.
++Only rarely is any higher boundary (such as a page
+ boundary) necessary; for those cases, use <code class="code">aligned_alloc</code> or
+ <code class="code">posix_memalign</code> (see <a class="pxref" href="#Aligned-Memory-Blocks">Allocating Aligned Memory Blocks</a>).
++Future releases of the GNU C Library may relax alignment for small allocations,
++so long as any object with fundamental alignment that fits in the small
++allocation will be properly aligned.  For example, a future <code class="code">malloc (1)</code>
++might return a pointer with odd alignment.
+ </p>
+ <p>Note that the memory located after the end of the block is likely to be
+ in use for something else; perhaps a block already allocated by another
+@@ -5636,13 +5663,33 @@
+ contents of another block.  If you have already allocated a block and
+ discover you want it to be bigger, use <code class="code">realloc</code> (see <a class="pxref" href="#Changing-Block-Size">Changing the Size of a Block</a>).
+ </p>
+-<p><strong class="strong">Portability Notes:</strong>
++<hr>
++</div>
++<div class="subsubsection-level-extent" id="Portable-Allocation">
++<div class="nav-panel">
++<p>
++Next: <a href="#Freeing-after-Malloc" accesskey="n" rel="next">Freeing Memory Allocated with <code class="code">malloc</code></a>, Previous: <a href="#Malloc-Examples" accesskey="p" rel="prev">Examples of <code class="code">malloc</code></a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++</div>
++<h4 class="subsubsection" id="Portable-Memory-Allocation"><span>3.2.3.3 Portable Memory Allocation<a class="copiable-link" href="#Portable-Memory-Allocation"> &para;</a></span></h4>
++
++<p>More care is needed when allocating memory in
++code intended to run on both GNU and non-GNU systems,
++or when a non-GNU replacement allocator is used (see <a class="pxref" href="#Replacing-malloc">Replacing <code class="code">malloc</code></a>).
++When storage size is small or outlandishly large,
++or when storage is allocated for a less-common type,
++the POSIX and ISO C standards permit multiple behaviors.
+ </p>
+ <ul class="itemize mark-bullet">
+-<li>In the GNU C Library, a successful <code class="code">malloc (0)</code>
+-returns a non-null pointer to a newly allocated size-zero block;
+-other implementations may return <code class="code">NULL</code> instead.
+-POSIX and the ISO C standard allow both behaviors.
++<li>In most systems, a successful <code class="code">malloc (0)</code>
++returns a non-null pointer to a newly allocated size-zero block.
++However, IBM AIX is unusual in that a successful <code class="code">malloc (0)</code>
++returns a null pointer, and this breaks common code such as the
++implementation of <code class="code">xmalloc</code> given in this manual.  See <a class="xref" href="#Malloc-Examples">Examples of <code class="code">malloc</code></a>.
++Code intended to be portable to IBM AIX can use
++<code class="code">p = malloc (size | (size == 0))</code> instead of <code class="code">p = malloc (size)</code>,
++or if it does not mind a null pointer on success it can replace the following
++<code class="code">if (p == NULL) fatal (...);</code> with
++<code class="code">if (p == NULL &amp;&amp; size != 0) fatal (...);</code>.
+ 
+ </li><li>In the GNU C Library, a failed <code class="code">malloc</code> call sets <code class="code">errno</code>,
+ but ISO C does not require this and non-POSIX implementations
+@@ -5652,16 +5699,57 @@
+ <code class="code">PTRDIFF_MAX</code>, to avoid problems with programs that subtract
+ pointers or use signed indexes.  Other implementations may succeed in
+ this case, leading to undefined behavior later.
+-</li></ul>
++
++</li><li>In the GNU C Library, <code class="code">malloc (<var class="var">size</var>)</code> returns a pointer that when
++converted to an integer is a multiple of <code class="code">alignof (max_align_t)</code>.
++Some other implementations may align the result only to what is needed for
++fundamentally-aligned objects of size at most <code class="code">max (<var class="var">size</var>, 1)</code>.
++For example, if <code class="code">alignof (max_align_t)</code> is 16 but smaller
++fundamentally-aligned objects all have alignment of at most 4,
++other implementations of <code class="code">malloc (15)</code> might return
++a pointer that is a multiple of 4 but not of 16 or even of 8.
++Portable code should therefore use a function like <code class="code">aligned_alloc</code>
++if it needs <code class="code">alignof (max_align_t)</code> alignment even for small allocations.
++
++</li><li>Although the GNU C Library&rsquo;s headers define only types with fundamental alignment,
++the C and POSIX standards require only the following types
++(if available) to have fundamental alignment:
++
++<blockquote class="quotation">
++<p><code class="code">char</code>;
++all integer types (including <code class="code">bool</code>);
++<code class="code">float</code>, <code class="code">double</code>, <code class="code">long double</code>;
++<code class="code">_Decimal32</code>, <code class="code">_Decimal64</code>, <code class="code">_Decimal128</code>;
++<code class="code">float _Complex</code>, <code class="code">double _Complex</code>, <code class="code">long double _Complex</code>;
++all enumerated types;
++all pointer types;
++all array types whose element types have fundamental alignment;
++all struct and union types whose element types all have
++fundamental alignment and that lack stricter alignment specifiers;
++<code class="code">va_list</code> (in <code class="code">&lt;stdarg.h&gt;</code>);
++<code class="code">fpos_t</code> (in <code class="code">&lt;stdio.h&gt;</code>);
++<code class="code">cnd_t</code>, <code class="code">thrd_t</code>, <code class="code">tss_t</code>, <code class="code">mtx_t</code>, <code class="code">once_flag</code>
++(in <code class="code">&lt;threads.h&gt;</code>);
++<code class="code">mbstate_t</code> (in <code class="code">&lt;wchar.h&gt;</code>).
++</p></blockquote>
++
++<p>In theory, portable code should not use <code class="code">malloc</code> to
++allocate storage containing types not in this list;
++it should instead use functions like <code class="code">aligned_alloc</code>.
++In practice, though, other implementations generally follow
++the GNU C Library&rsquo;s lead and define only types with fundamental alignment,
++and it is generally portable to use <code class="code">malloc</code> to allocate objects
++with types defined by the C library.
++</p></li></ul>
+ 
+ <hr>
+ </div>
+ <div class="subsubsection-level-extent" id="Freeing-after-Malloc">
+ <div class="nav-panel">
+ <p>
+-Next: <a href="#Changing-Block-Size" accesskey="n" rel="next">Changing the Size of a Block</a>, Previous: <a href="#Malloc-Examples" accesskey="p" rel="prev">Examples of <code class="code">malloc</code></a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++Next: <a href="#Changing-Block-Size" accesskey="n" rel="next">Changing the Size of a Block</a>, Previous: <a href="#Portable-Allocation" accesskey="p" rel="prev">Portable Memory Allocation</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Freeing-Memory-Allocated-with-malloc"><span>3.2.3.3 Freeing Memory Allocated with <code class="code">malloc</code><a class="copiable-link" href="#Freeing-Memory-Allocated-with-malloc"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Freeing-Memory-Allocated-with-malloc"><span>3.2.3.4 Freeing Memory Allocated with <code class="code">malloc</code><a class="copiable-link" href="#Freeing-Memory-Allocated-with-malloc"> &para;</a></span></h4>
+ <a class="index-entry-id" id="index-freeing-memory-allocated-with-malloc"></a>
+ <a class="index-entry-id" id="index-heap_002c-freeing-memory-from"></a>
+ 
+@@ -5776,7 +5864,7 @@
+ <p>
+ Next: <a href="#Allocating-Cleared-Space" accesskey="n" rel="next">Allocating Cleared Space</a>, Previous: <a href="#Freeing-after-Malloc" accesskey="p" rel="prev">Freeing Memory Allocated with <code class="code">malloc</code></a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Changing-the-Size-of-a-Block"><span>3.2.3.4 Changing the Size of a Block<a class="copiable-link" href="#Changing-the-Size-of-a-Block"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Changing-the-Size-of-a-Block"><span>3.2.3.5 Changing the Size of a Block<a class="copiable-link" href="#Changing-the-Size-of-a-Block"> &para;</a></span></h4>
+ <a class="index-entry-id" id="index-changing-the-size-of-a-block-_0028malloc_0029"></a>
+ 
+ <p>Often you do not know for certain how big a block you will ultimately need
+@@ -5818,6 +5906,12 @@
+ Otherwise, if <code class="code">realloc</code> cannot reallocate the requested size
+ it returns <code class="code">NULL</code> and sets <code class="code">errno</code>; the original block
+ is left undisturbed.
++</p>
++<p>Any non-null pointer returned by <code class="code">realloc</code> satisfies the same
++alignment restrictions as a similar pointer returned by <code class="code">malloc</code>
++with the same size.
++Any special alignment created by <code class="code">aligned_alloc</code>
++and similar functions is lost after <code class="code">realloc</code>.
+ </p></dd></dl>
+ 
+ <dl class="first-deftypefn first-deftypefun-alias-first-deftypefn def-block">
+@@ -5842,6 +5936,13 @@
+ <p><code class="code">reallocarray</code> should be used instead of <code class="code">realloc</code> when the new size
+ of the allocated block is the result of a multiplication that might overflow.
+ </p>
++<p>In the GNU C Library, the vector is aligned the same way that <code class="code">malloc</code>
++aligns its returned values.  In other implementations, it may be merely
++aligned suitably for any array of fundamentally-aligned elements each
++with size at most <code class="code">max (<var class="var">size</var>, 1)</code>.
++Any special alignment created by <code class="code">aligned_alloc</code>
++and similar functions is lost after <code class="code">reallocarray</code>.
++</p>
+ <p>This function was originally derived from OpenBSD 5.6, but was added in
+ POSIX.1-2024.
+ </p></dd></dl>
+@@ -5864,8 +5965,8 @@
+ <pre class="example-preformatted">void *
+ xreallocarray (void *ptr, size_t nmemb, size_t size)
+ {
+-  void *value = reallocarray (ptr, nmemb, size);
+-  if (value == 0)
++  void *p = reallocarray (ptr, nmemb, size);
++  if (p == NULL)
+     fatal (&quot;Virtual memory exhausted&quot;);
+   return value;
+ }
+@@ -5910,7 +6011,7 @@
+ <p>
+ Next: <a href="#Aligned-Memory-Blocks" accesskey="n" rel="next">Allocating Aligned Memory Blocks</a>, Previous: <a href="#Changing-Block-Size" accesskey="p" rel="prev">Changing the Size of a Block</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Allocating-Cleared-Space-1"><span>3.2.3.5 Allocating Cleared Space<a class="copiable-link" href="#Allocating-Cleared-Space-1"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Allocating-Cleared-Space-1"><span>3.2.3.6 Allocating Cleared Space<a class="copiable-link" href="#Allocating-Cleared-Space-1"> &para;</a></span></h4>
+ 
+ <p>The function <code class="code">calloc</code> allocates memory and clears it to zero.  It
+ is declared in <samp class="file">stdlib.h</samp>.
+@@ -5928,9 +6029,9 @@
+ </p>
+ 
+ 
+-<p>This function allocates a block long enough to contain a vector of
+-<var class="var">count</var> elements, each of size <var class="var">eltsize</var>.  Its contents are
+-cleared to zero before <code class="code">calloc</code> returns.
++<p>This function allocates a zeroed vector.  It acts like
++<code class="code">reallocarray (NULL, <var class="var">count</var>, <var class="var">eltsize</var>)</code> except that the
++vector&rsquo;s contents are cleared to zero before <code class="code">calloc</code> returns.
+ </p></dd></dl>
+ 
+ <p>You could define <code class="code">calloc</code> as follows:
+@@ -5939,10 +6040,10 @@
+ <pre class="example-preformatted">void *
+ calloc (size_t count, size_t eltsize)
+ {
+-  void *value = reallocarray (0, count, eltsize);
+-  if (value != 0)
+-    memset (value, 0, count * eltsize);
+-  return value;
++  void *p = reallocarray (0, count, eltsize);
++  if (p != NULL)
++    memset (p, 0, count * eltsize);
++  return p;
+ }
+ </pre></div>
+ 
+@@ -5961,7 +6062,7 @@
+ <p>
+ Next: <a href="#Malloc-Tunable-Parameters" accesskey="n" rel="next">Malloc Tunable Parameters</a>, Previous: <a href="#Allocating-Cleared-Space" accesskey="p" rel="prev">Allocating Cleared Space</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Allocating-Aligned-Memory-Blocks"><span>3.2.3.6 Allocating Aligned Memory Blocks<a class="copiable-link" href="#Allocating-Aligned-Memory-Blocks"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Allocating-Aligned-Memory-Blocks"><span>3.2.3.7 Allocating Aligned Memory Blocks<a class="copiable-link" href="#Allocating-Aligned-Memory-Blocks"> &para;</a></span></h4>
+ 
+ <a class="index-entry-id" id="index-page-boundary"></a>
+ <a class="index-entry-id" id="index-alignment-_0028with-malloc_0029"></a>
+@@ -6175,7 +6276,7 @@
+ <p>
+ Next: <a href="#Heap-Consistency-Checking" accesskey="n" rel="next">Heap Consistency Checking</a>, Previous: <a href="#Aligned-Memory-Blocks" accesskey="p" rel="prev">Allocating Aligned Memory Blocks</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Malloc-Tunable-Parameters-1"><span>3.2.3.7 Malloc Tunable Parameters<a class="copiable-link" href="#Malloc-Tunable-Parameters-1"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Malloc-Tunable-Parameters-1"><span>3.2.3.8 Malloc Tunable Parameters<a class="copiable-link" href="#Malloc-Tunable-Parameters-1"> &para;</a></span></h4>
+ 
+ <p>You can adjust some parameters for dynamic memory allocation with the
+ <code class="code">mallopt</code> function.  This function is the general SVID/XPG
+@@ -6279,11 +6380,8 @@
+ <dd><p>This parameter sets the number of arenas to use regardless of the number of
+ cores in the system.
+ </p>
+-<p>The default value of this tunable is <code class="code">0</code>, meaning that the limit on the
+-number of arenas is determined by the number of CPU cores online. For 32-bit
+-systems the limit is twice the number of cores online and on 64-bit systems, it
+-is eight times the number of cores online.  Note that the default value is not
+-derived from the default value of M_ARENA_TEST and is computed independently.
++<p>The default value of this tunable is <code class="code">0</code>, meaning that the limit is the
++number of CPU cores online reported by get_nprocs().
+ </p>
+ <p>This parameter can also be set for the process at startup by setting the
+ environment variable <code class="env">MALLOC_ARENA_MAX</code> to the desired value.
+@@ -6299,7 +6397,7 @@
+ <p>
+ Next: <a href="#Statistics-of-Malloc" accesskey="n" rel="next">Statistics for Memory Allocation with <code class="code">malloc</code></a>, Previous: <a href="#Malloc-Tunable-Parameters" accesskey="p" rel="prev">Malloc Tunable Parameters</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Heap-Consistency-Checking-1"><span>3.2.3.8 Heap Consistency Checking<a class="copiable-link" href="#Heap-Consistency-Checking-1"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Heap-Consistency-Checking-1"><span>3.2.3.9 Heap Consistency Checking<a class="copiable-link" href="#Heap-Consistency-Checking-1"> &para;</a></span></h4>
+ 
+ <a class="index-entry-id" id="index-heap-consistency-checking"></a>
+ <a class="index-entry-id" id="index-consistency-checking_002c-of-heap"></a>
+@@ -6448,7 +6546,7 @@
+ <p>
+ Next: <a href="#Summary-of-Malloc" accesskey="n" rel="next">Summary of <code class="code">malloc</code>-Related Functions</a>, Previous: <a href="#Heap-Consistency-Checking" accesskey="p" rel="prev">Heap Consistency Checking</a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Statistics-for-Memory-Allocation-with-malloc"><span>3.2.3.9 Statistics for Memory Allocation with <code class="code">malloc</code><a class="copiable-link" href="#Statistics-for-Memory-Allocation-with-malloc"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Statistics-for-Memory-Allocation-with-malloc"><span>3.2.3.10 Statistics for Memory Allocation with <code class="code">malloc</code><a class="copiable-link" href="#Statistics-for-Memory-Allocation-with-malloc"> &para;</a></span></h4>
+ 
+ <a class="index-entry-id" id="index-allocation-statistics"></a>
+ <p>You can get information about dynamic memory allocation by calling the
+@@ -6537,7 +6635,7 @@
+ <p>
+ Previous: <a href="#Statistics-of-Malloc" accesskey="p" rel="prev">Statistics for Memory Allocation with <code class="code">malloc</code></a>, Up: <a href="#Unconstrained-Allocation" accesskey="u" rel="up">Unconstrained Allocation</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h4 class="subsubsection" id="Summary-of-malloc_002dRelated-Functions"><span>3.2.3.10 Summary of <code class="code">malloc</code>-Related Functions<a class="copiable-link" href="#Summary-of-malloc_002dRelated-Functions"> &para;</a></span></h4>
++<h4 class="subsubsection" id="Summary-of-malloc_002dRelated-Functions"><span>3.2.3.11 Summary of <code class="code">malloc</code>-Related Functions<a class="copiable-link" href="#Summary-of-malloc_002dRelated-Functions"> &para;</a></span></h4>
+ 
+ <p>Here is a summary of the functions that work with <code class="code">malloc</code>:
+ </p>
+@@ -6939,7 +7037,9 @@
+ failures, and, at run time, to heap corruption and application crashes.
+ Replacement functions should implement the behavior documented for
+ their counterparts in the GNU C Library; for example, the replacement
+-<code class="code">free</code> should also preserve <code class="code">errno</code>.
++<code class="code">malloc</code> should return a null pointer only when failing,
++it should return pointers aligned to <code class="code">alignof (max_align_t)</code>,
++and the replacement <code class="code">free</code> should preserve <code class="code">errno</code>.
+ </p>
+ <p>The minimum set of functions which has to be provided by a custom
+ <code class="code">malloc</code> is given in the table below.
+@@ -12472,6 +12572,12 @@
+ object beginning at <var class="var">block</var>.  The return value is a pointer to the
+ located byte, or a null pointer if no match was found.
+ </p>
++<p>This function behaves as if it reads the bytes sequentially and stops at
++the first match, which means that if the object contains a match the
++behavior is defined even when the object size is less than <var class="var">size</var>.
++This behavior guarantee is unusual, and is not shared by related
++functions like <code class="code">memcmp</code> and <code class="code">wmemchr</code>.
++</p>
+ <p>In ISO C23 and later, this function is qualifier-generic:
+ that is, it is also implemented as a function-like macro,
+ and when the macro is used and <var class="var">block</var> has a type
+@@ -16012,6 +16118,24 @@
+ implementation has the possibility to perform such a conversion, the
+ function returns a handle.
+ </p>
++<p>The <var class="var">tocode</var> argument may optionally be suffixed with
++<code class="code">//TRANSLIT</code>.  When this suffix is present, transliteration is
++enabled.  With transliteration enabled, characters that cannot be
++represented directly in the destination character set may be approximated
++using one or more similar characters that are available in the
++destination character set.  Characters outside of the destination
++character set that cannot be transliterated are replaced with a question
++mark <code class="code">?</code>.
++</p>
++<p>The <var class="var">tocode</var> argument may also be suffixed with <code class="code">//IGNORE</code>.
++When this suffix is present, characters that cannot be converted are
++silently discarded.
++</p>
++<p>The suffixes may be combined, for example <code class="code">//TRANSLIT,IGNORE</code>.
++When both suffixes are specified, transliteration is attempted first.
++If a character cannot be transliterated, it is then handled according
++to <code class="code">//IGNORE</code>.
++</p>
+ <p>If the wanted conversion is not available, the <code class="code">iconv_open</code> function
+ returns <code class="code">(iconv_t) -1</code>.  In this case the global variable
+ <code class="code">errno</code> can have the following values:
+@@ -16138,6 +16262,9 @@
+ bytes.  If <var class="var">outbuf</var> or <code class="code">*<var class="var">outbuf</var></code> is a null pointer, the
+ conversion is performed but no output is available.
+ </p>
++<p>The input and output buffers may not have any bytes in common.  If they
++overlap, the behavior is undefined.
++</p>
+ <p>If <var class="var">inbuf</var> is a null pointer, the <code class="code">iconv</code> function performs the
+ necessary action to put the state of the conversion into the initial
+ state.  This is obviously a no-op for non-stateful encodings, but if the
+@@ -16158,7 +16285,8 @@
+ there are some bytes at the end of the buffer that possibly can form a
+ complete character but the input is incomplete.  The second reason for a
+ stop is that the output buffer is full.  And the third reason is that
+-the input contains invalid characters.
++the input contains invalid characters or translation to the character
++encoding of the output is not possible.
+ </p>
+ <p>In all of these cases the buffer pointers after the last successful
+ conversion, for the input and output buffers, are stored in <var class="var">inbuf</var> and
+@@ -16182,9 +16310,11 @@
+ </p>
+ <dl class="table">
+ <dt><code class="code">EILSEQ</code></dt>
+-<dd><p>The conversion stopped because of an invalid byte sequence in the input.
++<dd><p>The conversion stopped because of an invalid byte sequence in the
++input or because translation of the byte sequence to the character
++encoding of the output is not possible.
+ After the call, <code class="code">*<var class="var">inbuf</var></code> points at the first byte of the
+-invalid byte sequence.
++byte sequence which caused the error.
+ </p>
+ </dd>
+ <dt><code class="code">E2BIG</code></dt>
+@@ -47526,7 +47656,7 @@
+ represent line speeds.
+ </p>
+ <p><strong class="strong">Portability note:</strong> In the current version of the GNU C Library, the
+-<code class="code">speed_t</code> type is numerically indentical to the line speed rate.
++<code class="code">speed_t</code> type is numerically identical to the line speed rate.
+ Other libraries and older versions of the GNU C Library may require speeds to
+ be indicated by enumerated constants, which may not be numerically
+ identical to the requested line speed.  For portability, you must use
+@@ -47604,7 +47734,7 @@
+ value of type <code class="code">speed_t</code>.  This value may be smaller than the
+ underlying C type can store.
+ </p>
+-<p>For compatiblity with some other platforms the alias <code class="code">__MAX_BAUD</code>
++<p>For compatibility with some other platforms the alias <code class="code">__MAX_BAUD</code>
+ is defined for this constant.
+ </p></dd></dl>
+ 
+@@ -49795,7 +49925,7 @@
+ all platforms.
+ It is also provided for <code class="code">_Float128</code> and <code class="code">_Float64x</code> on
+ powerpc64le (PowerPC 64-bits little-endian), x86_64, x86,
+-aarch64, alpha, loongarch, mips64, riscv, s390 and sparc.
++aarch64, alpha, loongarch, mips64, riscv, s390x and sparc.
+ </p>
+ 
+ <ul class="mini-toc">
+@@ -55539,9 +55669,12 @@
+ </p>
+ 
+ <p>The <code class="code">fmin</code> function returns the lesser of the two values <var class="var">x</var>
+-and <var class="var">y</var>.  It is similar to the expression
++and <var class="var">y</var> respecting the order signed zeros.  It is similar to the
++expression
+ </p><div class="example smallexample">
+-<pre class="example-preformatted">((x) &lt; (y) ? (x) : (y))
++<pre class="example-preformatted">if (x == y)
++  return signbit (x) ? x : y;
++return ((x) &lt; (y) ? (x) : (y))
+ </pre></div>
+ <p>except that <var class="var">x</var> and <var class="var">y</var> are only evaluated once.
+ </p>
+@@ -55669,7 +55802,8 @@
+ <p>These functions, from TS 18661-1:2014 and TS 18661-3:2015, return
+ whichever of the two values <var class="var">x</var> and <var class="var">y</var> has the smaller absolute
+ value.  If both have the same absolute value, or either is NaN, they
+-behave the same as the <code class="code">fmin</code> functions.
++behave the same as the <code class="code">fmin</code> functions (including the order of
++signed zeros).
+ </p></dd></dl>
+ 
+ <dl class="first-deftypefn first-deftypefun-alias-first-deftypefn def-block">
+@@ -82775,7 +82909,7 @@
+ </p>
+ <dl class="first-deftypefn first-deftypefun-alias-first-deftypefn def-block">
+ <dt class="deftypefn deftypefun-alias-deftypefn def-line" id="index-pthread_005fmutex_005finit"><span class="category-def">Function: </span><span><code class="def-type">int</code> <strong class="def-name">pthread_mutex_init</strong> <code class="def-code-arguments">(pthread_mutex_t *<var class="var">mutex</var>, const pthread_mutexattr_t *<var class="var">mutexattr</var>)</code><a class="copiable-link" href="#index-pthread_005fmutex_005finit"> &para;</a></span></dt>
+-<dd><p>Initiailizes a mutex.
++<dd><p>Initializes a mutex.
+ This documentation is a stub.  For additional information on this
+ function, consult the manual page <a class="url" href="https://man7.org/linux/man-pages/man3/pthread_mutex_init.3.html">pthread_mutex_init(3)</a>
+ See <a class="xref" href="#Linux-Kernel">Linux (The Linux Kernel)</a>.
+@@ -82798,7 +82932,7 @@
+ may be many threads waiting at the same time, the calling thread may
+ need to repeat this wait-and-try many times before it successfully
+ locks <var class="var">mutex</var>, at which point the call to
+-<code class="code">pthread_mutex_locks</code> returns succesfully.
++<code class="code">pthread_mutex_locks</code> returns successfully.
+ </p>
+ <p>This function may fail with the following:
+ </p>
+@@ -82896,7 +83030,7 @@
+ </p>
+ </dd>
+ <dt><code class="code">PTHREAD_MUTEX_ERRORCHECK</code></dt>
+-<dd><p>Attemps to relock a mutex, or unlock a mutex not held, will result in an error.
++<dd><p>Attempts to relock a mutex, or unlock a mutex not held, will result in an error.
+ </p>
+ </dd>
+ <dt><code class="code">PTHREAD_MUTEX_RECURSIVE</code></dt>
+@@ -82906,7 +83040,7 @@
+ </p>
+ </dd>
+ <dt><code class="code">PTHREAD_MUTEX_DEFAULT</code></dt>
+-<dd><p>Attemps to relock a mutex, or unlock a mutex not held, will result in
++<dd><p>Attempts to relock a mutex, or unlock a mutex not held, will result in
+ undefined behavior.  This is the default.
+ </p>
+ </dd>
+@@ -82946,7 +83080,7 @@
+ <dl class="first-deftypefn first-deftypefun-alias-first-deftypefn def-block">
+ <dt class="deftypefn deftypefun-alias-deftypefn def-line" id="index-pthread_005fonce"><span class="category-def">Function: </span><span><code class="def-type">int</code> <strong class="def-name">pthread_once</strong> <code class="def-code-arguments">(pthread_once_t *<var class="var">once_control</var>, void (*<var class="var">init_routine</var>) (void))</code><a class="copiable-link" href="#index-pthread_005fonce"> &para;</a></span></dt>
+ <dd><p>Calls <var class="var">init_routine</var> once for each <var class="var">once_control</var>, which must
+-be statically initalized to <code class="code">PTHREAD_ONCE_INIT</code>.  Subsequent
++be statically initialized to <code class="code">PTHREAD_ONCE_INIT</code>.  Subsequent
+ calls to <code class="code">pthread_once</code> with the same <var class="var">once_control</var> do not
+ call <var class="var">init_routine</var>, even in multi-threaded environments.
+ This documentation is a stub.  For additional information on this
+@@ -83493,7 +83627,8 @@
+ <li><a href="#Dynamic-Linker-Invocation" accesskey="1">Dynamic Linker Invocation</a></li>
+ <li><a href="#Dynamic-Linker-Environment-Variables" accesskey="2">Dynamic Linker Environment Variables</a></li>
+ <li><a href="#Dynamic-Linker-Introspection" accesskey="3">Dynamic Linker Introspection</a></li>
+-<li><a href="#Dynamic-Linker-Hardening" accesskey="4">Avoiding Unexpected Issues With Dynamic Linking</a></li>
++<li><a href="#Indirect-Functions" accesskey="4">Indirect Functions</a></li>
++<li><a href="#Dynamic-Linker-Hardening" accesskey="5">Avoiding Unexpected Issues With Dynamic Linking</a></li>
+ </ul>
+ <hr>
+ <div class="section-level-extent" id="Dynamic-Linker-Invocation">
+@@ -83975,7 +84110,7 @@
+ <div class="section-level-extent" id="Dynamic-Linker-Introspection">
+ <div class="nav-panel">
+ <p>
+-Next: <a href="#Dynamic-Linker-Hardening" accesskey="n" rel="next">Avoiding Unexpected Issues With Dynamic Linking</a>, Previous: <a href="#Dynamic-Linker-Environment-Variables" accesskey="p" rel="prev">Dynamic Linker Environment Variables</a>, Up: <a href="#Dynamic-Linker" accesskey="u" rel="up">Dynamic Linker</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++Next: <a href="#Indirect-Functions" accesskey="n" rel="next">Indirect Functions</a>, Previous: <a href="#Dynamic-Linker-Environment-Variables" accesskey="p" rel="prev">Dynamic Linker Environment Variables</a>, Up: <a href="#Dynamic-Linker" accesskey="u" rel="up">Dynamic Linker</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+ <h3 class="section" id="Dynamic-Linker-Introspection-1"><span>37.3 Dynamic Linker Introspection<a class="copiable-link" href="#Dynamic-Linker-Introspection-1"> &para;</a></span></h3>
+ 
+@@ -84126,13 +84261,24 @@
+ object of type <code class="code">Lmid_t</code>.
+ </p>
+ </dd>
++<dt><a id="index-RTLD_005fDI_005fORIGIN_005fPATH"></a><span><code class="code">RTLD_DI_ORIGIN_PATH</code><a class="copiable-link" href="#index-RTLD_005fDI_005fORIGIN_005fPATH"> &para;</a></span></dt>
++<dd><p>The <code class="code">$ORIGIN</code> dynamic string token pointer for <var class="var">handle</var> is written
++to <code class="code">*<var class="var">arg</var></code>.  The <var class="var">arg</var> argument must be the address of a
++<code class="code">const char *</code>.  If the <code class="code">$ORIGIN</code> could not be determined, the
++function still returns 0 but writes a null pointer to <code class="code">*<var class="var">arg</var></code>.
++The returned string is only valid as long as the corresponding handle is
++valid.  Accessing it after <code class="code">dlclose</code> has been called for the
++corresponding <var class="var">handle</var> is undefined behavior.
++</p>
++</dd>
+ <dt><a id="index-RTLD_005fDI_005fORIGIN"></a><span><code class="code">RTLD_DI_ORIGIN</code><a class="copiable-link" href="#index-RTLD_005fDI_005fORIGIN"> &para;</a></span></dt>
+ <dd><p>The value of the <code class="code">$ORIGIN</code> dynamic string token for <var class="var">handle</var> is
+ written to the character array starting at <var class="var">arg</var> as a
+ null-terminated string.
+ </p>
+ <p>This request type should not be used because it is prone to buffer
+-overflows.
++overflows.  Instead, <code class="code">RTLD_DI_ORIGIN_PATH</code> described above should be
++used.
+ </p>
+ </dd>
+ <dt><a id="index-RTLD_005fDI_005fSERINFO"></a><span><code class="code">RTLD_DI_SERINFO</code><a class="copiable-link" href="#index-RTLD_005fDI_005fSERINFO"> &para;</a></span></dt>
+@@ -84322,12 +84468,317 @@
+ <hr>
+ </div>
+ </div>
++<div class="section-level-extent" id="Indirect-Functions">
++<div class="nav-panel">
++<p>
++Next: <a href="#Dynamic-Linker-Hardening" accesskey="n" rel="next">Avoiding Unexpected Issues With Dynamic Linking</a>, Previous: <a href="#Dynamic-Linker-Introspection" accesskey="p" rel="prev">Dynamic Linker Introspection</a>, Up: <a href="#Dynamic-Linker" accesskey="u" rel="up">Dynamic Linker</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++</div>
++<h3 class="section" id="Indirect-Functions-1"><span>37.4 Indirect Functions<a class="copiable-link" href="#Indirect-Functions-1"> &para;</a></span></h3>
++<a class="index-entry-id" id="index-indirect-function"></a>
++<a class="index-entry-id" id="index-IFUNC"></a>
++<a class="index-entry-id" id="index-STT_005fGNU_005fIFUNC"></a>
++<a class="index-entry-id" id="index-resolver-function-_0028IFUNC_0029"></a>
++
++<p><em class="dfn">Indirect functions</em> (often called <em class="dfn">IFUNCs</em>) are a GNU
++extension to ELF that defers the selection of a function
++implementation until load time.  A symbol of type
++<code class="code">STT_GNU_IFUNC</code> does not designate the implementation of a
++function.  Instead, it designates a <em class="dfn">resolver function</em>.
++The GNU C Library invokes the resolver while processing relocations that
++reference the symbol, and the address returned by the resolver becomes
++the target of those references.  The typical use of indirect functions
++is to select the variant of a function best suited to the system the
++program is running on, for example based on the available instruction
++set extensions.
++</p>
++<p>Indirect functions are usually defined using the <code class="code">ifunc</code> function
++attribute provided by GCC and compatible compilers:
++</p>
++<div class="example smallexample">
++<pre class="example-preformatted">static int
++my_func_generic (int a)
++{
++  /* <span class="r">...</span> */
++}
++
++static int
++my_func_vectorized (int a)
++{
++  /* <span class="r">...</span> */
++}
++
++/* <span class="r">The resolver returns the address of the selected
++   implementation.</span>  */
++static typeof (my_func_generic) *
++my_func_resolver (void)
++{
++  if (vector_extension_available ())
++    return my_func_vectorized;
++  return my_func_generic;
++}
++
++int my_func (int a) __attribute__ ((ifunc (&quot;my_func_resolver&quot;)));
++</pre></div>
++
++<ul class="mini-toc">
++<li><a href="#IFUNC-Resolver-Calling-Conventions" accesskey="1">IFUNC Resolver Calling Conventions</a></li>
++<li><a href="#When-IFUNC-Resolvers-Run" accesskey="2">When IFUNC Resolvers Run</a></li>
++<li><a href="#Supported-Functionality-in-IFUNC-Resolvers" accesskey="3">Supported Functionality in IFUNC Resolvers</a></li>
++</ul>
++<div class="subsection-level-extent" id="IFUNC-Resolver-Calling-Conventions">
++<h4 class="subsection"><span>37.4.1 IFUNC Resolver Calling Conventions<a class="copiable-link" href="#IFUNC-Resolver-Calling-Conventions"> &para;</a></span></h4>
++
++<p>The return value is the address of the selected implementation.
++On many architectures, the resolver receives arguments that describe
++the capabilities of the system, typically derived from the <code class="code">AT_HWCAP</code>
++value in the auxiliary vector (see <a class="pxref" href="#Auxiliary-Vector">Auxiliary Vector</a>).  These arguments
++exist because of the restricted environment resolvers run in (see below):
++they allow a resolver to select an implementation without having to obtain
++the information through other means.  Where such arguments are available,
++resolvers should use them instead of querying the system through
++function calls.
++</p>
++<p>The architecture-specific conventions are:
++</p>
++<dl class="table">
++<dt>AArch64</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">#include &lt;sys/ifunc.h&gt;
++
++void *resolver (uint64_t hwcap, const __ifunc_arg_t *arg);
++</pre></div>
++
++<p>The first argument contains the <code class="code">AT_HWCAP</code> value.  If the
++<code class="code">_IFUNC_ARG_HWCAP</code> bit is set, the second argument is valid and
++points to a <code class="code">__ifunc_arg_t</code> structure that provides access to all
++hardware capability values: the <code class="code">_size</code> member contains the size of
++the structure in bytes, and the <code class="code">_hwcap</code>, <code class="code">_hwcap2</code>,
++<code class="code">_hwcap3</code>, and <code class="code">_hwcap4</code> members contain the
++<code class="code">AT_HWCAP</code>, <code class="code">AT_HWCAP2</code>, <code class="code">AT_HWCAP3</code>, and
++<code class="code">AT_HWCAP4</code> values, respectively.  Resolvers must check
++<code class="code">_size</code> before accessing a member, because the GNU C Library may pass
++a structure that ends before that member.  The <code class="code">__ifunc_hwcap</code>
++inline function in <samp class="file">sys/ifunc.h</samp> performs the required checks
++when obtaining a hardware capability value by index.
++</p>
++<p>The canonical documentation for this interface is the
++<cite class="cite">GNU C Library ifunc interface</cite> section of the <cite class="cite">ELF for the
++Arm 64-bit Architecture (AArch64)</cite> ABI, available at
++<a class="uref" href="https://github.com/ARM-software/abi-aa/blob/main/sysvabi64/sysvabi64.rst">https://github.com/ARM-software/abi-aa/blob/main/sysvabi64/sysvabi64.rst</a>.
++</p>
++</dd>
++<dt>Arm</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">void *resolver (unsigned long int hwcap);
++</pre></div>
++
++<p>The argument contains the <code class="code">AT_HWCAP</code> value.
++</p>
++</dd>
++<dt>LoongArch</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">#include &lt;sys/ifunc.h&gt;
++
++void *resolver (const __ifunc_arg_t *arg);
++</pre></div>
++
++<p>The argument points to a <code class="code">__ifunc_arg_t</code> structure whose
++<code class="code">_size</code> member contains the size of the structure in bytes and
++whose <code class="code">_hwcap</code> member contains the <code class="code">AT_HWCAP</code> value.  Resolvers
++must check <code class="code">_size</code> before accessing members added by later versions
++of the structure.
++</p>
++</dd>
++<dt>PowerPC (32-bit and 64-bit)</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">void *resolver (unsigned long int hwcap);
++</pre></div>
++
++<p>The argument contains the <code class="code">AT_HWCAP</code> value.  The
++<code class="code">AT_HWCAP2</code> value is not passed as an argument.
++</p>
++</dd>
++<dt>RISC-V</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">#include &lt;sys/hwprobe.h&gt;
++
++void *resolver (uint64_t hwcap, __riscv_hwprobe_t hwprobe,
++                void *reserved);
++</pre></div>
++
++<p>The first argument contains the <code class="code">AT_HWCAP</code> value.  The second
++argument is a pointer to the <code class="code">__riscv_hwprobe</code> function
++(see <a class="pxref" href="#RISC_002dV">RISC-V-specific Facilities</a>), passed so that the resolver can probe for extensions
++without referencing a symbol in another object.  Versions of
++the GNU C Library before 2.40 pass a null pointer here, so resolvers must
++check the argument before calling it; the <code class="code">__riscv_hwprobe_one</code>
++inline function in <samp class="file">sys/hwprobe.h</samp> performs this check.  The
++third argument is reserved for future extension.
++</p>
++</dd>
++<dt>s390 (64-bit)</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">void *resolver (unsigned long int hwcap);
++</pre></div>
++
++<p>The argument contains the <code class="code">AT_HWCAP</code> value.
++</p>
++</dd>
++<dt>SPARC (32-bit and 64-bit)</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">void *resolver (int hwcap);
++</pre></div>
++
++<p>The argument contains the <code class="code">AT_HWCAP</code> value.
++</p>
++</dd>
++<dt>x86 (i386 and x86-64)</dt>
++<dd><div class="example smallexample">
++<pre class="example-preformatted">void *resolver (void);
++</pre></div>
++
++<p>No arguments are passed: on x86 the <code class="code">CPUID</code> instruction can be
++executed directly from the resolver instead.  Resolvers can use the
++<code class="code">__cpuid</code> and <code class="code">__cpuid_count</code> macros from the GCC
++<samp class="file">cpuid.h</samp> header.
++</p>
++<p>Alternatively, the <code class="code">CPU_FEATURE_PRESENT</code> and
++<code class="code">CPU_FEATURE_ACTIVE</code> macros from <samp class="file">sys/platform/x86.h</samp>
++(see <a class="pxref" href="#X86">X86-specific Facilities</a>) can be used; the data they consult is initialized by
++the GNU C Library before any resolver runs.
++</p></dd>
++</dl>
++
++</div>
++<div class="subsection-level-extent" id="When-IFUNC-Resolvers-Run">
++<h4 class="subsection"><span>37.4.2 When IFUNC Resolvers Run<a class="copiable-link" href="#When-IFUNC-Resolvers-Run"> &para;</a></span></h4>
++
++<p>Resolver functions run early, before the process or the newly loaded
++objects are fully initialized.  The exact point at which a resolver
++runs depends on how the indirect function is referenced and how the
++program is linked:
++</p>
++<ul class="itemize mark-bullet">
++<li>In dynamically linked programs, resolvers for non-lazy references run
++during relocation processing at program startup, before ELF
++constructors and before <code class="code">main</code>.  Non-lazy references include data
++relocations against the function address (for example, initialized
++function pointer variables), and all references if lazy binding is
++disabled (for example, with the <samp class="option">-z now</samp> link-time option or
++the <code class="env">LD_BIND_NOW</code> environment variable).
++
++</li><li>With lazy binding, the resolver for a function call through the PLT
++may not run until the function is called for the first time.  Programs
++should not depend on whether a resolver runs at load time or at the
++time of the first call.
++
++</li><li>For objects loaded with <code class="code">dlopen</code>, resolvers run during the
++relocation of the newly loaded objects, before their ELF constructors
++run.
++
++</li><li>In statically linked programs (including static PIE), resolvers are
++invoked by the startup code in the GNU C Library, before ELF constructors
++and before <code class="code">main</code>.
++</li></ul>
++
++<p>A resolver can be invoked more than once: in general, it runs once for
++every relocation that references the indirect function symbol, and
++distinct objects referencing the same symbol cause separate resolver
++invocations.  Under lazy binding, resolver invocations can also happen
++concurrently on multiple threads.  Resolvers must therefore be
++idempotent: they should return the same implementation on every
++invocation and avoid side effects.
++</p>
++</div>
++<div class="subsection-level-extent" id="Supported-Functionality-in-IFUNC-Resolvers">
++<h4 class="subsection"><span>37.4.3 Supported Functionality in IFUNC Resolvers<a class="copiable-link" href="#Supported-Functionality-in-IFUNC-Resolvers"> &para;</a></span></h4>
++
++<p>Because resolvers run during relocation processing, only a restricted
++execution environment is available to them.  The GNU C Library provides the
++guarantees listed below, each annotated with the version of the GNU C Library
++from which it applies.  Versions before 2.44 provided none of them:
++resolvers could run before thread-local storage, the TCB, and the stack
++protector were initialized, and before the relocations of other objects
++had been processed.  A resolver that must remain compatible with those
++versions should not rely on any of these guarantees, and should restrict
++itself to the architecture-provided resolver arguments and to data
++defined in the same translation unit.
++</p>
++<ul class="itemize mark-bullet">
++<li>The thread control block (TCB) of the initial thread is set up before
++any resolver runs.  This applies to dynamically linked programs and to
++statically linked programs (including static PIE).  Consequently,
++resolvers may be compiled with stack protector instrumentation
++(<samp class="option">-fstack-protector</samp> and its variants): the stack canary is
++initialized before the first resolver runs.  (Since the GNU C Library 2.44.)
++
++</li><li>Tunables (see <a class="pxref" href="#Tunables">Tunables</a>) and the architecture-specific CPU feature
++detection used by the GNU C Library are processed before any resolver runs.
++A resolver that selects an implementation based on the GNU C Library&rsquo;s CPU
++feature data therefore observes values that already reflect any tunable
++that masks hardware capabilities, such as <code class="code">glibc.cpu.hwcaps</code>
++(see <a class="pxref" href="#Hardware-Capability-Tunables">Hardware Capability Tunables</a>).  (Since the GNU C Library 2.44.)
++
++</li><li>A resolver may read from and write to thread-local variables
++(<code class="code">__thread</code>, <code class="code">_Thread_local</code>) defined by the same object
++that defines the resolver, using any TLS access model.  The initial
++values of such variables are visible to the resolver, and stores
++performed by the resolver persist after it returns.  This applies to
++objects loaded at process startup, to objects loaded with
++<code class="code">dlopen</code>, and to statically linked programs.  (Since the GNU C Library
++2.44.)
++
++</li><li>At program startup, the regular (non-IFUNC) relocations of all
++initially loaded objects are processed before any resolver runs.  A
++resolver may therefore reference data and call functions defined in
++other initially loaded objects.  (Since the GNU C Library 2.44.)
++
++</li><li>During <code class="code">dlopen</code>, newly loaded objects are relocated after their
++dependencies.  A resolver in a newly loaded object may reference data
++and call functions defined by the object itself, by its dependencies
++(direct and indirect), and by objects that were already loaded before
++the <code class="code">dlopen</code> call.  (Since the GNU C Library 2.44.)
++</li></ul>
++
++<p>The GNU C Library itself defines indirect functions and the guarantees above
++apply to these internal resolvers as well.
++</p>
++<p>Everything not listed above should be considered unsupported.  In
++particular, the following restrictions apply:
++</p>
++<ul class="itemize mark-bullet">
++<li>ELF constructors of the objects being loaded have not run when their
++resolvers are invoked.  Resolvers must not depend on any initialization
++performed by constructors, such as the construction of C++ global objects,
++even in other objects whose relocations have already been processed.
++
++</li><li>Accessing thread-local variables defined by other objects is not
++supported.
++
++</li><li>Functions that depend on a fully initialized the GNU C Library, or that may
++call back into the dynamic linker, are not supported in resolvers.
++This includes (but is not limited to) <code class="code">malloc</code>, <code class="code">dlopen</code>,
++<code class="code">dlsym</code>, and creating threads.
++
++</li><li>Because a resolved address is bound permanently, resolvers must not
++base their decision on state that can change during the lifetime of
++the process (see <a class="pxref" href="#Single_002dThreaded">Detecting Single-Threaded
++Execution</a>, for an example involving
++<code class="code">__libc_single_threaded</code>).
++</li></ul>
++
++<p>For recommendations on the use of indirect functions in hardened or
++security-sensitive applications, see <a class="pxref" href="#Dynamic-Linker-Hardening">Avoiding Unexpected Issues With Dynamic Linking</a>.
++</p>
++<hr>
++</div>
++</div>
+ <div class="section-level-extent" id="Dynamic-Linker-Hardening">
+ <div class="nav-panel">
+ <p>
+-Previous: <a href="#Dynamic-Linker-Introspection" accesskey="p" rel="prev">Dynamic Linker Introspection</a>, Up: <a href="#Dynamic-Linker" accesskey="u" rel="up">Dynamic Linker</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++Previous: <a href="#Indirect-Functions" accesskey="p" rel="prev">Indirect Functions</a>, Up: <a href="#Dynamic-Linker" accesskey="u" rel="up">Dynamic Linker</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="Avoiding-Unexpected-Issues-With-Dynamic-Linking"><span>37.4 Avoiding Unexpected Issues With Dynamic Linking<a class="copiable-link" href="#Avoiding-Unexpected-Issues-With-Dynamic-Linking"> &para;</a></span></h3>
++<h3 class="section" id="Avoiding-Unexpected-Issues-With-Dynamic-Linking"><span>37.5 Avoiding Unexpected Issues With Dynamic Linking<a class="copiable-link" href="#Avoiding-Unexpected-Issues-With-Dynamic-Linking"> &para;</a></span></h3>
+ 
+ <p>This section details recommendations for increasing application
+ robustness, by avoiding potential issues related to dynamic linking.
+@@ -84355,7 +84806,7 @@
+ <li><a href="#Run_002dtime-Considerations" accesskey="4">Run-time Considerations</a></li>
+ </ul>
+ <div class="subsection-level-extent" id="Restricted-Dynamic-Linker-Features">
+-<h4 class="subsection"><span>37.4.1 Restricted Dynamic Linker Features<a class="copiable-link" href="#Restricted-Dynamic-Linker-Features"> &para;</a></span></h4>
++<h4 class="subsection"><span>37.5.1 Restricted Dynamic Linker Features<a class="copiable-link" href="#Restricted-Dynamic-Linker-Features"> &para;</a></span></h4>
+ 
+ <p>Avoiding certain dynamic linker features can increase predictability of
+ applications and reduce the risk of running into dynamic linker defects.
+@@ -84390,6 +84841,13 @@
+ allocation, is not async-signal-safe, and introduces considerable
+ complexity.
+ 
++</li><li>Do not use text relocations.  Text relocations are often created by
++accident if position-dependent code is linked into position-independent
++executables or shared objects.  Text relocations require creating
++read-write-execute segments at run time, which may not be possible given
++system security hardening policy.  Text relocations are typically more
++complex to process than the widely used data-only relocation types.
++
+ </li><li>Make dependencies on shared objects explicit.  Do not assume that
+ certain libraries (such as <code class="code">libc.so.6</code>) are always loaded.
+ Specifically, if a main program or shared object references a symbol,
+@@ -84411,9 +84869,12 @@
+ <p>Underlinking (see above) can hide the presence of cycles.
+ </p>
+ </li><li>Limit the creation of indirect function (IFUNC) resolvers.  These
+-resolvers run during relocation processing, when the GNU C Library is not in
+-a fully consistent state.  If you write your own IFUNC resolvers, do
+-not depend on external data or function references in those resolvers.
++resolvers run during relocation processing, before the process or the
++newly loaded objects are fully initialized
++(see <a class="pxref" href="#Indirect-Functions">Indirect Functions</a>).  If you write your own IFUNC resolvers,
++keep them self-contained: do not depend on external data or function
++references in those resolvers, even where current versions of
++the GNU C Library support such references.
+ 
+ </li><li>Do not use the audit functionality (<code class="code">LD_AUDIT</code>, <code class="code">DT_AUDIT</code>,
+ <code class="code">DT_DEPAUDIT</code>).  Its callback and hooking capabilities introduce a
+@@ -84467,12 +84928,13 @@
+ </p>
+ <ul class="itemize mark-bullet">
+ <li>The dynamic linker does not take constructor and destructor priorities
+-into account when determining their execution order.  Priorities are
+-only used by the link editor for ordering execution within a
+-completely linked object.  If a dynamic shared object needs to be
+-initialized before another object, this can be expressed with a
+-<code class="code">DT_NEEDED</code> dependency on the object that needs to be initialized
+-earlier.
++into account when determining their execution order.  Priorities can be
++set using the GCC attributes <code class="code">constructor</code>, <code class="code">destructor</code>, and
++<code class="code">init_priority</code>.  They are only used by the link editor for
++ordering execution within a completely linked object.  If a dynamic
++shared object needs to be initialized before another object, this can be
++expressed with a <code class="code">DT_NEEDED</code> dependency on the object that needs to
++be initialized earlier.
+ 
+ </li><li>The recommendations to avoid cyclic dependencies and symbol
+ interposition make it less likely that ELF objects are accessed before
+@@ -84638,7 +85100,7 @@
+ 
+ </div>
+ <div class="subsection-level-extent" id="Producing-Matching-Binaries">
+-<h4 class="subsection"><span>37.4.2 Producing Matching Binaries<a class="copiable-link" href="#Producing-Matching-Binaries"> &para;</a></span></h4>
++<h4 class="subsection"><span>37.5.2 Producing Matching Binaries<a class="copiable-link" href="#Producing-Matching-Binaries"> &para;</a></span></h4>
+ 
+ <p>This subsection recommends tools and build flags for producing
+ applications that meet the recommendations of the previous subsection.
+@@ -84680,7 +85142,8 @@
+ instruct the link editor to fail the link if the resulting final object
+ would have read-write-execute segments or an executable stack.  Such
+ issues usually indicate that the input files are not marked up
+-correctly.
++correctly.  Use <samp class="option">-Wl,-z,text</samp>, so that the link editor produces
++errors instead of generating binaries with text relocations.
+ 
+ </li><li>Ensure that for each <code class="code">LOAD</code> segment in the ELF program header, file
+ offsets, memory sizes, and load addresses are multiples of the largest
+@@ -84702,7 +85165,7 @@
+ 
+ </div>
+ <div class="subsection-level-extent" id="Checking-Binaries">
+-<h4 class="subsection"><span>37.4.3 Checking Binaries<a class="copiable-link" href="#Checking-Binaries"> &para;</a></span></h4>
++<h4 class="subsection"><span>37.5.3 Checking Binaries<a class="copiable-link" href="#Checking-Binaries"> &para;</a></span></h4>
+ 
+ <p>In some cases, if the previous recommendations are not followed, this
+ can be determined from the produced binaries.  This section contains
+@@ -84770,12 +85233,14 @@
+ should not contain <code class="code">RPATH</code> or <code class="code">RUNPATH</code> entries.
+ 
+ </li><li>Likewise, the dynamic segment should not show any <code class="code">AUDIT</code>,
+-<code class="code">DEPAUDIT</code>, <code class="code">AUXILIARY</code>, <code class="code">FILTER</code>, or
++<code class="code">DEPAUDIT</code>, <code class="code">AUXILIARY</code>, <code class="code">FILTER</code>, <code class="code">TEXTREL</code>, or
+ <code class="code">PREINIT_ARRAY</code> tags.
+ 
+ </li><li>If the dynamic segment contains a (deprecated) <code class="code">HASH</code> tag, it
+ must also contain a <code class="code">GNU_HASH</code> tag.
+ 
++</li><li>The <code class="code">TEXTREL</code> flag (under the <code class="code">FLAGS</code> tag) should not be used.
++
+ </li><li>The <code class="code">INITFIRST</code> flag (under <code class="code">FLAGS_1</code>) should not be used.
+ 
+ </li><li>The program header must not have <code class="code">LOAD</code> segments that are writable
+@@ -84789,7 +85254,7 @@
+ 
+ </div>
+ <div class="subsection-level-extent" id="Run_002dtime-Considerations">
+-<h4 class="subsection"><span>37.4.4 Run-time Considerations<a class="copiable-link" href="#Run_002dtime-Considerations"> &para;</a></span></h4>
++<h4 class="subsection"><span>37.5.4 Run-time Considerations<a class="copiable-link" href="#Run_002dtime-Considerations"> &para;</a></span></h4>
+ 
+ <p>In addition to preparing program binaries in a recommended fashion, the
+ run-time environment should be set up in such a way that problematic
+@@ -85102,14 +85567,6 @@
+ </p></dd></dl>
+ 
+ <dl class="first-deftp def-block">
+-<dt class="deftp def-line" id="index-memory_005ftunable_005ftcache_005funsorted_005flimit"><span class="category-def">Probe: </span><span><strong class="def-name">memory_tunable_tcache_unsorted_limit</strong> <var class="def-var-arguments">(int <var class="var">$arg1</var>, int <var class="var">$arg2</var>)</var><a class="copiable-link" href="#index-memory_005ftunable_005ftcache_005funsorted_005flimit"> &para;</a></span></dt>
+-<dd><p>This probe is triggered when the
+-<code class="code">glibc.malloc.tcache_unsorted_limit</code> tunable is set.  Argument
+-<var class="var">$arg1</var> is the requested value, and <var class="var">$arg2</var> is the previous
+-value of this tunable.
+-</p></dd></dl>
+-
+-<dl class="first-deftp def-block">
+ <dt class="deftp def-line" id="index-memory_005ftcache_005fdouble_005ffree"><span class="category-def">Probe: </span><span><strong class="def-name">memory_tcache_double_free</strong> <var class="def-var-arguments">(void *<var class="var">$arg1</var>, int <var class="var">$arg2</var>)</var><a class="copiable-link" href="#index-memory_005ftcache_005fdouble_005ffree"> &para;</a></span></dt>
+ <dd><p>This probe is triggered when <code class="code">free</code> determines that the memory
+ being freed has probably already been freed, and resides in the
+@@ -85216,7 +85673,6 @@
+ glibc.cpu.x86_shared_cache_size: 0x100000 (min: 0x0, max: 0xffffffffffffffff)
+ glibc.pthread.rseq: 1 (min: 0, max: 1)
+ glibc.cpu.prefer_map_32bit_exec: 0 (min: 0, max: 1)
+-glibc.mem.tagging: 0 (min: 0, max: 255)
+ glibc.malloc.hugetlb: 0x0 (min: 0x0, max: 0xffffffffffffffff)
+ glibc.cpu.x86_rep_movsb_threshold: 0x2000 (min: 0x100, max: 0xffffffffffffffff)
+ glibc.malloc.mxfast: 0x0 (min: 0x0, max: 0xffffffffffffffff)
+@@ -85229,7 +85685,6 @@
+ glibc.pthread.stack_cache_size: 0x2800000 (min: 0x0, max: 0xffffffffffffffff)
+ glibc.malloc.mmap_max: 0 (min: 0, max: 2147483647)
+ glibc.cpu.plt_rewrite: 0 (min: 0, max: 2)
+-glibc.malloc.tcache_unsorted_limit: 0x0 (min: 0x0, max: 0xffffffffffffffff)
+ glibc.cpu.x86_ibt:
+ glibc.cpu.hwcaps:
+ glibc.malloc.arena_max: 0x0 (min: 0x1, max: 0xffffffffffffffff)
+@@ -85241,25 +85696,153 @@
+ glibc.rtld.optional_static_tls: 0x200 (min: 0x0, max: 0xffffffffffffffff)
+ glibc.malloc.tcache_max: 0x0 (min: 0x0, max: 0xffffffffffffffff)
+ glibc.malloc.check: 0 (min: 0, max: 3)
++glibc.elf.thp: 0 (min: 0, max: 1)
+ </pre></div>
+ 
+ 
+ <ul class="mini-toc">
+-<li><a href="#Tunable-names" accesskey="1">Tunable names</a></li>
+-<li><a href="#Memory-Allocation-Tunables" accesskey="2">Memory Allocation Tunables</a></li>
+-<li><a href="#Dynamic-Linking-Tunables" accesskey="3">Dynamic Linking Tunables</a></li>
+-<li><a href="#POSIX-Thread-Tunables" accesskey="4">POSIX Thread Tunables</a></li>
+-<li><a href="#Hardware-Capability-Tunables" accesskey="5">Hardware Capability Tunables</a></li>
+-<li><a href="#Memory-Related-Tunables" accesskey="6">Memory Related Tunables</a></li>
+-<li><a href="#gmon-Tunables" accesskey="7">gmon Tunables</a></li>
++<li><a href="#System_002dwide-Tunables" accesskey="1">System-wide Tunables</a></li>
++<li><a href="#Tunable-names" accesskey="2">Tunable names</a></li>
++<li><a href="#Memory-Allocation-Tunables" accesskey="3">Memory Allocation Tunables</a></li>
++<li><a href="#Dynamic-Linking-Tunables" accesskey="4">Dynamic Linking Tunables</a></li>
++<li><a href="#POSIX-Thread-Tunables" accesskey="5">POSIX Thread Tunables</a></li>
++<li><a href="#Hardware-Capability-Tunables" accesskey="6">Hardware Capability Tunables</a></li>
++<li><a href="#Memory-Related-Tunables" accesskey="7">Memory Related Tunables</a></li>
++<li><a href="#gmon-Tunables" accesskey="8">gmon Tunables</a></li>
++<li><a href="#ELF-Tunables" accesskey="9">ELF Tunables</a></li>
+ </ul>
+ <hr>
++<div class="section-level-extent" id="System_002dwide-Tunables">
++<div class="nav-panel">
++<p>
++Next: <a href="#Tunable-names" accesskey="n" rel="next">Tunable names</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++</div>
++<h3 class="section" id="System_002dwide-Tunables-1"><span>39.1 System-wide Tunables<a class="copiable-link" href="#System_002dwide-Tunables-1"> &para;</a></span></h3>
++<a class="index-entry-id" id="index-System_002dwide-Tunables"></a>
++<a class="index-entry-id" id="index-_002fetc_002ftunables_002econf"></a>
++
++<p>In addition to setting the <code class="code">GLIBC_TUNABLES</code> environment variable,
++tunables may be provided globally via the file
++<samp class="file">/etc/tunables.conf</samp>, which gets stored in glibc&rsquo;s dynamic
++library cache <samp class="file">/etc/ld.so.cache</samp> and read by every program at
++startup.
++</p>
++<p><strong class="strong">Portability Note:</strong> Specific tunable settings and the
++<samp class="file">/etc/tunables.conf</samp> file format and path are not part of the
++stable library interfaces and may change between releases.
++</p>
++<p>The file <samp class="file">/etc/tunables.conf</samp> contains one tunable per line:
++</p>
++<div class="example">
++<pre class="example-preformatted">glibc.malloc.trim_threshold=128
++glibc.malloc.check=3
++</pre></div>
++
++<p><samp class="file">ldconfig</samp> (with whatever options you normally use) will read the
++tunables in <samp class="file">/etc/tunables.conf</samp> and save them as an extension
++in <samp class="file">/etc/ld.so.cache</samp>.  Tunables in the cache are applied to
++every program at startup, programs which are already running are not
++affected.
++</p>
++<p><samp class="file">/etc/tunables.conf</samp> supports the same &ldquo;include <var class="var">file</var>&rdquo;
++syntax as <samp class="file">ld.so.conf</samp>.
++</p>
++<p>Tunables in <samp class="file">/etc/tunables.conf</samp> serve as defaults.  They
++override the built-in defaults in each program, but may be overridden
++by the <code class="code">GLIBC_TUNABLES</code> environment variable.  Each tunable may
++have one or more prefixes which modifies the behavior of the tunable.
++</p>
++<dl class="table">
++<dt><code class="code">overridable</code></dt>
++<dt><code class="code">+</code></dt>
++<dt><code class="code">nonoverridable</code></dt>
++<dt><code class="code">-</code></dt>
++<dd><p>Prefixing the tunable name with <code class="code">nonoverridable</code> or <code class="code">-</code>
++blocks changes from the environment variable, giving the global
++setting precedence.  Prefixing with <code class="code">overridable</code> or <code class="code">+</code>
++(the default) reverts this behavior, which is only useful with the
++filters (below).
++</p>
++</dd>
++<dt><code class="code">onlysecure</code></dt>
++<dt><code class="code">@</code></dt>
++<dd><p>Tunables prefixed with <code class="code">onlysecure</code> or <code class="code">@</code> will apply only
++to processes that are AT_SECURE (i.e. setuid or setgid binaries, or
++elevated capabilities).
++</p>
++</dd>
++<dt><code class="code">nonsecure</code></dt>
++<dt><code class="code">$</code></dt>
++<dd><p>Tunables prefixed with <code class="code">nonsecure</code> or <code class="code">$</code> will apply only to
++processes that aren&rsquo;t AT_SECURE.
++</p>
++</dd>
++<dt><code class="code">anysecure</code></dt>
++<dt><code class="code">*</code></dt>
++<dd><p>Tunables prefixed with <code class="code">anysecure</code> or <code class="code">*</code> will apply to all
++processes.
++</p>
++</dd>
++</dl>
++
++<p>When none of the <code class="code">onlysecure</code>, <code class="code">nonsecure</code> or <code class="code">anysecure</code>
++prefixes is given, a tunable behaves as if <code class="code">nonsecure</code> had been
++specified: it applies only to processes that are not AT_SECURE.  Use
++<code class="code">anysecure</code> or <code class="code">onlysecure</code> to affect AT_SECURE (setuid,
++setgid, or capability-elevated) processes.
++</p>
++<p>The <code class="code">GLIBC_TUNABLES</code> environment variable is ignored entirely for
++AT_SECURE processes, so the system-wide file is the only way to set a
++tunable for such a process.  A tunable applied this way is not subject to
++any per-tunable security screening, so <code class="code">onlysecure</code> and
++<code class="code">anysecure</code> must be used deliberately: they can enable
++security-sensitive tunables (for example <code class="code">glibc.malloc.check</code>) in
++every setuid or setgid program.  The config file is therefore trusted to
++the same degree as <samp class="file">/etc/ld.so.cache</samp> and must only be writable by
++the system administrator.
++</p>
++<p>Filters make the system-wide tunables only affect certain programs.
++This allows having a non-overridable default for most of the system
++but a different, overridable, value for certain programs that might
++not work at all with the default setting.  The syntax for filters is
++to have each filter on its own line, followed by tunables that are
++applied when the filter matches, with this format:
++</p>
++<div class="example">
++<pre class="example-preformatted">[ <var class="var">filtername</var> : <var class="var">pattern</var> ]
++</pre></div>
++
++<p>Existing filters are:
++</p>
++<dl class="table">
++<dt><code class="code">proc</code></dt>
++<dd><p>Matches the process name.  The pattern is either a fully qualified
++path, or the basename of such a path.  The process name is read from
++<samp class="file">/proc/self/exe</samp> (if available) or <samp class="file">argv[0]</samp> (unless
++AT_SECURE is in effect).  Example:
++</p>
++<div class="example">
++<pre class="example-preformatted">-glibc.cpu.x86_shstk=1
++[proc:/usr/bin/program_that_crashes_with_shstk]
+++glibc.cpu.x86_shstk=0
++</pre></div>
++
++</dd>
++</dl>
++
++<p>Note that the effects of a filter only last until the next filter, or
++a line with <code class="code">[]</code> on it (&ldquo;no filter&rdquo;), or the end of the file
++(if the filter appears in an included file, at the end of the included
++file).
++</p>
++<hr>
++</div>
+ <div class="section-level-extent" id="Tunable-names">
+ <div class="nav-panel">
+ <p>
+-Next: <a href="#Memory-Allocation-Tunables" accesskey="n" rel="next">Memory Allocation Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++Next: <a href="#Memory-Allocation-Tunables" accesskey="n" rel="next">Memory Allocation Tunables</a>, Previous: <a href="#System_002dwide-Tunables" accesskey="p" rel="prev">System-wide Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="Tunable-names-1"><span>39.1 Tunable names<a class="copiable-link" href="#Tunable-names-1"> &para;</a></span></h3>
++<h3 class="section" id="Tunable-names-1"><span>39.2 Tunable names<a class="copiable-link" href="#Tunable-names-1"> &para;</a></span></h3>
+ <a class="index-entry-id" id="index-Tunable-names"></a>
+ <a class="index-entry-id" id="index-Tunable-namespaces"></a>
+ 
+@@ -85286,7 +85869,7 @@
+ <p>
+ Next: <a href="#Dynamic-Linking-Tunables" accesskey="n" rel="next">Dynamic Linking Tunables</a>, Previous: <a href="#Tunable-names" accesskey="p" rel="prev">Tunable names</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="Memory-Allocation-Tunables-1"><span>39.2 Memory Allocation Tunables<a class="copiable-link" href="#Memory-Allocation-Tunables-1"> &para;</a></span></h3>
++<h3 class="section" id="Memory-Allocation-Tunables-1"><span>39.3 Memory Allocation Tunables<a class="copiable-link" href="#Memory-Allocation-Tunables-1"> &para;</a></span></h3>
+ <a class="index-entry-id" id="index-memory-allocation-tunables"></a>
+ <a class="index-entry-id" id="index-malloc-tunables"></a>
+ <a class="index-entry-id" id="index-tunables_002c-malloc"></a>
+@@ -85411,10 +85994,8 @@
+ <p>This tunable sets the number of arenas to use in a process regardless of the
+ number of cores in the system.
+ </p>
+-<p>The default value of this tunable is <code class="code">0</code>, meaning that the limit on the
+-number of arenas is determined by the number of CPU cores online.  For 32-bit
+-systems the limit is twice the number of cores online and on 64-bit systems, it
+-is 8 times the number of cores online.
++<p>The default value of this tunable is <code class="code">0</code>, meaning that the limit is the
++number of CPU cores online reported by get_nprocs().
+ </p></dd></dl>
+ 
+ <dl class="first-deftp def-block">
+@@ -85426,55 +86007,35 @@
+ 
+ <dl class="first-deftp def-block">
+ <dt class="deftp def-line" id="index-glibc_002emalloc_002etcache_005fcount"><span class="category-def">Tunable: </span><span><strong class="def-name">glibc.malloc.tcache_count</strong><a class="copiable-link" href="#index-glibc_002emalloc_002etcache_005fcount"> &para;</a></span></dt>
+-<dd><p>The maximum number of chunks of each size to cache. The default is 7.
++<dd><p>The maximum number of chunks of each size to cache. The default is 16.
+ The upper limit is 65535.  If set to zero, the per-thread cache is effectively
+ disabled.
+ </p>
+ <p>The approximate maximum overhead of the per-thread cache is thus equal
+ to the number of bins times the chunk count in each bin times the size
+-of each chunk.  With defaults, the approximate maximum overhead of the
+-per-thread cache is approximately 236 KB on 64-bit systems and 118 KB
+-on 32-bit systems.
+-</p></dd></dl>
+-
+-<dl class="first-deftp def-block">
+-<dt class="deftp def-line" id="index-glibc_002emalloc_002etcache_005funsorted_005flimit"><span class="category-def">Tunable: </span><span><strong class="def-name">glibc.malloc.tcache_unsorted_limit</strong><a class="copiable-link" href="#index-glibc_002emalloc_002etcache_005funsorted_005flimit"> &para;</a></span></dt>
+-<dd><p>When the user requests memory and the request cannot be met via the
+-per-thread cache, the arenas are used to meet the request.  At this
+-time, additional chunks will be moved from existing arena lists to
+-pre-fill the corresponding cache.  While copies from the fastbins,
+-smallbins, and regular bins are bounded and predictable due to the bin
+-sizes, copies from the unsorted bin are not bounded, and incur
+-additional time penalties as they need to be sorted as they&rsquo;re
+-scanned.  To make scanning the unsorted list more predictable and
+-bounded, the user may set this tunable to limit the number of chunks
+-that are scanned from the unsorted list while searching for chunks to
+-pre-fill the per-thread cache with.  The default, or when set to zero,
+-is no limit.
++of each chunk.
+ </p></dd></dl>
+ 
+ <dl class="first-deftp def-block">
+ <dt class="deftp def-line" id="index-glibc_002emalloc_002emxfast"><span class="category-def">Tunable: </span><span><strong class="def-name">glibc.malloc.mxfast</strong><a class="copiable-link" href="#index-glibc_002emalloc_002emxfast"> &para;</a></span></dt>
+-<dd><p>One of the optimizations <code class="code">malloc</code> uses is to maintain a series of &ldquo;fast
+-bins&rdquo; that hold chunks up to a specific size.  The default and
+-maximum size which may be held this way is 80 bytes on 32-bit systems
+-or 160 bytes on 64-bit systems.  Applications which value size over
+-speed may choose to reduce the size of requests which are serviced
+-from fast bins with this tunable.  Note that the value specified
+-includes <code class="code">malloc</code>&rsquo;s internal overhead, which is normally the size of one
+-pointer, so add 4 on 32-bit systems or 8 on 64-bit systems to the size
+-passed to <code class="code">malloc</code> for the largest bin size to enable.
++<dd><p>This tunable has no effect since the &ldquo;fastbins&rdquo; have been removed.
+ </p></dd></dl>
+ 
+ <dl class="first-deftp def-block">
+ <dt class="deftp def-line" id="index-glibc_002emalloc_002ehugetlb"><span class="category-def">Tunable: </span><span><strong class="def-name">glibc.malloc.hugetlb</strong><a class="copiable-link" href="#index-glibc_002emalloc_002ehugetlb"> &para;</a></span></dt>
+ <dd><p>This tunable controls the usage of Huge Pages on <code class="code">malloc</code> calls.  The
+-default value is <code class="code">0</code>, which disables any additional support on
+-<code class="code">malloc</code>.
++default value is <code class="code">0</code> on most targets.  Using <code class="code">0</code> disables support
++that improves use of huge pages in <code class="code">malloc</code>.  However huge pages may
++still be created depending on the OS settings.
+ </p>
+ <p>Setting its value to <code class="code">1</code> enables the use of <code class="code">madvise</code> with
+ <code class="code">MADV_HUGEPAGE</code> after memory allocation with <code class="code">mmap</code>.  It is enabled
+ only if the system supports Transparent Huge Page (currently only on Linux).
++This is the default used for AArch64.
++</p>
++<p>When <code class="code">glibc.elf.thp</code> set to 1, malloc uses the actual kernel THP mode
++instead of defaulting to madvise mode and madvise_thp will stop issuing
++MADV_HUGEPAGE if kernel THP mode is always.
+ </p>
+ <p>Setting its value to <code class="code">2</code> enables the use of Huge Page directly with
+ <code class="code">mmap</code> with the use of <code class="code">MAP_HUGETLB</code> flag.  The huge page size
+@@ -85491,7 +86052,7 @@
+ <p>
+ Next: <a href="#POSIX-Thread-Tunables" accesskey="n" rel="next">POSIX Thread Tunables</a>, Previous: <a href="#Memory-Allocation-Tunables" accesskey="p" rel="prev">Memory Allocation Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="Dynamic-Linking-Tunables-1"><span>39.3 Dynamic Linking Tunables<a class="copiable-link" href="#Dynamic-Linking-Tunables-1"> &para;</a></span></h3>
++<h3 class="section" id="Dynamic-Linking-Tunables-1"><span>39.4 Dynamic Linking Tunables<a class="copiable-link" href="#Dynamic-Linking-Tunables-1"> &para;</a></span></h3>
+ <a class="index-entry-id" id="index-dynamic-linking-tunables"></a>
+ <a class="index-entry-id" id="index-rtld-tunables"></a>
+ 
+@@ -85596,7 +86157,7 @@
+ <p>
+ Next: <a href="#Hardware-Capability-Tunables" accesskey="n" rel="next">Hardware Capability Tunables</a>, Previous: <a href="#Dynamic-Linking-Tunables" accesskey="p" rel="prev">Dynamic Linking Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="POSIX-Thread-Tunables-1"><span>39.4 POSIX Thread Tunables<a class="copiable-link" href="#POSIX-Thread-Tunables-1"> &para;</a></span></h3>
++<h3 class="section" id="POSIX-Thread-Tunables-1"><span>39.5 POSIX Thread Tunables<a class="copiable-link" href="#POSIX-Thread-Tunables-1"> &para;</a></span></h3>
+ <a class="index-entry-id" id="index-pthread-mutex-tunables"></a>
+ <a class="index-entry-id" id="index-thread-mutex-tunables"></a>
+ <a class="index-entry-id" id="index-mutex-tunables"></a>
+@@ -85667,7 +86228,7 @@
+ <p>
+ Next: <a href="#Memory-Related-Tunables" accesskey="n" rel="next">Memory Related Tunables</a>, Previous: <a href="#POSIX-Thread-Tunables" accesskey="p" rel="prev">POSIX Thread Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="Hardware-Capability-Tunables-1"><span>39.5 Hardware Capability Tunables<a class="copiable-link" href="#Hardware-Capability-Tunables-1"> &para;</a></span></h3>
++<h3 class="section" id="Hardware-Capability-Tunables-1"><span>39.6 Hardware Capability Tunables<a class="copiable-link" href="#Hardware-Capability-Tunables-1"> &para;</a></span></h3>
+ <a class="index-entry-id" id="index-hardware-capability-tunables"></a>
+ <a class="index-entry-id" id="index-hwcap-tunables"></a>
+ <a class="index-entry-id" id="index-tunables_002c-hwcap"></a>
+@@ -85862,43 +86423,51 @@
+ </p>
+ <p>Accepted values are:
+ </p>
+-<p>0 = disabled: do not enable GCS.
+-</p>
+-<p>1 = enforced: check markings and fail if any binary is not marked.
+-</p>
+-<p>2 = optional: check markings but keep GCS off if any binary is unmarked.
+-</p>
+-<p>3 = override: enable GCS, markings are ignored.
+-</p>
++<ul class="itemize mark-bullet">
++<li><code class="code">0</code> = disabled: do not enable GCS.
++</li><li><code class="code">1</code> = enforced: check markings and abort if any binary is not
++marked, otherwise enable GCS and lock all GCS features.
++</li><li><code class="code">2</code> = optional: check markings but keep GCS off if any binary
++is unmarked, otherwise enable GCS but do not lock any GCS features.
++</li><li><code class="code">3</code> = override: enable GCS and lock all GCS features, markings
++are ignored.
++</li></ul>
++
+ <p>If unmarked binary is loaded via <code class="code">dlopen</code> when GCS is enabled and
+-markings are not ignored (<code class="code">aarch64_gcs == 1</code> or <code class="code">2</code>), then
+-the process will be aborted.
++markings are not ignored (i.e. <code class="code">aarch64_gcs == 1</code> or <code class="code">2</code>), then
++<code class="code">dlopen</code> will return an error.
+ </p>
+ <p>Default is <code class="code">0</code>, so GCS is disabled by default.
+ </p>
+ <p>This tunable is specific to AArch64. On systems that do not support
+ Guarded Control Stack this tunable has no effect.
+ </p>
++<p>GCS features (or operations on shadow stack) such as <code class="code">STATUS</code> (i.e.
++enabling and disabling GCS), <code class="code">WRITE</code>, and <code class="code">PUSH</code>, will be locked
++for the <code class="code">enforced</code> and <code class="code">override</code> tunable values.
++</p>
+ <p>Before enabling GCS for the process the value of this tunable is checked
+ and depending on it the following outcomes are possible.
+ </p>
+-<p><code class="code">aarch64_gcs == 0</code>: GCS will not be enabled and GCS markings will not be
++<ul class="itemize mark-bullet">
++<li><code class="code">aarch64_gcs == 0</code>: GCS will remain disabled and GCS markings will not be
+ checked for any binaries.
+-</p>
+-<p><code class="code">aarch64_gcs == 1</code>: GCS markings will be checked for all binaries loaded
+-at startup and, only if all binaries are GCS-marked, GCS will be enabled. If
+-any of the binaries are not GCS-marked, the process will abort. Subsequent call
+-to <code class="code">dlopen</code> for an unmarked binary will also result in abort.
+-</p>
+-<p><code class="code">aarch64_gcs == 2</code>: GCS markings will be checked for all binaries loaded
++</li><li><code class="code">aarch64_gcs == 1</code>: GCS markings will be checked for all binaries loaded
++at startup and, only if all binaries are GCS-marked, GCS will be enabled and
++all GCS features will be locked.  If any of the binaries are not GCS-marked,
++the process will abort.  Subsequent call to <code class="code">dlopen</code> for an unmarked binary
++will result in <code class="code">dlopen</code> returning an error.
++</li><li><code class="code">aarch64_gcs == 2</code>: GCS markings will be checked for all binaries loaded
+ at startup and, if any of such binaries are not GCS-marked, GCS will not be
+ enabled and there will be no more checks for GCS marking. If all binaries
+-loaded at startup are GCS-marked, then GCS will be enabled, in which case a
+-call to <code class="code">dlopen</code> for an unmarked binary will also result in abort.
+-</p>
+-<p><code class="code">aarch64_gcs == 3</code>: GCS will be enabled and GCS markings will not be
+-checked for any binaries.
+-</p></dd></dl>
++loaded at startup are GCS-marked, then GCS will be enabled but GCS features
++will not be locked.  In this case a call to <code class="code">dlopen</code> for an unmarked binary
++will result in <code class="code">dlopen</code> returning an error.
++</li><li><code class="code">aarch64_gcs == 3</code>: GCS will be enabled and all GCS features will be
++locked.  GCS markings will not be checked for any binaries.
++</li></ul>
++
++</dd></dl>
+ 
+ <hr>
+ </div>
+@@ -85907,7 +86476,7 @@
+ <p>
+ Next: <a href="#gmon-Tunables" accesskey="n" rel="next">gmon Tunables</a>, Previous: <a href="#Hardware-Capability-Tunables" accesskey="p" rel="prev">Hardware Capability Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="Memory-Related-Tunables-1"><span>39.6 Memory Related Tunables<a class="copiable-link" href="#Memory-Related-Tunables-1"> &para;</a></span></h3>
++<h3 class="section" id="Memory-Related-Tunables-1"><span>39.7 Memory Related Tunables<a class="copiable-link" href="#Memory-Related-Tunables-1"> &para;</a></span></h3>
+ <a class="index-entry-id" id="index-memory-related-tunables"></a>
+ 
+ <dl class="first-deftp def-block">
+@@ -85917,35 +86486,6 @@
+ </p></dd></dl>
+ 
+ <dl class="first-deftp def-block">
+-<dt class="deftp def-line" id="index-glibc_002emem_002etagging"><span class="category-def">Tunable: </span><span><strong class="def-name">glibc.mem.tagging</strong><a class="copiable-link" href="#index-glibc_002emem_002etagging"> &para;</a></span></dt>
+-<dd><p>If the hardware supports memory tagging, this tunable can be used to
+-control the way the GNU C Library uses this feature.  At present this is only
+-supported on AArch64 systems with the MTE extension; it is ignored for
+-all other systems.
+-</p>
+-<p>This tunable takes a value between 0 and 255 and acts as a bitmask
+-that enables various capabilities.
+-</p>
+-<p>Bit 0 (the least significant bit) causes the <code class="code">malloc</code>
+-subsystem to allocate
+-tagged memory, with each allocation being assigned a random tag.
+-</p>
+-<p>Bit 1 enables precise faulting mode for tag violations on systems that
+-support deferred tag violation reporting.  This may cause programs
+-to run more slowly.
+-</p>
+-<p>Bit 2 enables either precise or deferred faulting mode for tag violations
+-whichever is preferred by the system.
+-</p>
+-<p>Other bits are currently reserved.
+-</p>
+-<p>The GNU C Library startup code will automatically enable memory tagging
+-support in the kernel if this tunable has any non-zero value.
+-</p>
+-<p>The default value is &lsquo;<samp class="samp">0</samp>&rsquo;, which disables all memory tagging.
+-</p></dd></dl>
+-
+-<dl class="first-deftp def-block">
+ <dt class="deftp def-line" id="index-glibc_002emem_002edecorate_005fmaps"><span class="category-def">Tunable: </span><span><strong class="def-name">glibc.mem.decorate_maps</strong><a class="copiable-link" href="#index-glibc_002emem_002edecorate_005fmaps"> &para;</a></span></dt>
+ <dd><p>If the kernel supports naming anonymous virtual memory areas (since
+ Linux version 5.17, although not always enabled by some kernel
+@@ -85955,7 +86495,7 @@
+ stack created by <code class="code">pthread_create</code> or memory allocated by
+ <code class="code">malloc</code>).
+ </p>
+-<p>The process mappings can be obtained by reading the <code class="code">/proc/&lt;pid&gt;maps</code>
++<p>The process mappings can be obtained by reading the <code class="code">/proc/&lt;pid&gt;/maps</code>
+ (with <code class="code">pid</code> being either the <em class="dfn">process ID</em> or <code class="code">self</code> for the
+ process own mapping).
+ </p>
+@@ -85968,9 +86508,9 @@
+ <div class="section-level-extent" id="gmon-Tunables">
+ <div class="nav-panel">
+ <p>
+-Previous: <a href="#Memory-Related-Tunables" accesskey="p" rel="prev">Memory Related Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++Next: <a href="#ELF-Tunables" accesskey="n" rel="next">ELF Tunables</a>, Previous: <a href="#Memory-Related-Tunables" accesskey="p" rel="prev">Memory Related Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
+ </div>
+-<h3 class="section" id="gmon-Tunables-1"><span>39.7 gmon Tunables<a class="copiable-link" href="#gmon-Tunables-1"> &para;</a></span></h3>
++<h3 class="section" id="gmon-Tunables-1"><span>39.8 gmon Tunables<a class="copiable-link" href="#gmon-Tunables-1"> &para;</a></span></h3>
+ <a class="index-entry-id" id="index-gmon-tunables"></a>
+ 
+ <dl class="first-deftp def-block">
+@@ -86027,6 +86567,34 @@
+ error will be printed at program startup, the profiler will be
+ disabled, and no <samp class="file">gmon.out</samp> file will be generated.
+ </p></dd></dl>
++
++<hr>
++</div>
++<div class="section-level-extent" id="ELF-Tunables">
++<div class="nav-panel">
++<p>
++Previous: <a href="#gmon-Tunables" accesskey="p" rel="prev">gmon Tunables</a>, Up: <a href="#Tunables" accesskey="u" rel="up">Tunables</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>][<a href="#Concept-Index" title="Index" rel="index">Index</a>]</p>
++</div>
++<h3 class="section" id="ELF-Tunables-1"><span>39.9 ELF Tunables<a class="copiable-link" href="#ELF-Tunables-1"> &para;</a></span></h3>
++<a class="index-entry-id" id="index-elf-tunables"></a>
++
++<dl class="first-deftp def-block">
++<dt class="deftp def-line" id="index-glibc_002eelf_002ethp"><span class="category-def">Tunable: </span><span><strong class="def-name">glibc.elf.thp</strong><a class="copiable-link" href="#index-glibc_002eelf_002ethp"> &para;</a></span></dt>
++<dd><p>This tunable controls Transparent Huge Page (THP) aware alignment of
++ELF loadable segments.
++</p>
++<p>The default value is <code class="code">0</code>, which preserves the traditional page-sized
++alignment for loadable segments.
++</p>
++<p>If set to <code class="code">1</code>, glibc will attempt to align sufficiently large
++<code class="code">PT_LOAD</code> segments to the PMD huge page size when mapping them
++with <code class="code">mmap</code>.  This increases the likelihood that the kernel can
++back these mappings with Transparent Huge Pages.
++</p>
++<p>This tunable has an effect only on systems that support Transparent
++Huge Pages (currently Linux).  On other systems, or if THP is disabled
++at the kernel level, enabling this tunable has no effect.
++</p></dd></dl>
+ <hr>
+ </div>
+ </div>
+@@ -86709,7 +87277,8 @@
+ <p>The result of subtracting two pointers in C is always an integer, but the
+ precise data type varies from C compiler to C compiler.  Likewise, the
+ data type of the result of <code class="code">sizeof</code> also varies between compilers.
+-ISO C defines standard aliases for these two types, so you can refer to
++Also, it helps to have a data type with the greatest fundamental alignment.
++ISO C defines standard aliases for these types, so you can refer to
+ them in a portable fashion.  They are defined in the header file
+ <samp class="file">stddef.h</samp>.
+ <a class="index-entry-id" id="index-stddef_002eh"></a>
+@@ -86738,12 +87307,24 @@
+ arguments or variables that hold the size of an object.
+ </p></dd></dl>
+ 
+-<p><strong class="strong">Compatibility Note:</strong> Implementations of C before the advent of
+-ISO&nbsp;C<!-- /@w --> generally used <code class="code">unsigned int</code> for representing object sizes
+-and <code class="code">int</code> for pointer subtraction results.  They did not
+-necessarily define either <code class="code">size_t</code> or <code class="code">ptrdiff_t</code>.  Unix
+-systems did define <code class="code">size_t</code>, in <samp class="file">sys/types.h</samp>, but the
+-definition was usually a signed type.
++<dl class="first-deftp def-block">
++<dt class="deftp def-line" id="index-max_005falign_005ft"><span class="category-def">Data Type: </span><span><strong class="def-name">max_align_t</strong><a class="copiable-link" href="#index-max_005falign_005ft"> &para;</a></span></dt>
++<dd>
++<a class="index-entry-id" id="index-fundamental-alignment"></a>
++<p>This is an object type with the greatest <em class="dfn">fundamental alignment</em>,
++i.e., the greatest alignment needed by standard types.
++Code can use <code class="code">alignof (max_align_t)</code> when calculating space
++needed for arbitrary collections of objects, so long as the objects&rsquo;
++types have a fundamental alignment and lack stricter alignment specifiers.
++</p></dd></dl>
++
++<p>In the GNU C Library, the value of <code class="code">alignof (max_align_t)</code> is 16 on
++most architectures.  However, it is 8 on 32-bit architectures that do
++not require 16-byte alignment from <code class="code">malloc</code> to support predefined
++types.
++</p>
++<p><strong class="strong">Compatibility Note:</strong> The C11 standard introduced <code class="code">max_align_t</code>;
++older compilers may lack the type.
+ </p>
+ <hr>
+ </div>
+@@ -98144,6 +98725,11 @@
+ <p><samp class="file">stdlib.h</samp> (ISO):  <a class="ref" href="#Basic-Allocation">Basic Memory Allocation</a>.
+ </p>
+ </dd>
++<dt><code class="code">max_align_t</code></dt>
++<dd>
++<p><samp class="file">stddef.h</samp> (ISO):  <a class="ref" href="#Important-Data-Types">Important Data Types</a>.
++</p>
++</dd>
+ <dt><code class="code">int mblen (const char *<var class="var">string</var>, size_t <var class="var">size</var>)</code></dt>
+ <dd>
+ <p><samp class="file">stdlib.h</samp> (ISO):  <a class="ref" href="#Non_002dreentrant-Character-Conversion">Non-reentrant Conversion of Single Characters</a>.
+@@ -102916,32 +103502,11 @@
+ <p>NOTE: <samp class="option">--enable-cet</samp> is only supported on x86_64 and x32.
+ </p>
+ </dd>
+-<dt>&lsquo;<samp class="samp">--enable-memory-tagging</samp>&rsquo;</dt>
+-<dd><p>Enable memory tagging support if the architecture supports it.  When
+-the GNU C Library is built with this option then the resulting library will
+-be able to control the use of tagged memory when hardware support is
+-present by use of the tunable &lsquo;<samp class="samp">glibc.mem.tagging</samp>&rsquo;.  This includes
+-the generation of tagged memory when using the <code class="code">malloc</code> APIs.
+-</p>
+-<p>At present only AArch64 platforms with MTE provide this functionality,
+-although the library will still operate (without memory tagging) on
+-older versions of the architecture.
+-</p>
+-<p>The default is to disable support for memory tagging.
+-</p>
+-</dd>
+ <dt>&lsquo;<samp class="samp">--disable-profile</samp>&rsquo;</dt>
+ <dd><p>Don&rsquo;t build libraries with profiling information.  You may want to use
+ this option if you don&rsquo;t plan to do profiling.
+ </p>
+ </dd>
+-<dt>&lsquo;<samp class="samp">--enable-static-nss</samp>&rsquo;</dt>
+-<dd><p>Compile static versions of the NSS (Name Service Switch) libraries.
+-This is not recommended because it defeats the purpose of NSS; a program
+-linked statically with the NSS libraries cannot be dynamically
+-reconfigured to use a different name database.
+-</p>
+-</dd>
+ <dt>&lsquo;<samp class="samp">--enable-hardcoded-path-in-tests</samp>&rsquo;</dt>
+ <dd><p>By default, dynamic tests are linked to run with the installed C library.
+ This option hardcodes the newly built C library path in dynamic tests
+@@ -103299,7 +103864,7 @@
+ <p>GCC 12.1 or higher is required.  In general it is recommended to use
+ the newest version of the compiler that is known to work for building
+ the GNU C Library, as newer compilers usually produce better code.  As of
+-release time, GCC 15.2.1 is the newest compiler verified to work to build
++release time, GCC 16.1.1 is the newest compiler verified to work to build
+ the GNU C Library.
+ </p>
+ <p>For multi-arch support it is recommended to use a GCC which has been built with
+@@ -103319,7 +103884,7 @@
+ 
+ <p>You must use GNU <code class="code">binutils</code> (as and ld) to build the GNU C Library.
+ No other assembler or linker has the necessary functionality at the
+-moment. As of release time, GNU <code class="code">binutils</code> 2.45.1 is the newest
++moment. As of release time, GNU <code class="code">binutils</code> 2.46.1 is the newest
+ verified to work to build the GNU C Library.
+ </p>
+ </li><li>GNU <code class="code">texinfo</code> 4.7 or later
+@@ -103328,7 +103893,7 @@
+ this version of the <code class="code">texinfo</code> package.  Earlier versions do not
+ understand all the tags used in the document, and the installation
+ mechanism for the info files is not present or works differently.
+-As of release time, <code class="code">texinfo</code> 7.2 is the newest verified to work
++As of release time, <code class="code">texinfo</code> 7.3 is the newest verified to work
+ to build the GNU C Library.
+ </p>
+ </li><li>GNU <code class="code">awk</code> 3.1.2, or higher
+@@ -103336,7 +103901,7 @@
+ <p><code class="code">awk</code> is used in several places to generate files.
+ Some <code class="code">gawk</code> extensions are used, including the <code class="code">asorti</code>
+ function, which was introduced in version 3.1.2 of <code class="code">gawk</code>.
+-As of release time, <code class="code">gawk</code> version 5.3.2 is the newest verified
++As of release time, <code class="code">gawk</code> version 5.4.1 is the newest verified
+ to work to build the GNU C Library.
+ </p>
+ <p>Testing the GNU C Library requires <code class="code">gawk</code> to be compiled with
+@@ -103353,19 +103918,19 @@
+ 
+ <p>Perl is not required, but if present it is used in some tests and the
+ <code class="code">mtrace</code> program, to build the GNU C Library manual.  As of release
+-time <code class="code">perl</code> version 5.42.0 is the newest verified to work to
++time <code class="code">perl</code> version 5.44.0 is the newest verified to work to
+ build the GNU C Library.
+ </p>
+ </li><li>GNU <code class="code">sed</code> 3.02 or newer
+ 
+ <p><code class="code">Sed</code> is used in several places to generate files.  Most scripts work
+ with any version of <code class="code">sed</code>.  As of release time, <code class="code">sed</code> version
+-4.9 is the newest verified to work to build the GNU C Library.
++4.10 is the newest verified to work to build the GNU C Library.
+ </p>
+ </li><li>Python 3.4 or later
+ 
+ <p>Python is required to build the GNU C Library.  As of release time, Python
+-3.14.0 is the newest verified to work for building and testing
++3.14.6 is the newest verified to work for building and testing
+ the GNU C Library.
+ </p>
+ </li><li>PExpect 4.0
+@@ -103465,7 +104030,7 @@
+ prefix or allow it to default to <samp class="file">/usr/local</samp>, then all the
+ components are installed there.
+ </p>
+-<p>As of release time, Linux version 6.12 is the newest stable version verified
++<p>As of release time, Linux version 7.1 is the newest stable version verified
+ to work to build the GNU C Library.
+ </p>
+ <hr>
+@@ -105172,6 +105737,8 @@
+ <ul class="itemize mark-bullet">
+ <li>Osama Abdelkader for various contributions.
+ 
++</li><li>Shamil Abdulaev for various fixes.
++
+ </li><li>Nick Alcock for contributing fixes to allow the GNU C Library to be built with the
+ stack smashing protector enabled.
+ 
+@@ -105272,8 +105839,8 @@
+ 
+ </li><li>Palmer Dabbelt for contributing the port to Linux/RISC-V.
+ 
+-</li><li>DJ Delorie for maintenance of Linux/RISC-V, numerous fixes, and handbook
+-contributions.
++</li><li>DJ Delorie for maintenance of Linux/RISC-V, work on the tunables system,
++numerous fixes, and handbook contributions.
+ 
+ </li><li>Jianbo Deng for the work on the Loongson port.
+ 
+@@ -105310,11 +105877,13 @@
+ </li><li>versioning of objects on the symbol level
+ </li></ul>
+ 
++</li><li>Cosmina Dunca for contributions to the AArch64 port.
++
+ </li><li>Richard Earnshaw for continued support and fixes to the various ARM
+ machine files.
+ 
+ </li><li>Paul Eggert for the <code class="code">mktime</code> function, for his direction as
+-part of the GNU C Library steering committee, and numerous fixes.
++part of the GNU C Library steering committee, and numerous fixes and contributions.
+ 
+ </li><li>Roy Eldar for various fixes.
+ 
+@@ -105329,7 +105898,9 @@
+ </li><li>Olaf Flebbe and Ralf B&auml;chle for contributing
+ <samp class="file">sysdeps/mips/fpu_control.h</samp>.
+ 
+-</li><li>Dylan Fleming for work on the AArch64 port.
++</li><li>Dylan Fleming for various contributions to the AArch64 port.
++
++</li><li>Michael Ford for various fixes.
+ 
+ </li><li>Alistair Francis for Y2038 related fixes.
+ 
+@@ -105341,6 +105912,8 @@
+ </li><li>Martin Galvan for contributing gdb pretty printer support to glibc and adding
+ an initial set of pretty printers for structures in the POSIX Threads library.
+ 
++</li><li>Xiang Gao for fixes to the libio subsystem.
++
+ </li><li>Romain Geissler for various fixes.
+ 
+ </li><li>Michael Glad for the passphrase-hashing function <code class="code">crypt</code> and related
+@@ -105420,6 +105993,8 @@
+ Ultrix 4 (<code class="code">mips-dec-ultrix4</code>) and the port to the DEC Alpha
+ running OSF/1 (<code class="code">alpha-dec-osf1</code>).
+ 
++</li><li>Mike Kelly for contributions to the hurd port.
++
+ </li><li>Mark Kettenis for implementing the <code class="code">utmpx</code> interface and a utmp
+ daemon, and for a Hesiod NSS module.
+ 
+@@ -105446,6 +106021,8 @@
+ 
+ </li><li>Akhilesh Kumar for various fixes to locales.
+ 
++</li><li>Avinal Kumar for various internationalization fixes.
++
+ </li><li>Luna Lamb for various contributions to the AArch64 port.
+ 
+ </li><li>Jeff Law for various fixes.
+@@ -105477,6 +106054,8 @@
+ 
+ </li><li>Maxim Kuvyrkov for various fixes.
+ 
++</li><li>Rocket Ma for various fixes.
++
+ </li><li>Luis Machado for optimized functions on PowerPC.
+ 
+ </li><li>David J. MacKenzie for his contribution to the <code class="code">getopt</code>
+@@ -105497,7 +106076,7 @@
+ 
+ </li><li>Allan McRae for various fixes.
+ 
+-</li><li>Meng Qinggang for contributions to the LoongArch port.
++</li><li>Meng Qinggang for many contributions to the LoongArch port.
+ 
+ </li><li>Aaron Merey for contributed tests.
+ 
+@@ -105555,6 +106134,8 @@
+ </li><li>Will Newton for contributing some optimized string functions and pointer
+ encryption support for ARM and various fixes.
+ 
++</li><li>Diego Nieto Cid for contributions to the hurd port.
++
+ </li><li>Carlos O&rsquo;Donell for his maintainership of the HPPA architecture, for
+ maintaining the GNU C Library web pages and wiki, for his direction as FSF
+ Project Steward for the GNU C Library and numerous bug fixes.
+@@ -105579,7 +106160,7 @@
+ 
+ </li><li>Siddhesh Poyarekar for various fixes, an implementation of a framework for
+ performance benchmarking of functions, implementing the tunables
+-infrastructure, and handbook improvements.
++infrastructure, handling of security issues, and handbook improvements.
+ 
+ </li><li>Tom Quinn for contributing the startup code to support SunOS shared
+ libraries and the port to SGI machines running Irix 4
+@@ -105663,29 +106244,37 @@
+ 
+ </li><li>Pino Toscano for various fixes.
+ 
+-</li><li>Matt Turner for various fixes to the Alpha port.
++</li><li>Matt Turner for various fixes, in particular to the Alpha port.
+ 
+ </li><li>Valery Ushakov for locale fixes.
+ 
++</li><li>Jonathan Wakely for work on C++26 support.
++
+ </li><li>Feifei Wang for Hygon-related contributions.
+ 
+ </li><li>Hsiangkai Wang for various fixes.
+ 
++</li><li>Rui Wang for contributions to the THP support.
++
+ </li><li>Tim Waugh for the implementation of the POSIX.2 <code class="code">wordexp</code>
+ function family.
+ 
+ </li><li>Ulrich Weigand for various fixes to the PowerPC64 and Arm ports.
+ 
+ </li><li>Florian Weimer for his maintainership of the network and dynamic-link
+-components, for handling of security issues, and for numerous fixes and
+-contributions.
++components, for handling of security issues, many contributions to the
++test framework, and for numerous further fixes and contributions.
++
++</li><li>Richard Wild for contributions to the AArch64 port.
+ 
+ </li><li>Zack Weinberg for the <code class="code">explicit_bzero</code> implementation and for various
+ fixes.
+ 
+ </li><li>Mark Wielaard for various fixes.
+ 
+-</li><li>Xi Ruoyao for various fixes and work on the loongarch port.
++</li><li>xiejiamei for Hygon-related contributions.
++
++</li><li>Xi Ruoyao for many fixes and for work on the loongarch port.
+ 
+ </li><li>Qixing ksyx Xue for various fixes.
+ 
+@@ -106976,6 +107565,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-_002fcondition">/condition</a></td><td class="printindex-index-section"><a href="#Other-Safety-Remarks">Other Safety Remarks</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-_002fetc_002fhostname">/etc/hostname</a></td><td class="printindex-index-section"><a href="#Host-Identification">Host Identification</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-_002fetc_002fnsswitch_002econf"><samp class="file">/etc/nsswitch.conf</samp></a></td><td class="printindex-index-section"><a href="#NSS-Configuration-File">NSS Configuration File</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-_002fetc_002ftunables_002econf">/etc/tunables.conf</a></td><td class="printindex-index-section"><a href="#System_002dwide-Tunables">System-wide Tunables</a></td></tr>
+ <tr><td colspan="3"><hr></td></tr>
+ <tr><th id="Concept-Index_cp_symbol-8">4</th></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-4_002en-BSD-Unix">4.<var class="var">n</var> BSD Unix</a></td><td class="printindex-index-section"><a href="#Berkeley-Unix">Berkeley Unix</a></td></tr>
+@@ -107313,6 +107903,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-efficiency-of-chunks">efficiency of chunks</a></td><td class="printindex-index-section"><a href="#Obstack-Chunks">Obstack Chunks</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-EINTR_002c-and-restarting-interrupted-primitives">EINTR, and restarting interrupted primitives</a></td><td class="printindex-index-section"><a href="#Interrupted-Primitives">Interrupted Primitives</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-elapsed-time">elapsed time</a></td><td class="printindex-index-section"><a href="#Time-Basics">Time Basics</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-elf-tunables">elf tunables</a></td><td class="printindex-index-section"><a href="#ELF-Tunables">ELF Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-end-of-file_002c-on-a-stream">end of file, on a stream</a></td><td class="printindex-index-section"><a href="#EOF-and-Errors">EOF and Errors</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-end_002dof_002dfile_002c-on-a-file-descriptor">end-of-file, on a file descriptor</a></td><td class="printindex-index-section"><a href="#I_002fO-Primitives">I/O Primitives</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-env">env</a></td><td class="printindex-index-section"><a href="#Other-Safety-Remarks">Other Safety Remarks</a></td></tr>
+@@ -107431,6 +108022,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-fully-buffered-stream">fully buffered stream</a></td><td class="printindex-index-section"><a href="#Buffering-Concepts">Buffering Concepts</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Function-not-implemented">Function not implemented</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-function-prototypes-_0028variadic_0029">function prototypes (variadic)</a></td><td class="printindex-index-section"><a href="#Variadic-Prototypes">Variadic Prototypes</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-fundamental-alignment">fundamental alignment</a></td><td class="printindex-index-section"><a href="#Important-Data-Types">Important Data Types</a></td></tr>
+ <tr><td colspan="3"><hr></td></tr>
+ <tr><th id="Concept-Index_cp_letter-G">G</th></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-gamma-function">gamma function</a></td><td class="printindex-index-section"><a href="#Special-Functions">Special Functions</a></td></tr>
+@@ -107498,6 +108090,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-IEEE-floating-point-representation">IEEE floating point representation</a></td><td class="printindex-index-section"><a href="#IEEE-Floating-Point">IEEE Floating Point</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-IEEE-Std-1003_002e1">IEEE Std 1003.1</a></td><td class="printindex-index-section"><a href="#POSIX">POSIX</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-IEEE-Std-1003_002e2">IEEE Std 1003.2</a></td><td class="printindex-index-section"><a href="#POSIX">POSIX</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-IFUNC">IFUNC</a></td><td class="printindex-index-section"><a href="#Indirect-Functions">Indirect Functions</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-ignore-action-for-a-signal">ignore action for a signal</a></td><td class="printindex-index-section"><a href="#Basic-Signal-Handling">Basic Signal Handling</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-illegal-instruction">illegal instruction</a></td><td class="printindex-index-section"><a href="#Program-Error-Signals">Program Error Signals</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Illegal-seek">Illegal seek</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
+@@ -107506,6 +108099,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Inappropriate-ioctl-for-device">Inappropriate ioctl for device</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Inappropriate-operation-for-background-process">Inappropriate operation for background process</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-independent-channels">independent channels</a></td><td class="printindex-index-section"><a href="#Independent-Channels">Independent Channels</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-indirect-function">indirect function</a></td><td class="printindex-index-section"><a href="#Indirect-Functions">Indirect Functions</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-inexact-exception">inexact exception</a></td><td class="printindex-index-section"><a href="#FP-Exceptions">FP Exceptions</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-infinity">infinity</a></td><td class="printindex-index-section"><a href="#Infinity-and-NaN">Infinity and NaN</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-init">init</a></td><td class="printindex-index-section"><a href="#Conditionally-Safe-Features">Conditionally Safe Features</a></td></tr>
+@@ -107998,6 +108592,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-REPRINT-character">REPRINT character</a></td><td class="printindex-index-section"><a href="#Editing-Characters">Editing Characters</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Required-key-not-available">Required key not available</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-reserved-names">reserved names</a></td><td class="printindex-index-section"><a href="#Reserved-Names">Reserved Names</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-resolver-function-_0028IFUNC_0029">resolver function (IFUNC)</a></td><td class="printindex-index-section"><a href="#Indirect-Functions">Indirect Functions</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Resource-deadlock-avoided">Resource deadlock avoided</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-resource-limits">resource limits</a></td><td class="printindex-index-section"><a href="#Limits-on-Resources">Limits on Resources</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Resource-temporarily-unavailable">Resource temporarily unavailable</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
+@@ -108178,6 +108773,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-string-vectors_002c-null_002dbyte-separated">string vectors, null-byte separated</a></td><td class="printindex-index-section"><a href="#Argz-and-Envz-Vectors">Argz and Envz Vectors</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-string_002c-representation-of">string, representation of</a></td><td class="printindex-index-section"><a href="#Representation-of-Strings">Representation of Strings</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-Structure-needs-cleaning">Structure needs cleaning</a></td><td class="printindex-index-section"><a href="#Error-Codes">Error Codes</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-STT_005fGNU_005fIFUNC"><code class="code">STT_GNU_IFUNC</code></a></td><td class="printindex-index-section"><a href="#Indirect-Functions">Indirect Functions</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-style-of-communication-_0028of-a-socket_0029">style of communication (of a socket)</a></td><td class="printindex-index-section"><a href="#Socket-Concepts">Socket Concepts</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-subprocess">subprocess</a></td><td class="printindex-index-section"><a href="#Process-Creation-Concepts">Process Creation Concepts</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-subshell">subshell</a></td><td class="printindex-index-section"><a href="#Initializing-the-Shell">Initializing the Shell</a></td></tr>
+@@ -108204,6 +108800,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-system-call">system call</a></td><td class="printindex-index-section"><a href="#System-Calls">System Calls</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-system-call-number">system call number</a></td><td class="printindex-index-section"><a href="#System-Calls">System Calls</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-System-V-Unix">System V Unix</a></td><td class="printindex-index-section"><a href="#SVID">SVID</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-System_002dwide-Tunables">System-wide Tunables</a></td><td class="printindex-index-section"><a href="#System_002dwide-Tunables">System-wide Tunables</a></td></tr>
+ <tr><td colspan="3"><hr></td></tr>
+ <tr><th id="Concept-Index_cp_letter-T">T</th></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-task-ID">task ID</a></td><td class="printindex-index-section"><a href="#Process-Identification">Process Identification</a></td></tr>
+@@ -108572,6 +109169,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002ecpu_002ex86_005frep_005fstosb_005fthreshold"><code>glibc.cpu.x86_rep_stosb_threshold</code></a></td><td class="printindex-index-section"><a href="#Hardware-Capability-Tunables">Hardware Capability Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002ecpu_002ex86_005fshared_005fcache_005fsize"><code>glibc.cpu.x86_shared_cache_size</code></a></td><td class="printindex-index-section"><a href="#Hardware-Capability-Tunables">Hardware Capability Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002ecpu_002ex86_005fshstk"><code>glibc.cpu.x86_shstk</code></a></td><td class="printindex-index-section"><a href="#Hardware-Capability-Tunables">Hardware Capability Tunables</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002eelf_002ethp"><code>glibc.elf.thp</code></a></td><td class="printindex-index-section"><a href="#ELF-Tunables">ELF Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002egmon"><code>glibc.gmon</code></a></td><td class="printindex-index-section"><a href="#gmon-Tunables">gmon Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc"><code>glibc.malloc</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc_002earena_005fmax"><code>glibc.malloc.arena_max</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+@@ -108584,14 +109182,12 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc_002eperturb"><code>glibc.malloc.perturb</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc_002etcache_005fcount"><code>glibc.malloc.tcache_count</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc_002etcache_005fmax"><code>glibc.malloc.tcache_max</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+-<tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc_002etcache_005funsorted_005flimit"><code>glibc.malloc.tcache_unsorted_limit</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc_002etop_005fpad"><code>glibc.malloc.top_pad</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emalloc_002etrim_005fthreshold"><code>glibc.malloc.trim_threshold</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Tunables">Memory Allocation Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emem"><code>glibc.mem</code></a></td><td class="printindex-index-section"><a href="#Memory-Related-Tunables">Memory Related Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emem_002edecorate_005fmaps"><code>glibc.mem.decorate_maps</code></a></td><td class="printindex-index-section"><a href="#Memory-Related-Tunables">Memory Related Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emem_002emaxarcs"><code>glibc.mem.maxarcs</code></a></td><td class="printindex-index-section"><a href="#gmon-Tunables">gmon Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emem_002eminarcs"><code>glibc.mem.minarcs</code></a></td><td class="printindex-index-section"><a href="#gmon-Tunables">gmon Tunables</a></td></tr>
+-<tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002emem_002etagging"><code>glibc.mem.tagging</code></a></td><td class="printindex-index-section"><a href="#Memory-Related-Tunables">Memory Related Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002epthread"><code>glibc.pthread</code></a></td><td class="printindex-index-section"><a href="#POSIX-Thread-Tunables">POSIX Thread Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002epthread_002emutex_005fspin_005fcount"><code>glibc.pthread.mutex_spin_count</code></a></td><td class="printindex-index-section"><a href="#POSIX-Thread-Tunables">POSIX Thread Tunables</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-glibc_002epthread_002erseq"><code>glibc.pthread.rseq</code></a></td><td class="printindex-index-section"><a href="#POSIX-Thread-Tunables">POSIX Thread Tunables</a></td></tr>
+@@ -108622,6 +109218,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-longjmp_005ftarget"><code>longjmp_target</code></a></td><td class="printindex-index-section"><a href="#Non_002dlocal-Goto-Probes">Non-local Goto Probes</a></td></tr>
+ <tr><td colspan="3"><hr></td></tr>
+ <tr><th id="Type-Index_tp_letter-M">M</th></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-max_005falign_005ft"><code>max_align_t</code></a></td><td class="printindex-index-section"><a href="#Important-Data-Types">Important Data Types</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-mbstate_005ft"><code>mbstate_t</code></a></td><td class="printindex-index-section"><a href="#Keeping-the-state">Keeping the state</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-memory_005farena_005fnew"><code>memory_arena_new</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Probes">Memory Allocation Probes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-memory_005farena_005fretry"><code>memory_arena_retry</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Probes">Memory Allocation Probes</a></td></tr>
+@@ -108651,7 +109248,6 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-memory_005ftcache_005fdouble_005ffree"><code>memory_tcache_double_free</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Probes">Memory Allocation Probes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-memory_005ftunable_005ftcache_005fcount"><code>memory_tunable_tcache_count</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Probes">Memory Allocation Probes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-memory_005ftunable_005ftcache_005fmax_005fbytes"><code>memory_tunable_tcache_max_bytes</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Probes">Memory Allocation Probes</a></td></tr>
+-<tr><td></td><td class="printindex-index-entry"><a href="#index-memory_005ftunable_005ftcache_005funsorted_005flimit"><code>memory_tunable_tcache_unsorted_limit</code></a></td><td class="printindex-index-section"><a href="#Memory-Allocation-Probes">Memory Allocation Probes</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-mode_005ft"><code>mode_t</code></a></td><td class="printindex-index-section"><a href="#Attribute-Meanings">Attribute Meanings</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-mtx_005ft"><code>mtx_t</code></a></td><td class="printindex-index-section"><a href="#ISO-C-Mutexes">ISO C Mutexes</a></td></tr>
+ <tr><td colspan="3"><hr></td></tr>
+@@ -112279,6 +112875,7 @@
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-RTLD_005fDI_005fLINKMAP"><code>RTLD_DI_LINKMAP</code></a></td><td class="printindex-index-section"><a href="#Dynamic-Linker-Introspection">Dynamic Linker Introspection</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-RTLD_005fDI_005fLMID"><code>RTLD_DI_LMID</code></a></td><td class="printindex-index-section"><a href="#Dynamic-Linker-Introspection">Dynamic Linker Introspection</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-RTLD_005fDI_005fORIGIN"><code>RTLD_DI_ORIGIN</code></a></td><td class="printindex-index-section"><a href="#Dynamic-Linker-Introspection">Dynamic Linker Introspection</a></td></tr>
++<tr><td></td><td class="printindex-index-entry"><a href="#index-RTLD_005fDI_005fORIGIN_005fPATH"><code>RTLD_DI_ORIGIN_PATH</code></a></td><td class="printindex-index-section"><a href="#Dynamic-Linker-Introspection">Dynamic Linker Introspection</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-RTLD_005fDI_005fPHDR"><code>RTLD_DI_PHDR</code></a></td><td class="printindex-index-section"><a href="#Dynamic-Linker-Introspection">Dynamic Linker Introspection</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-RTLD_005fDI_005fSERINFO"><code>RTLD_DI_SERINFO</code></a></td><td class="printindex-index-section"><a href="#Dynamic-Linker-Introspection">Dynamic Linker Introspection</a></td></tr>
+ <tr><td></td><td class="printindex-index-entry"><a href="#index-RTLD_005fDI_005fSERINFOSIZE"><code>RTLD_DI_SERINFOSIZE</code></a></td><td class="printindex-index-section"><a href="#Dynamic-Linker-Introspection">Dynamic Linker Introspection</a></td></tr>

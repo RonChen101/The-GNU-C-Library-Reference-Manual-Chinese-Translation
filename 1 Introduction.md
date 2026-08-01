@@ -1,4 +1,4 @@
-这是The GNU C Library Reference Manual，版本2.43。
+这是The GNU C Library Reference Manual，版本2.44。
 
 Copyright © 1993–2026 Free Software Foundation, Inc.
 
@@ -559,11 +559,11 @@ In addition, some individual header files reserve names beyond those that they a
 </div>
 
 <div style="margin: 0 0 0 3em;">
-如果这个宏没有被定义，就目前来说，则他的默认值为32，但这个默认值的改变已经在准备了，因为为了Y2038安全需要更新time_t，因此程序不应该依赖默认值。
+如果这个宏没有被定义，则当前他的值默认为32，但这个默认值计划在未来修改。这是因为_TIME_BITS=64（实现time_t的Y2038安全）只能和_FILE_OFFSET_BITS=64配合使用。当系统迁移到默认使用64为time_t时，_FILE_OFFSET_BITS也默认为64，就算应用程序不处理大型文件。程序不应该依赖当前默认值。
 </div>
 
 <div style="margin: 0 0 0 3em;">
-This macro should only be selected if the system provides mechanisms for handling large files. On 64 bit systems this macro has no effect since the *64 functions are identical to the normal functions.只有系统提供了处理大文件处理机制时，才应定义此宏。在64位系统上，*64函数（以64结尾的函数）和普通函数完全相同，所以这个宏完全没用。
+只有系统提供了处理大文件处理机制时，才应定义此宏。在64位系统上，*64函数（以64结尾的函数）和普通函数完全相同，所以这个宏完全没用。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
