@@ -334,7 +334,7 @@ C程序调用的库由两部分构成：一，定义类型和宏，声明变量�
 
 为了使用the GNU C Library中的功能，你应该确保你的源文件包含正确的头文件。这样编译器就可以访问这些功能的声明，并且可以正确的处理他们的引用。当你的程序被编译，链接器会解析引用到归档文件（实际的库文件）提供的定义上。
 
-头文件通过“`#include`”预处理指令引入到源文件中。C语言支持两种这种指令的形式；第一种，
+头文件通过‘`#include`’预处理指令引入到源文件中。C语言支持两种这种指令的形式；第一种，
 ```c
 #include "header"
 ```
@@ -344,15 +344,15 @@ C程序调用的库由两部分构成：一，定义类型和宏，声明变量�
 ```
 通常用于引入标注库的头文件`file.h`，包含了定义和声明。这个文件一般被系统管理员安装到标准目录中。你应该使用第二种形式来引用C标准库的头文件。
 
-通常，“`#include`”指令应该放在源文件顶部，在所有代码之前。如果你的源文件在开头放了一些解释这个文件中有什么代码的注释（好习惯），将“`#include`”指令紧跟在后面，并跟在功能测试宏定义后面（参考[Feature Test Macros](https://sourceware.org/glibc/manual/latest/html_node/Feature-Test-Macros.html)）。
+通常，‘`#include`’指令应该放在源文件顶部，在所有代码之前。如果你的源文件在开头放了一些解释这个文件中有什么代码的注释（好习惯），将‘`#include`’指令紧跟在后面，并跟在功能测试宏定义后面（参考[Feature Test Macros](https://sourceware.org/glibc/manual/latest/html_node/Feature-Test-Macros.html)）。
 
-有关使用头文件和“`#include`”指令的更多信息，请参考The GNU C Preprocessor Manual中的[Header Files](https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html#Header-Files)章节。
+有关使用头文件和‘`#include`’指令的更多信息，请参考The GNU C Preprocessor Manual中的[Header Files](https://gcc.gnu.org/onlinedocs/cpp/Header-Files.html#Header-Files)章节。
 
 The GNU C Library提供多个头文件，每个都包含了与一组相关功能有关的类型和宏定义，变量和函数的声明。这意味着你的程序可能需要引入多个头文件，取决于你具体要使用哪些功能。
 
 有些库头文件自动引入了其他库头文件。然而，从编程风格角度，你不应该以来这个；最好显式引用你所使用的功能需要的所有的头文件。The GNU C Library头文件也是这样写的，不过不小心引用了多次相同的头文件没什么关系；第二次引用相同的头文件没有任何作用。同理，当你的程序需要使用引用多个不同头文件，引用他们的顺序并不重要。
 
-**兼容性说明**：在任何ISO C实现中，按任何顺序引用任何标准头文件，引用任意次数，都能正常运行。然而，传统上并非如此，在一些老的C实现中。
+**兼容性说明：**在任何ISO C实现中，按任何顺序引用任何标准头文件，引用任意次数，都能正常运行。然而，传统上并非如此，在一些老的C实现中。
 
 严格来说，你没必要为了使用一个头文件中声明的函数去引用那个头文件；你可以自己显式的声明那个函数，根据规范。但是，通常，更建议引用头文件，因为头文件可能定义了类型和宏，而其他地方没有，又，头文件可能给某些函数定义了更高效的宏替代版本。使用头文件也是一种确保声明无误的做法。
 
@@ -366,7 +366,7 @@ The GNU C Library提供多个头文件，每个都包含了与一组相关功能
 
 - 若你只想在某次特定调用中避免使用宏定义，可以将函数名用括号括起来。之所以有用，是因为这种语法背景下的函数名不会被识别为宏调用。
 
-- 若你想在整个源文件中禁用某个宏定义，可以通过“`#undef`”预处理指令，除非该功能有其他明确规定。
+- 若你想在整个源文件中禁用某个宏定义，可以通过‘`#undef`’预处理指令，除非该功能有其他明确规定。
 
 例如，假设头文件`stdlib.h`中声明了一个函数`abs`
 
@@ -405,53 +405,53 @@ int h (int *i) { return abs (++*i); }
 
 - 这允许编译器对这些函数的调用进行任意的优化，而无需担心他们被用户重定义。有一些库的功能，比如处理可变参数（参考[Variadic Functions](https://sourceware.org/glibc/manual/latest/html_node/Variadic-Functions.html)）和非本地退出（[Non-Local Exits](https://sourceware.org/glibc/manual/latest/html_node/Non_002dLocal-Exits.html)），实际上需要C编译器的大量配合，从实现角度考虑，编译器将他们视为这些语言的内置部分往往更简单。
 
-除了这个手册中记录的名称外，保留名还包括所有以下划线（“_”）开头的外部标识符，和无论作何种用途的以两个下划线或一个下划线开头接一个大写字母的标识符。这样保证了库和头文件可以定义函数，变量和宏定义处理内部的需求，而不会与用户的程序名称冲突。
+除了这个手册中记录的名称外，保留名还包括所有以下划线（‘_’）开头的外部标识符，和无论作何种用途的以两个下划线或一个下划线开头接一个大写字母的标识符。这样保证了库和头文件可以定义函数，变量和宏定义处理内部的需求，而不会与用户的程序名称冲突。
 
 还有一类标识符被保留，为了未来C语言的扩展或POSIX.1环境。虽然在你的程序中使用这些标识符现在不会有问题，但是未来可能有，所以你应该避免使用他们。
 
-- 以大写字母“`E`”开头，后接数字或大写字母的名称可能用于新增的错误码。参考[Error Reporting](https://sourceware.org/glibc/manual/latest/html_node/Error-Reporting.html)。
+- 以大写字母‘`E`’开头，后接数字或大写字母的名称可能用于新增的错误码。参考[Error Reporting](https://sourceware.org/glibc/manual/latest/html_node/Error-Reporting.html)。
 
-- 以“`is`”或“`to`”开头，后接小写字母的名称可能用于新增的字符检查和转换函数。参考[Character Handling](https://sourceware.org/glibc/manual/latest/html_node/Character-Handling.html)。
+- 以‘`is`’或‘`to`’开头，后接小写字母的名称可能用于新增的字符检查和转换函数。参考[Character Handling](https://sourceware.org/glibc/manual/latest/html_node/Character-Handling.html)。
 
-- 以“`LC_`”开头，后接一个大写字母的名称可能用于新增的指定区域属性的宏定义。参考[Locales and Internationalization](https://sourceware.org/glibc/manual/latest/html_node/Locales.html)。
+- 以‘`LC_`’开头，后接一个大写字母的名称可能用于新增的指定区域属性的宏定义。参考[Locales and Internationalization](https://sourceware.org/glibc/manual/latest/html_node/Locales.html)。
 
-- 所有以现存的数学函数（参考[Mathematics](https://sourceware.org/glibc/manual/latest/html_node/Mathematics.html)）开头，后接“`f`”或“`l`”的名称都被保留，对应操作`float`和`long` `double`参数的函数。
+- 所有以现存的数学函数（参考[Mathematics](https://sourceware.org/glibc/manual/latest/html_node/Mathematics.html)）开头，后接‘`f`’或‘`l`’的名称都被保留，对应操作`float`和`long` `double`参数的函数。
 
-- 以“`SIG`”开头，后接一个大写字母的名称可能用于新增的信号名称。参考[Standard Signals](https://sourceware.org/glibc/manual/latest/html_node/Standard-Signals.html)。
+- 以‘`SIG`’开头，后接一个大写字母的名称可能用于新增的信号名称。参考[Standard Signals](https://sourceware.org/glibc/manual/latest/html_node/Standard-Signals.html)。
 
-- 以“`SIG_`”开头，后接一个大写字母的名称都被保留，可能用于新增的信号操作。参考[Basic Signal Handling](https://sourceware.org/glibc/manual/latest/html_node/Basic-Signal-Handling.html)。
+- 以‘`SIG_`’开头，后接一个大写字母的名称都被保留，可能用于新增的信号操作。参考[Basic Signal Handling](https://sourceware.org/glibc/manual/latest/html_node/Basic-Signal-Handling.html)。
 
-- 以“`str`”，“`mem`”或“`wcs`”开头，后接一个小写字母的名称都被保留，可能用于新增的字符串和数组函数。参考[String and Array Utilities](https://sourceware.org/glibc/manual/latest/html_node/String-and-Array-Utilities.html)。
+- 以‘`str`’，‘`mem`’或‘`wcs`’开头，后接一个小写字母的名称都被保留，可能用于新增的字符串和数组函数。参考[String and Array Utilities](https://sourceware.org/glibc/manual/latest/html_node/String-and-Array-Utilities.html)。
 
-- 以“`_t`”结尾的名称都被保留，可能用于新增的类型名称。
+- 以‘`_t`’结尾的名称都被保留，可能用于新增的类型名称。
 
 此外，一些个特定的头文件会保留超出其定义范围之外的名称。只有你的程序包含了特定的头文件时，你才需要考虑这些限制。
 
-- 头文件`dirent.h`保留了以“`d_`”开头的名称。
+- 头文件`dirent.h`保留了以‘`d_`’开头的名称。
 
-- 头文件`fcntl.h`保留了以“`l_`”，“`F_`”，“`O_`”和“`S_`”开头的名称。
+- 头文件`fcntl.h`保留了以‘`l_`’，‘`F_`’，‘`O_`’和‘`S_`’开头的名称。
 
-- 头文件`grp.h`保留了以“`gr_`”开头的名称。
+- 头文件`grp.h`保留了以‘`gr_`’开头的名称。
 
-- 头文件`limits.h`保留了以“`_MAX`”开头的结尾的名称。
+- 头文件`limits.h`保留了以‘`_MAX`’开头的结尾的名称。
 
-- 头文件`pwd.h`保留了以“`pw_`”开头的名称。
+- 头文件`pwd.h`保留了以‘`pw_`’开头的名称。
 
-- 头文件`signal.h`保留了以“`sa_`”和“`SA_`”开头的名称。
+- 头文件`signal.h`保留了以‘`sa_`’和‘`SA_`’开头的名称。
 
-- 头文件`sys/stat.h`保留了以“`st_`”和“`S_`”开头的名称。
+- 头文件`sys/stat.h`保留了以‘`st_`’和‘`S_`’开头的名称。
 
-- 头文件`sys/times.h`保留了以“`tms_`”开头的名称。
+- 头文件`sys/times.h`保留了以‘`tms_`’开头的名称。
 
-- 头文件`termios.h`保留了以“`c_`”，“`V`”，“`I`”，“`O`”和“`TC`”开头的名称；还有以“`B`”开头，后接一个数字的名称。
+- 头文件`termios.h`保留了以‘`c_`’，‘`V`’，‘`I`’，‘`O`’和‘`TC`’开头的名称；还有以‘`B`’开头，后接一个数字的名称。
 
 ### 1.3.4 功能测试宏
 
 编译源文件时，可用的功能集合，取决于你定义了哪些功能测试宏。
 
-如果你用“`gcc` `-ansi`”编译你的程序，你只能用ISO C库的功能，除非你通过定义一个或多个功能测试宏，显式需求了额外的特性。参考The GNU CC手册中[GNU CC Command Options](https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html#Invoking-GCC)，以了解更多GCC选项的更多信息。
+如果你用‘`gcc` `-ansi`’编译你的程序，你只能用ISO C库的功能，除非你通过定义一个或多个功能测试宏，显式需求了额外的特性。参考The GNU CC手册中[GNU CC Command Options](https://gcc.gnu.org/onlinedocs/gcc/Invoking-GCC.html#Invoking-GCC)，以了解更多GCC选项的更多信息。
 
-你应该在你源文件的顶部，通过使用“`#define`”预处理指令，来定义这些宏。这些指令必须在`#include`之前。最好让他们在文件的非常非常前面，你也可以使用GCC的“`-D`”选项，但是更好的办法是让你的源文件自己内部包含的表明他们自己的依赖需求。
+你应该在你源文件的顶部，通过使用‘`#define`’预处理指令，来定义这些宏。这些指令必须在`#include`之前。最好让他们在文件的非常非常前面，你也可以使用GCC的‘`-D`’选项，但是更好的办法是让你的源文件自己内部包含的表明他们自己的依赖需求。
 
 这套机制的存在，是为了使库兼容多个标准。虽然不同的标准总是被描述为彼此的超集，他们通常互不兼容，因为大的标准需要的函数名，较小的标准把他们保留给客户使用了。这并非吹毛求疵——在实际应用中确实层引发过问题。例如，一些非GNU程序定义了名为`getline`，和本库函数中的`getline`毫无关系。如果不加区分的启用所有功能，这些程序将无法通过编译。
 
@@ -459,7 +459,7 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_POSIX_SOURCE**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果你定义了这个宏，POSIX.1标准和ISO C标准的功能都支持。
 </div>
 
@@ -469,35 +469,35 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_POSIX_C_SOURCE**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 将此宏定义为一个正数，以控制哪些POSIX功能可用。数值越大，可用的功能就越多。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 大于等于<code>1</code>时，1990版POSIX.1标准。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 大于等于<code>2</code>时，1992版POSIX.2标准。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 大于等于<code>199309L</code>时，1993版POSIX.1b标准。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 大于等于<code>199506L</code>时，1995版POSIX.1c标准。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 大于等于<code>200112L</code>时，2001版POSIX标准。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 大于等于<code>200809L</code>时，2008版POSIX标准。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 大于等于<code>202405L</code>时，2024版POSIX标准。
 </div>
 
@@ -509,15 +509,15 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_XOPEN_SOURCE_EXTENDED**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果你定义了这个宏，XPG（X/Open Portability Guide）的功能将会被引入。这是POSIX.1和POSIX.2功能的超集，事实上，<code>_POSIX_SOURCE</code>和<code>_POSIX_C_SOURCE</code>会自动定义。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 作为对所有Unix系统的统一，该宏还包含了仅在BSD和SVID中可用的功能。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果<code>_XOPEN_SOURCE_EXTENDED</code>也被定义了，会有更多可用的函数。这使X/Open Unix品牌认证所需要的所有功能函数都可用了。
 </div>
 
@@ -527,7 +527,7 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_LARGEFILE_SOURCE**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果这个宏被定义了，一些额外的函数就可用了，这些函数弥补了以往所有标准中的一些不足。具体的，<code>fseeko</code>和<code>ftello</code>函数将会变得可用。若缺少这些函数，ISO C接口（<code>fseek</code>，<code>ftell</code>）和底层POSIX接口（<code>lseek</code>）之间的差异将会引发问题。
 </div>
 
@@ -537,11 +537,11 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_LARGEFILE64_SOURCE**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果你定义了这个宏，一组额外的函数将可用，使32位系统能够使用大小超过2GB的文件，而通常是限制2GB以内的。如果系统不支持那么大的文件，那么这个接口就没用。在自然文件大小限制大于2GB的系统上（比如，64位系统），新的函数和被代替的函数完全等价。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 新的功能通过一组新的类型和函数提供，用以代替现有的。这些新对象的名字包含<code>64</code>，表明其用途，例如，<code>off_t</code>和<code>off64_t</code>，<code>fseeko</code>和<code>fseeko64</code>。
 </div>
 
@@ -551,23 +551,23 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_FILE_OFFSET_BITS**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 这个宏决定了使用哪些文件系统接口，即一种接口替代另一种接口。<code>_LARGEFILE64_SOURCE</code>是将64位接口作为附加接口提供，而<code>_FILE_OFFSET_BITS</code>则允许64位接口直接取代旧接口。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果<code>_FILE_OFFSET_BITS</code>定义为<code>32</code>，将启用32位接口，<code>off_t</code>类型将会有32位，在32位系统上。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果宏定义为<code>64</code>，则大文件接口将替代旧接口。也就是说，这些函数不会以不同的名称提供（比如<code>_LARGEFILE64_SOURCE</code>那样）。相反，旧的函数名现在指向新的函数，例如，现在调用<code>fseeko</code>实际上调用<code>fseeko64</code>。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果这个宏没有被定义，则当前他的值默认为<code>32</code>，但这个默认值计划在未来修改。这是因为<code>_TIME_BITS=64</code>（实现<code>time_t</code>的Y2038安全）只能和<code>_FILE_OFFSET_BITS=64</code>配合使用。当系统迁移到默认使用64位的<code>time_t</code>时，<code>_FILE_OFFSET_BITS</code>也默认为<code>64</code>，就算应用程序不处理大型文件。程序不应该依赖当前默认值。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 只有系统提供了处理大文件处理机制时，才应定义此宏。在64位系统上，<code>*64</code>函数（以64结尾的函数）和普通函数完全相同，所以这个宏完全没用。
 </div>
 
@@ -577,11 +577,11 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_TIME_BITS**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 定义这个宏可以控制<code>time_t</code>的位宽，还有所有<code>time_t</code>衍生类型的位宽，还有所有相关函数的原型。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 
 1. 如果<code>_TIME_BITS</code>未定义，<code>time_t</code>的位宽取决于具体架构。目前，在多数架构中，默认为64位。然而，在一些传统架构上（i686，ARM），默认为32位，这个装备修改了，程序不应该依赖默认值。
 
@@ -594,7 +594,7 @@ int h (int *i) { return abs (++*i); }
 4. 对于任何其他使用场景，都会产生编译时错误。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 只有<code>_FILE_OFFSET_BITS=64</code>时，<code>_TIME_BITS=64</code>才有用。
 </div>
 
@@ -664,11 +664,11 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_DEFAULT_SOURCE**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 如果定义了此宏，则将包含大多数特性，除了X/Open，LFS和GNU扩展：其作用是启用POSIX 2008版中的特性，以及某些BSD和SVID特性，且无需通过单独的特性测试宏来控制他们。
 </div>
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 请注意，编译器选项也会影响所包含的特性：
 </div>
 
@@ -701,7 +701,7 @@ int h (int *i) { return abs (++*i); }
 
 宏：**_THREAD_SAFE**
 
-<div style="margin: 0 0 0 3em;">
+<div style="margin: 0 0 1em 3em;">
 这些宏已过时。他们的效果等同于将<code>_POSIX_C_SOURCE</code>定义为<code>199506L</code>。
 </div>
 
@@ -709,7 +709,7 @@ int h (int *i) { return abs (++*i); }
 一些古老的C语言库需要这两个宏中其中一个被定义，以使基本功能（例如<code>getchar</code>）具备线程安全性。
 </div>
 
-我们推荐你在新程序中使用`_GNU_SOURCE`。如果你不指定GCC的“`-ansi`”选项，或者其他一致性选项，比如`-std=c99`，并且不显式定义上面的任何宏，则其效果等同于将`_DEFAULT_SOURCE`定义为1。
+我们推荐你在新程序中使用`_GNU_SOURCE`。如果你不指定GCC的‘`-ansi`’选项，或者其他一致性选项，比如`-std=c99`，并且不显式定义上面的任何宏，则其效果等同于将`_DEFAULT_SOURCE`定义为1。
 
 当你定义了一个功能测试宏以请求更大范围的功能时，再定义一个功能测试宏以请求这些功能的子集时无害的。比如，你定义了`_POSIX_C_SOURCE`，再定义`_POSIX_SOURCE`则没有影响。又或者，你定义了`_GNU_SOURCE`，那么定义`_POSIX_SOURCE`或者`_POSIX_C_SOURCE`也没用。
 
