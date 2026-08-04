@@ -307,6 +307,7 @@ The GNU C Library援引收录了Linux手册页6.9.1版本文档，记录了Linux
 在本手册中，当提到手册页时，比如：
 
 <div style="margin: 0 0 1em 3em;">
+
 [sendmsg(2)](https://man7.org/linux/man-pages/man2/sendmsg.2.html)参考[Linux (The Linux Kernel)](https://sourceware.org/glibc/manual/latest/html_node/Linux-Kernel.html#Linux-Kernel)。
 </div>
 
@@ -352,7 +353,7 @@ The GNU C Library提供多个头文件，每个都包含了与一组相关功能
 
 有些库头文件自动引入了其他库头文件。然而，从编程风格角度，你不应该以来这个；最好显式引用你所使用的功能需要的所有的头文件。The GNU C Library头文件也是这样写的，不过不小心引用了多次相同的头文件没什么关系；第二次引用相同的头文件没有任何作用。同理，当你的程序需要使用引用多个不同头文件，引用他们的顺序并不重要。
 
-**兼容性说明：**在任何ISO C实现中，按任何顺序引用任何标准头文件，引用任意次数，都能正常运行。然而，传统上并非如此，在一些老的C实现中。
+<strong>兼容性说明：</strong>在任何ISO C实现中，按任何顺序引用任何标准头文件，引用任意次数，都能正常运行。然而，传统上并非如此，在一些老的C实现中。
 
 严格来说，你没必要为了使用一个头文件中声明的函数去引用那个头文件；你可以自己显式的声明那个函数，根据规范。但是，通常，更建议引用头文件，因为头文件可能定义了类型和宏，而其他地方没有，又，头文件可能给某些函数定义了更高效的宏替代版本。使用头文件也是一种确保声明无误的做法。
 
@@ -460,49 +461,60 @@ int h (int *i) { return abs (++*i); }
 宏：**_POSIX_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果你定义了这个宏，POSIX.1标准和ISO C标准的功能都支持。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-如果你将宏<code>_POSIX_C_SOURCE</code>定义为一个正数，<code>_POSIX_SOURCE</code>的状态无关紧要。
+
+如果你将宏`_POSIX_C_SOURCE`定义为一个正数，`_POSIX_SOURCE`的状态无关紧要。
 </div>
 
 宏：**_POSIX_C_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 将此宏定义为一个正数，以控制哪些POSIX功能可用。数值越大，可用的功能就越多。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-大于等于<code>1</code>时，1990版POSIX.1标准。
+
+大于等于`1`时，1990版POSIX.1标准。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-大于等于<code>2</code>时，1992版POSIX.2标准。
+
+大于等于`2`时，1992版POSIX.2标准。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-大于等于<code>199309L</code>时，1993版POSIX.1b标准。
+
+大于等于`199309L`时，1993版POSIX.1b标准。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-大于等于<code>199506L</code>时，1995版POSIX.1c标准。
+
+大于等于`199506L`时，1995版POSIX.1c标准。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-大于等于<code>200112L</code>时，2001版POSIX标准。
+
+大于等于`200112L`时，2001版POSIX标准。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-大于等于<code>200809L</code>时，2008版POSIX标准。
+
+大于等于`200809L`时，2008版POSIX标准。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-大于等于<code>202405L</code>时，2024版POSIX标准。
+
+大于等于`202405L`时，2024版POSIX标准。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-更大的<code>_POSIX_C_SOURCE</code>值将启用未来的扩展。POSIX标准会根据需要，定义这些值，在他们成为标准后的一段时间后，the GNU C Library应该会支持他们。1996版POSIX.1标准规定，如果将<code>_POSIX_C_SOURCE</code>定义为大于或等于<code>199506L</code>的值，即可启用1996版的功能。一般来说，在the GNU C Library中，对标准的bug修复会包含在对应的版本中；比如，<code>200112L</code>包含了POSIX.1-2004的内容。
+
+更大的`_POSIX_C_SOURCE`值将启用未来的扩展。POSIX标准会根据需要，定义这些值，在他们成为标准后的一段时间后，the GNU C Library应该会支持他们。1996版POSIX.1标准规定，如果将`_POSIX_C_SOURCE`定义为大于或等于`199506L`的值，即可启用1996版的功能。一般来说，在the GNU C Library中，对标准的bug修复会包含在对应的版本中；比如，`200112L`包含了POSIX.1-2004的内容。
 </div>
 
 宏：**_XOPEN_SOURCE**
@@ -510,169 +522,201 @@ int h (int *i) { return abs (++*i); }
 宏：**_XOPEN_SOURCE_EXTENDED**
 
 <div style="margin: 0 0 1em 3em;">
-如果你定义了这个宏，XPG（X/Open Portability Guide）的功能将会被引入。这是POSIX.1和POSIX.2功能的超集，事实上，<code>_POSIX_SOURCE</code>和<code>_POSIX_C_SOURCE</code>会自动定义。
+
+如果你定义了这个宏，XPG（X/Open Portability Guide）的功能将会被引入。这是POSIX.1和POSIX.2功能的超集，事实上，`_POSIX_SOURCE`和`_POSIX_C_SOURCE`会自动定义。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
+
 作为对所有Unix系统的统一，该宏还包含了仅在BSD和SVID中可用的功能。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-如果<code>_XOPEN_SOURCE_EXTENDED</code>也被定义了，会有更多可用的函数。这使X/Open Unix品牌认证所需要的所有功能函数都可用了。
+
+如果`_XOPEN_SOURCE_EXTENDED`也被定义了，会有更多可用的函数。这使X/Open Unix品牌认证所需要的所有功能函数都可用了。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-如果宏<code>_XOPEN_SOURCE</code>的值为500，则包含迄今为止描述的所有功能，以及来自单一Unix规范，第2版的一些新定义。值600（对应第6次修订）包含SUSv3的定义，值700（对应第7次修订）包含SUSv4的定义。值800包含POSIX.1-2024的定义。
+
+如果宏`_XOPEN_SOURCE`的值为500，则包含迄今为止描述的所有功能，以及来自单一Unix规范，第2版的一些新定义。值600（对应第6次修订）包含SUSv3的定义，值700（对应第7次修订）包含SUSv4的定义。值800包含POSIX.1-2024的定义。
 </div>
 
 宏：**_LARGEFILE_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
-如果这个宏被定义了，一些额外的函数就可用了，这些函数弥补了以往所有标准中的一些不足。具体的，<code>fseeko</code>和<code>ftello</code>函数将会变得可用。若缺少这些函数，ISO C接口（<code>fseek</code>，<code>ftell</code>）和底层POSIX接口（<code>lseek</code>）之间的差异将会引发问题。
+
+如果这个宏被定义了，一些额外的函数就可用了，这些函数弥补了以往所有标准中的一些不足。具体的，`fseeko`和`ftello`函数将会变得可用。若缺少这些函数，ISO C接口（`fseek`，`ftell`）和底层POSIX接口（`lseek`）之间的差异将会引发问题。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
+
 这个宏是作为大文件支持扩展（LFS）的一部分而引入的。
 </div>
 
 宏：**_LARGEFILE64_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果你定义了这个宏，一组额外的函数将可用，使32位系统能够使用大小超过2GB的文件，而通常是限制2GB以内的。如果系统不支持那么大的文件，那么这个接口就没用。在自然文件大小限制大于2GB的系统上（比如，64位系统），新的函数和被代替的函数完全等价。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-新的功能通过一组新的类型和函数提供，用以代替现有的。这些新对象的名字包含<code>64</code>，表明其用途，例如，<code>off_t</code>和<code>off64_t</code>，<code>fseeko</code>和<code>fseeko64</code>。
+
+新的功能通过一组新的类型和函数提供，用以代替现有的。这些新对象的名字包含`64`，表明其用途，例如，`off_t`和`off64_t`，`fseeko`和`fseeko64`。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-这个宏是作为大文件支持扩展（LFS）的一部分而引入的。他是一个过渡性接口，适用于64位偏移量尚未被普遍常用的时期（参考<code>_FILE_OFFSET_BITS</code>）。
+
+这个宏是作为大文件支持扩展（LFS）的一部分而引入的。他是一个过渡性接口，适用于64位偏移量尚未被普遍常用的时期（参考`_FILE_OFFSET_BITS`）。
 </div>
 
 宏：**_FILE_OFFSET_BITS**
 
 <div style="margin: 0 0 1em 3em;">
-这个宏决定了使用哪些文件系统接口，即一种接口替代另一种接口。<code>_LARGEFILE64_SOURCE</code>是将64位接口作为附加接口提供，而<code>_FILE_OFFSET_BITS</code>则允许64位接口直接取代旧接口。
+
+这个宏决定了使用哪些文件系统接口，即一种接口替代另一种接口。`_LARGEFILE64_SOURCE`是将64位接口作为附加接口提供，而`_FILE_OFFSET_BITS`则允许64位接口直接取代旧接口。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-如果<code>_FILE_OFFSET_BITS</code>定义为<code>32</code>，将启用32位接口，<code>off_t</code>类型将会有32位，在32位系统上。
+
+如果`_FILE_OFFSET_BITS`定义为`32`，将启用32位接口，`off_t`类型将会有32位，在32位系统上。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-如果宏定义为<code>64</code>，则大文件接口将替代旧接口。也就是说，这些函数不会以不同的名称提供（比如<code>_LARGEFILE64_SOURCE</code>那样）。相反，旧的函数名现在指向新的函数，例如，现在调用<code>fseeko</code>实际上调用<code>fseeko64</code>。
+
+如果宏定义为`64`，则大文件接口将替代旧接口。也就是说，这些函数不会以不同的名称提供（比如`_LARGEFILE64_SOURCE`那样）。相反，旧的函数名现在指向新的函数，例如，现在调用`fseeko`实际上调用`fseeko64`。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-如果这个宏没有被定义，则当前他的值默认为<code>32</code>，但这个默认值计划在未来修改。这是因为<code>_TIME_BITS=64</code>（实现<code>time_t</code>的Y2038安全）只能和<code>_FILE_OFFSET_BITS=64</code>配合使用。当系统迁移到默认使用64位的<code>time_t</code>时，<code>_FILE_OFFSET_BITS</code>也默认为<code>64</code>，就算应用程序不处理大型文件。程序不应该依赖当前默认值。
+
+如果这个宏没有被定义，则当前他的值默认为`32`，但这个默认值计划在未来修改。这是因为`_TIME_BITS=64`（实现`time_t`的Y2038安全）只能和`_FILE_OFFSET_BITS=64`配合使用。当系统迁移到默认使用64位的`time_t`时，`_FILE_OFFSET_BITS`也默认为`64`，就算应用程序不处理大型文件。程序不应该依赖当前默认值。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-只有系统提供了处理大文件处理机制时，才应定义此宏。在64位系统上，<code>*64</code>函数（以64结尾的函数）和普通函数完全相同，所以这个宏完全没用。
+
+只有系统提供了处理大文件处理机制时，才应定义此宏。在64位系统上，`*64`函数（以64结尾的函数）和普通函数完全相同，所以这个宏完全没用。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
+
 这个宏是作为大文件支持扩展（LFS）的一部分而引入的。
 </div>
 
 宏：**_TIME_BITS**
 
 <div style="margin: 0 0 1em 3em;">
-定义这个宏可以控制<code>time_t</code>的位宽，还有所有<code>time_t</code>衍生类型的位宽，还有所有相关函数的原型。
+
+定义这个宏可以控制`time_t`的位宽，还有所有`time_t`衍生类型的位宽，还有所有相关函数的原型。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
 
-1. 如果<code>_TIME_BITS</code>未定义，<code>time_t</code>的位宽取决于具体架构。目前，在多数架构中，默认为64位。然而，在一些传统架构上（i686，ARM），默认为32位，这个装备修改了，程序不应该依赖默认值。
 
-2. 如果<code>_TIME_BITS</code>定义为64，<code>time_t</code>将被定义为64位整数。在time_t为32位的传统平台上，对相关的系统调用取决于系统所运行的Linux内核版本。Linux内核版本<strong>5.1</strong>以上的，使用支持64位时间的系统调用。否则，将使用基于旧式（即32位）系统调用的回退代码。
+1. 如果`_TIME_BITS`未定义，`time_t`的位宽取决于具体架构。目前，在多数架构中，默认为64位。然而，在一些传统架构上（i686，ARM），默认为32位，这个装备修改了，程序不应该依赖默认值。
 
-    在此类平台中，the GNU C Library将会同时定义<code>__USE_TIME64_REDIRECTS</code>来指明是否会被替换为其他形式（通过重定义符号名称或使用符号别名来实现）。比如，<code>clock_gettime</code>可能会被替换为<code>__clock_gettime64</code>。
+2. 如果`_TIME_BITS`定义为64，`time_t`将被定义为64位整数。在time_t为32位的传统平台上，对相关的系统调用取决于系统所运行的Linux内核版本。Linux内核版本**5.1**以上的，使用支持64位时间的系统调用。否则，将使用基于旧式（即32位）系统调用的回退代码。
 
-3. 如果<code>_TIME_BITS</code>被定义为32，<code>time_t</code>就会被定义为32位整数，如果支持的话。但这并不推荐，因为32位的<code>time_t</code>会在2038年停止工作。
+    在此类平台中，the GNU C Library将会同时定义`__USE_TIME64_REDIRECTS`来指明是否会被替换为其他形式（通过重定义符号名称或使用符号别名来实现）。比如，`clock_gettime`可能会被替换为`__clock_gettime64`。
+
+3. 如果`_TIME_BITS`被定义为32，`time_t`就会被定义为32位整数，如果支持的话。但这并不推荐，因为32位的`time_t`会在2038年停止工作。
 
 4. 对于任何其他使用场景，都会产生编译时错误。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-只有<code>_FILE_OFFSET_BITS=64</code>时，<code>_TIME_BITS=64</code>才有用。
+
+只有`_FILE_OFFSET_BITS=64`时，`_TIME_BITS=64`才有用。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
+
 通过使用此宏，某些移植版本能够获得64位的时间支持，从而免受2038年问题的影响。
 </div>
 
 宏：**_ISOC99_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则会包含ISO C99的特性。由于这些特性默认包含，因此该宏主要在编译器使用较早的语言版本时才有实际意义。
 </div>
 
 宏：**_ISOC11_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了这个宏，则会包含ISO C11对ISO C99的扩展特性。
 </div>
 
 宏：**_ISOC23_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
-如果定义了此宏，则包含ISO C23对ISO C11的扩展。the GNU C Library仅支持该草案标准中的部分特性。同时也支持旧的名称<code>_ISOC2X_SOURCE</code>。
+
+如果定义了此宏，则包含ISO C23对ISO C11的扩展。the GNU C Library仅支持该草案标准中的部分特性。同时也支持旧的名称`_ISOC2X_SOURCE`。
 </div>
 
 宏：**_ISOC2Y_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则将包含ISO C2Y对ISO C23的扩展。the GNU C Library仅支持该草案标准中的部分特性。
 </div>
 
 宏：**\_\_STDC_WANT_LIB_EXT2__**
 
 <div style="margin: 0 0 1em 3em;">
-如果将此宏定义为<code>1</code>，则将启用ISO/IEC TR 24731-2:2010（动态分配函数(Dynamic Allocation Functions)）中的特性。the GNU C Library仅支持该技术报告（Technical Report，TR）中的部分特性。
+
+如果将此宏定义为`1`，则将启用ISO/IEC TR 24731-2:2010（动态分配函数(Dynamic Allocation Functions)）中的特性。the GNU C Library仅支持该技术报告（Technical Report，TR）中的部分特性。
 </div>
 
 宏：**\_\_STDC_WANT_IEC_60559_BFP_EXT__**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则将启用ISO/IEC TS 18661-1:2014（C语言浮点扩展：二进制浮点算数(Floating-point extensions for C: Binary floating-point arithmetic)）中的特性。the GNU C Library仅支持该技术规范（Technical Specification，TS）中的部分特性。
 </div>
 
 宏：**\_\_STDC_WANT_IEC_60559_FUNCS_EXT__**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则将启用ISO/IEC TS 18661-4:2015（C 语言浮点扩展：补充函数(Floating-point extensions for C: Supplementary functions)）中的特性。the GNU C Library仅支持该技术规范（Technical Specification，TS）中的部分特性。
 </div>
 
 宏：**\_\_STDC_WANT_IEC_60559_TYPES_EXT__**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则将启用ISO/IEC TS 18661-3:2015（C语言浮点扩展：交换类型与扩展类型(Floating-point extensions for C: Interchange and extended types)）中的特性。the GNU C Library仅支持该技术规范（Technical Specification，TS）中的部分特性。
 </div>
 
 宏：**\_\_STDC_WANT_IEC_60559_EXT__**
 
 <div style="margin: 0 0 1em 3em;">
-如果定义了此宏，则将启用附录F中定义的ISO C23特性。这会影响<code>totalorder</code>函数以及与NaN有效载荷相关的函数的声明。
+
+如果定义了此宏，则将启用附录F中定义的ISO C23特性。这会影响`totalorder`函数以及与NaN有效载荷相关的函数的声明。
 </div>
 
 宏：**_GNU_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则将包含所有特性：ISO C89、ISO C99、POSIX.1、POSIX.2、BSD、SVID、X/Open、LFS以及GNU扩展。当POSIX.1与BSD的定义发生冲突时，以POSIX.1的定义为准。
 </div>
 
 宏：**_DEFAULT_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则将包含大多数特性，除了X/Open，LFS和GNU扩展：其作用是启用POSIX 2008版中的特性，以及某些BSD和SVID特性，且无需通过单独的特性测试宏来控制他们。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
+
 请注意，编译器选项也会影响所包含的特性：
 </div>
 
 <div style="margin: 0 0 1em 3em;">
+
 
 - 如果你使用了严格一致性选项（strict conformance option），那么超出编译器语言版本范围的特性将被禁用，不过仍可通过特性测试宏来启用他们。
 
@@ -682,18 +726,21 @@ int h (int *i) { return abs (++*i); }
 宏：**_ATFILE_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
-如果定义了此宏，则将包含额外的<code>*at</code>接口。
+
+如果定义了此宏，则将包含额外的`*at`接口。
 </div>
 
 宏：**_FORTIFY_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
-如果将此宏定义为1，则会为多个库函数添加安全加固机制。如果定义为2，则会应用更严格的检查。如果定义为3，the GNU C Library还可能启用会带来额外性能开销的检查。参考<a href="https://sourceware.org/glibc/manual/latest/html_node/Source-Fortification.html">Fortification of function calls</a>。
+
+如果将此宏定义为1，则会为多个库函数添加安全加固机制。如果定义为2，则会应用更严格的检查。如果定义为3，the GNU C Library还可能启用会带来额外性能开销的检查。参考[Fortification of function calls](https://sourceware.org/glibc/manual/latest/html_node/Source-Fortification.html)。
 </div>
 
 宏：**_DYNAMIC_STACK_SIZE_SOURCE**
 
 <div style="margin: 0 0 1em 3em;">
+
 如果定义了此宏，则将定义正确的（但不是编译期常量）的MINSIGSTKSZ、SIGSTKSZ 和 PTHREAD_STACK_MIN。
 </div>
 
@@ -702,11 +749,13 @@ int h (int *i) { return abs (++*i); }
 宏：**_THREAD_SAFE**
 
 <div style="margin: 0 0 1em 3em;">
-这些宏已过时。他们的效果等同于将<code>_POSIX_C_SOURCE</code>定义为<code>199506L</code>。
+
+这些宏已过时。他们的效果等同于将`_POSIX_C_SOURCE`定义为`199506L`。
 </div>
 
 <div style="margin: 0 0 1em 3em;">
-一些古老的C语言库需要这两个宏中其中一个被定义，以使基本功能（例如<code>getchar</code>）具备线程安全性。
+
+一些古老的C语言库需要这两个宏中其中一个被定义，以使基本功能（例如`getchar`）具备线程安全性。
 </div>
 
 我们推荐你在新程序中使用`_GNU_SOURCE`。如果你不指定GCC的‘`-ansi`’选项，或者其他一致性选项，比如`-std=c99`，并且不显式定义上面的任何宏，则其效果等同于将`_DEFAULT_SOURCE`定义为1。
