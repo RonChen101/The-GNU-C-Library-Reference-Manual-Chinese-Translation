@@ -70,7 +70,7 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 
 在某些Unix系统上，很多系统调用接收了指向栈的指针也都会返回`EFAULT`，而内核出于某种晦涩难明的原因在试图扩展栈时失败了。万一真遇到这种情况，在该系统上你或许应当改用静态分配或动态分配的内存，而不要使用栈内存。
 
-## 2.2 Error Codes
+## 2.2 错误码
 
 错误码宏定义在头文件`errno.h`中。他们全都展开（这个展开指的是宏被替换成宏对应的式子）为整数常量。一些错误码在GNU系统上不会出现，但是他们可能在使用the GNU C Library的其他系统上出现。
 
@@ -323,11 +323,246 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 “Numerical result out of range.”数学函数的计算结果因上溢或下溢而无法表示。
 </div>
 
-Macro: int EAGAIN
-“Resource temporarily unavailable.” The call might work if you try again later.
+宏：`int` **`EAGAIN`**
 
-This error can happen in a few different situations:
+<div style="margin: 0 0 1em 3em;">
 
-An operation that would block was attempted on an object that has non-blocking mode selected. Trying the same operation again will block until some external condition makes it possible to read, write, or connect (whatever the operation). You can use select to find out when the operation will be possible; see Waiting for Input or Output.
-A temporary resource shortage made an operation impossible. fork can return this error. It indicates that the shortage is expected to pass, so your program can try the call again later and it may succeed. It is probably a good idea to delay for a few seconds before trying it again, to allow time for other processes to release scarce resources. Such shortages are usually fairly serious and affect the whole system, so usually an interactive program should report the error to the user and return to its command loop.
-Portability Note: In the GNU C Library, EAGAIN and EWOULDBLOCK are equal. Portable code should check for both errors and treat them the same.
+“Resource temporarily unavailable.”一会儿后再尝试，调用也许就成功了。
+
+这个错误可能在一些不同的情况下发生：
+
+- 对一个设置了非阻塞模式的对象进行会阻塞的操作。如果再次尝试相同操作，将会阻塞，直到某个外部的条件让他能够读，写，或连接（无论什么操作）。你可以使用`select`查询何时可以执行操作；参考[Waiting for Input or Output](https://sourceware.org/glibc/manual/latest/html_node/Waiting-for-I_002fO.html)。
+
+- 临时的资源短缺导致操作无法完成。`fork`可能返回此错误。这表示资源资源短缺是暂时性的，因此稍后重试可能会成功。在重试前等待几秒可能会很有用，以便让其他进程有时间释放稀缺资源。此类资源短缺通常相当严重，会影响整个系统，因此交互式程序通常应向用户报告该错误，并返回到命令循环中。
+
+<strong>可移植性说明：</strong>在the GNU C Library中，`EAGAIN`和`EWOULDBLOCK`的值相等。可移植的代码，应该同时检查两个错误码，并将他们视为同一种情况处理。
+</div>
+
+宏：`int` **`EWOULDBLOCK`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Operation would block.”在the GNU C Library中，这是`EAGAIN`的另一个名称（上面那个）。
+</div>
+
+宏：`int` **`EINPROGRESS`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Operation now in progress.”对一个已设置为非阻塞模式的对象发起一个无法立即完成的操作。有些函数必须阻塞（比如`connect`；参考[Making a Connection](https://sourceware.org/glibc/manual/latest/html_node/Connecting.html)），永远不会返回`EAGAIN`。相反他们返回`EINPROGRESS`，表明操作已经启动，但还需要一些时间才能完成。尝试在调用完成前操作那个对象，则会返回`EALREADY`。你可以使用`select`查询待处理操作何时完成；参考[Waiting for Input or Output](https://sourceware.org/glibc/manual/latest/html_node/Waiting-for-I_002fO.html)。
+</div>
+
+宏：`int` **`EALREADY`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Operation already in progress.”在一个已设置为非阻塞模式的对象上，已经有一个操作正在执行。
+</div>
+
+宏：`int` **`ENOTSOCK`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Socket operation on non-socket.”在需要socket的场合，制定了一个非socket的文件。
+</div>
+
+宏：`int` **`EMSGSIZE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Message too long.”传入socket的消息大小超过了最大限制。
+</div>
+
+宏：`int` **`EPROTOTYPE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Protocol wrong type for socket.”socket类型不支持所请求的通信协议。
+</div>
+
+宏：`int` **`ENOPROTOOPT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Protocol not available.”你指定的socket选项对于该socket使用的特定协议没有意义。参考[Socket Options](https://sourceware.org/glibc/manual/latest/html_node/Socket-Options.html)。
+</div>
+
+宏：`int` **`EPROTONOSUPPORT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Protocol not supported.”该socket域不支持所请求的通信协议（可能是因为所请求的协议完全无效）。参考[Creating a Socket](https://sourceware.org/glibc/manual/latest/html_node/Creating-a-Socket.html)。
+</div>
+
+宏：`int` **`ESOCKTNOSUPPORT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Socket type not supported.”socket类型不支持。
+</div>
+
+宏：`int` **`EOPNOTSUPP`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Operation not supported.”你请求的操作不支持。一些socket函数不是对所有类型的socket都有意义，还有一些可能没有对所有通信协议实现。在GNU/Hurd系统上，当对象不支持特定操作时，许多调用都会产生这个错误；这是一个通用指示，服务器不知道该如何处理该调用。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+<strong>可移植性说明：</strong>取决于操作系统，`EOPNOTSUPP`和`ENOTSUP`的值可能相等。可移植代码应同时检查这两种错误，并将他们视为相同情况处理。
+</div>
+
+宏：`int` **`EPFNOSUPPORT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Protocol family not supported.”你所请求的socket通信协议族不受支持。
+</div>
+
+宏：`int` **`EAFNOSUPPORT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Address family not supported by protocol.”对socket指定的地址族不受支持；他和socket使用的通信协议不一致。参考[Sockets](https://sourceware.org/glibc/manual/latest/html_node/Sockets.html).
+</div>
+
+宏：`int` **`EADDRINUSE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Address already in use.”所请求的socket地址已经在使用中。参考[Socket Addresses](https://sourceware.org/glibc/manual/latest/html_node/Socket-Addresses.html)。
+</div>
+
+宏：`int` **`ENETDOWN`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Network is down.”因为网络已断开，socket操作失败。
+</div>
+
+宏：`int` **`ENETUNREACH`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Network is unreachable.”因为包含远程主机的子网不可达，socket操作失败。
+</div>
+
+宏：`int` **`ENETRESET`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Network dropped connection on reset.”因为远程主机崩溃，网络连接被重置。
+</div>
+
+宏：`int` **`ECONNABORTED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Software caused connection abort.”网络连接在本地被中止。
+</div>
+
+宏：`int` **`ECONNRESET`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Connection reset by peer.”网络连接因本地主机无法控制的原因而关闭，例如远程机器重启，或发生了不可恢复的协议违规。
+</div>
+
+宏：`int` **`ENOBUFS`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No buffer space available.” The kernel’s buffers for I/O operations are all in use. In GNU, this error is always synonymous with `ENOMEM`; you may get one or the other from network operations.内核用于I/O操作的缓冲区已全部被占用。在GNU系统中，此错误始终与`ENOMEM`同义；你在网络操作时，可能会返回其中任意一个错误码。
+</div>
+
+宏：`int` **`EISCONN`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Transport endpoint is already connected.”你尝试连接一个已连接的socket。参考[Making a Connection](https://sourceware.org/glibc/manual/latest/html_node/Connecting.html)。
+</div>
+
+宏：`int` **`ENOTCONN`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Transport endpoint is not connected.”socket未连接。当你通过socket传输数据，但没有事先指定数据的目标地址时，就会收到此错误。对于未连接的socket（例如UDP等数据报协议），则会收到`EDESTADDRREQ`。
+</div>
+
+宏：`int` **`EDESTADDRREQ`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Destination address required.”socket未设置默认目标地址。当你尝试通过无连接的套接字发送数据，但没有事先使用`connect`指定数据的目标地址时，便会收到此错误。
+</div>
+
+宏：`int` **`ESHUTDOWN`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Cannot send after transport endpoint shutdown.”socket已关闭。
+</div>
+
+宏：`int` **`ETOOMANYREFS`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Too many references: cannot splice.”AI生成：这个错误源于早期的Unix网络实现（特别是BSD），当时存在一种叫做“Protocol Splicing”（协议拼接）的实验性机制。该机制允许将一个套接字的输出直接“拼接”到另一个套接字的输入上，以实现零拷贝的数据转发。当参与拼接的套接字引用计数超过系统允许的上限时，就会报出ETOOMANYREFS: Too many references: cannot splice错误。
+</div>
+
+宏：`int` **`ETIMEDOUT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Connection timed out.”设置了超时时间的socket操作在指定超时时间内，未收到任何响应。
+</div>
+
+宏：`int` **`ECONNREFUSED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Connection refused.”远程主机拒绝了网络连接（通常因为他没有运行所请求的服务）。
+</div>
+
+宏：`int` **`ELOOP`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Too many levels of symbolic links.”在解析文件名的过程中遇到了过多的符号链接（即软链接，类似与windows的桌面快捷方式，与硬链接的区别是，软链接的源文件删除后会失效，软链接可以指向目录）。这通常表明存在符号链接循环。
+</div>
+
+宏：`int` **`ENAMETOOLONG`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“File name too long.”文件名过长（比`PATH_MAX`更长；参考[Limits on File System Capacity](https://sourceware.org/glibc/manual/latest/html_node/Limits-for-Files.html)）或主机名过长（在`gethostname`或`sethostname`中；参考[Host Identification](https://sourceware.org/glibc/manual/latest/html_node/Host-Identification.html)）。
+</div>
+
+宏：`int` **`EHOSTDOWN`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Host is down.”所请求的网络连接对应的远程主机已关闭。
+</div>
+
+宏：`int` **`EHOSTUNREACH`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No route to host.”所请求的网络连接对应的远程主机不可达。
+</div>
+
+宏：`int` **`ENOTEMPTY`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Directory not empty.”需要空目录的情况下，目录不为空。通常，这个错误发生在你尝试删除一个目录。
+</div>
+
+宏：`int` **`EPROCLIM`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Too many processes.”这意味着尝试`fork`操作将超过每个用户的进程数上限。参考[Limiting Resource Usage](https://sourceware.org/glibc/manual/latest/html_node/Limits-on-Resources.html)，以了解有关`RLIMIT_NPROC`限制的详细信息。
+</div>
