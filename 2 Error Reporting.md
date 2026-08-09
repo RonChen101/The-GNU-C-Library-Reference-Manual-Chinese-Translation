@@ -473,7 +473,7 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 
 <div style="margin: 0 0 1em 3em;">
 
-“No buffer space available.” The kernel’s buffers for I/O operations are all in use. In GNU, this error is always synonymous with `ENOMEM`; you may get one or the other from network operations.内核用于I/O操作的缓冲区已全部被占用。在GNU系统中，此错误始终与`ENOMEM`同义；你在网络操作时，可能会返回其中任意一个错误码。
+“No buffer space available.”内核用于I/O操作的缓冲区已全部被占用。在GNU系统中，此错误始终与`ENOMEM`同义；你在网络操作时，可能会返回其中任意一个错误码。
 </div>
 
 宏：`int` **`EISCONN`**
@@ -508,7 +508,12 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 
 <div style="margin: 0 0 1em 3em;">
 
-“Too many references: cannot splice.”AI生成：这个错误源于早期的Unix网络实现（特别是BSD），当时存在一种叫做“Protocol Splicing”（协议拼接）的实验性机制。该机制允许将一个套接字的输出直接“拼接”到另一个套接字的输入上，以实现零拷贝的数据转发。当参与拼接的套接字引用计数超过系统允许的上限时，就会报出ETOOMANYREFS: Too many references: cannot splice错误。
+“Too many references: cannot splice.”
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+AI生成：这个错误源于早期的Unix网络实现（特别是BSD），当时存在一种叫做“Protocol Splicing”（协议拼接）的实验性机制。该机制允许将一个套接字的输出直接“拼接”到另一个套接字的输入上，以实现零拷贝的数据转发。当参与拼接的套接字引用计数超过系统允许的上限时，就会报出ETOOMANYREFS: Too many references: cannot splice错误。
 </div>
 
 宏：`int` **`ETIMEDOUT`**
@@ -565,4 +570,404 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 <div style="margin: 0 0 1em 3em;">
 
 “Too many processes.”这意味着尝试`fork`操作将超过每个用户的进程数上限。参考[Limiting Resource Usage](https://sourceware.org/glibc/manual/latest/html_node/Limits-on-Resources.html)，以了解有关`RLIMIT_NPROC`限制的详细信息。
+</div>
+
+宏：`int` **`EUSERS`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Too many users.”由于用户数量过多，文件配额系统出现混乱。
+</div>
+
+宏：`int` **`EDQUOT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Disk quota exceeded.”用户磁盘配额已超额。
+</div>
+
+宏：`int` **`ESTALE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Stale file handle.”这表明文件系统内部出现混乱，通常是由于NFS文件系统的服务器端进行了文件系统重组，或其他文件系统发生了损坏。要修复这个问题，通常需要卸载文件系统，可能能修复，然后重新挂载。
+</div>
+
+宏：`int` **`EREMOTE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Object is remote.”尝试通过NFS挂载一个远程文件系统时，所使用的文件名本身已经指向了一个NFS挂载的文件。（在某些操作系统上这属于错误，但是我们希望在GNU/Hurd系统上能正常工作，因此不会出现这个错误码。）
+</div>
+
+宏：`int` **`EBADRPC`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“RPC struct is bad.”
+</div>
+
+宏：`int` **`ERPCMISMATCH`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“RPC version wrong.”
+</div>
+
+宏：`int` **`EPROGUNAVAIL`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“RPC program not available.”
+</div>
+
+宏：`int` **`EPROGMISMATCH`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“RPC program version wrong.”
+</div>
+
+宏：`int` **`EPROCUNAVAIL`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“RPC bad procedure for program.”
+</div>
+
+宏：`int` **`ENOLCK`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No locks available.”这个是文件锁功能来使用的；参考[File Locks](https://sourceware.org/glibc/manual/latest/html_node/File-Locks.html)。这个错误不会出现在GNU/Hurd系统上，但是可能作为一个对其他操作系统上的NFS服务器的操作的结果返回。
+</div>
+
+宏：`int` **`EFTYPE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Inappropriate file type or format.”该操作的文件类型不正确，或数据文件的格式不正确。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+在某些系统上，如果尝试对非目录文件设置粘滞位（sticky bit），`chmod`会返回此错误；参考[Assigning File Permissions](https://sourceware.org/glibc/manual/latest/html_node/Setting-Permissions.html)。
+</div>
+
+宏：`int` **`EAUTH`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Authentication error.”
+</div>
+
+宏：`int` **`ENEEDAUTH`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Need authenticator.”
+</div>
+
+宏：`int` **`ENOSYS`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Function not implemented.”这表明调用的函数没有实现，无论在C库还是在操作系统中。当你遇到这个错误时，除非你安装新版本的C库或操作系统，不然某个函数会一直报`ENOSYS`错误。
+</div>
+
+宏：`int` **`ELIBEXEC`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Cannot exec a shared library directly.”
+</div>
+
+宏：`int` **`ENOTSUP`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Not supported.”某个函数收到的参数的值是有效的，但是那个参数请求的功能不可用，则函数会返回这个错误。这意味着函数根本没有实现某个命令，选项值，或标志位。对于通过参数传入对象进行操作的函数，这可能意味着该对象（文件描述符，端口等）不支持其他参数；不同文件描述符可能支持不同的参数值的范围。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+如果整个函数在当前实现中完全不可用，则会返回`ENOSYS`。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+<strong>可移植性说明：</strong>在某些系统上，`EAGAIN`和`EWOULDBLOCK`的值可能相等。可移植的代码，应该同时检查两个错误码，并将他们视为同一种情况处理。
+</div>
+
+宏：`int` **`EILSEQ`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Invalid or incomplete multibyte or wide character.”在解码多字节字符时，函数遇到了无效或不完整的字节序列，或者给定的宽字符无效。
+</div>
+
+宏：`int` **`EBACKGROUND`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Inappropriate operation for background process.”在GNU/Hurd系统上，当调用者不属于终端的前台进程组时，支持`term`协议的服务端会对某些操作返回此错误。用户通常不会直接看到这个错误，因为`read`和`write`等函数会将其转换为`SIGTTIN`或`SIGTTOU`信号。参考[Job Control](https://sourceware.org/glibc/manual/latest/html_node/Job-Control.html)，以了解有关进程组和这些信号的详细信息。
+</div>
+
+宏：`int` **`EDIED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Translator died.”在GNU/Hurd系统上，当文件（这个文件可以是任何东西，比如硬件，程序等）被翻译，并且翻译器在启动中，与文件连接之前死亡了，则该程序会返回此错误。
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+AI生成：GNU/Hurd采用了一种独特的微内核+用户态服务器架构。与传统Unix将所有文件系统逻辑写死在内核里不同，Hurd把文件系统的实现放在了用户空间的独立程序中，这些程序就叫Translators（转换器/翻译器）。当你访问某个文件或目录时，Hurd实际上是在与一个Translator进程通信。
+</div>
+
+宏：`int` **`ED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“?.”有经验的用户自然能看的出来哪里错了。
+</div>
+
+宏：`int` **`EGREGIOUS`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“You really blew it this time.（你彻底搞杂了。）”你到底干了<strong>什么</strong>？
+</div>
+
+宏：`int` **`EIEIO`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Computer bought the farm.（电脑报废了。）”事已至此，先吃饭吧。
+</div>
+
+宏：`int` **`EGRATUITOUS`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Gratuitous error.”这个错误码毫无用处。
+</div>
+
+宏：`int` **`EBADMSG`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Bad message.”
+</div>
+
+宏：`int` **`EIDRM`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Identifier removed.”
+</div>
+
+宏：`int` **`EMULTIHOP`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Multihop attempted.”
+</div>
+
+宏：`int` **`ENODATA`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No data available.”
+</div>
+
+宏：`int` **`ENOLINK`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Link has been severed.”
+</div>
+
+宏：`int` **`ENOMSG`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No message of desired type.”
+</div>
+
+宏：`int` **`ENOSR`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Out of streams resources.”
+</div>
+
+宏：`int` **`ENOSTR`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Device not a stream.”
+</div>
+
+宏：`int` **`EOVERFLOW`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Value too large for defined data type.”
+</div>
+
+宏：`int` **`EPROTO`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Protocol error.”
+</div>
+
+宏：`int` **`ETIME`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Timer expired.”
+</div>
+
+宏：`int` **`ECANCELED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Operation canceled.”一个异步操作在完成前被取消了。参考[Perform I/O Operations in Parallel](https://sourceware.org/glibc/manual/latest/html_node/Asynchronous-I_002fO.html)。当你调用`aio_cancel`，受影响的操作的正常结果是以该错误码结束；参考[Cancellation of AIO Operations](https://sourceware.org/glibc/manual/latest/html_node/Asynchronous-I_002fO.html)。
+</div>
+
+宏：`int` **`EOWNERDEAD`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Owner died.”
+</div>
+
+宏：`int` **`ENOTRECOVERABLE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“State not recoverable.”
+</div>
+
+以下的错误码在Linux/i386内核中定义。他们还没有文档说明。
+
+宏：`int` **`ERESTART`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Interrupted system call should be restarted.”
+</div>
+
+宏：`int` **`ECHRNG`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Channel number out of range.”
+</div>
+
+宏：`int` **`EL2NSYNC`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Level 2 not synchronized.”
+</div>
+
+宏：`int` **`EL3HLT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Level 3 halted.”
+</div>
+
+宏：`int` **`EL3RST`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Level 3 reset.”
+</div>
+
+宏：`int` **`ELNRNG`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Link number out of range.”
+</div>
+
+宏：`int` **`EUNATCH`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Protocol driver not attached.”
+</div>
+
+宏：`int` **`ENOCSI`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No CSI structure available.”
+</div>
+
+宏：`int` **`EL2HLT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Level 2 halted.”
+</div>
+
+宏：`int` **`EBADE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Invalid exchange.”
+</div>
+
+宏：`int` **`EBADR`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Invalid request descriptor.”
+</div>
+
+宏：`int` **`EXFULL`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Exchange full.”
+</div>
+
+宏：`int` **`ENOANO`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No anode.”
+</div>
+
+宏：`int` **`EBADRQC`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Invalid request code.”
+</div>
+
+宏：`int` **`EBADSLT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Invalid slot.”
+</div>
+
+宏：`int` **`EDEADLOCK`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“File locking deadlock error.”
+</div>
+
+宏：`int` **`EBFONT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Bad font file format.”
 </div>
