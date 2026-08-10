@@ -971,3 +971,198 @@ AI生成：GNU/Hurd采用了一种独特的微内核+用户态服务器架构。
 
 “Bad font file format.”
 </div>
+
+宏：`int` **`ENONET`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Machine is not on the network.”
+</div>
+
+宏：`int` **`ENOPKG`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Package not installed.”
+</div>
+
+宏：`int` **`EADV`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Advertise error.”
+</div>
+
+宏：`int` **`ESRMNT`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Srmount error.”
+</div>
+
+宏：`int` **`ECOMM`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Communication error on send.”
+
+宏：`int` **`EDOTDOT`**
+</div>
+
+<div style="margin: 0 0 1em 3em;">
+
+“RFS specific error.”
+</div>
+
+宏：`int` **`ENOTUNIQ`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Name not unique on network.”
+</div>
+
+宏：`int` **`EBADFD`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“File descriptor in bad state.”
+</div>
+
+宏：`int` **`EREMCHG`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Remote address changed.”
+</div>
+
+宏：`int` **`ELIBACC`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Can not access a needed shared library.”
+</div>
+
+宏：`int` **`ELIBBAD`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Accessing a corrupted shared library.”
+</div>
+
+宏：`int` **`ELIBSCN`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“.lib section in a.out corrupted.”
+</div>
+
+宏：`int` **`ELIBMAX`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Attempting to link in too many shared libraries.”
+</div>
+
+宏：`int` **`ESTRPIPE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Streams pipe error.”
+</div>
+
+宏：`int` **`EUCLEAN`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Structure needs cleaning.”
+</div>
+
+宏：`int` **`ENOTNAM`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Not a XENIX named type file.”
+</div>
+
+宏：`int` **`ENAVAIL`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No XENIX semaphores available.”
+</div>
+
+宏：`int` **`EISNAM`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Is a named type file.”
+</div>
+
+宏：`int` **`EREMOTEIO`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Remote I/O error.”
+</div>
+
+宏：`int` **`ENOMEDIUM`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“No medium found.”
+</div>
+
+宏：`int` **`EMEDIUMTYPE`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Wrong medium type.”
+</div>
+
+宏：`int` **`ENOKEY`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Required key not available.”
+</div>
+
+宏：`int` **`EKEYEXPIRED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Key has expired.”
+</div>
+
+宏：`int` **`EKEYREVOKED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Key has been revoked.”
+</div>
+
+宏：`int` **`EKEYREJECTED`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Key was rejected by service.”
+</div>
+
+宏：`int` **`ERFKILL`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Operation not possible due to RF-kill.”
+</div>
+
+宏：`int` **`EHWPOISON`**
+
+<div style="margin: 0 0 1em 3em;">
+
+“Memory page has hardware error.”
+</div>
+
+## 2.3 错误信息
+
+库提供了一些函数和变量，为了方便你的程序可以客制化格式输出有关库调用失败的详细错误信息。`strerror`和`perror`函数可以根据传入的错误码，返回标准的错误信息；`program_invocation_short_name`变量可以让你获取发生错误的函数的名称。
+
+函数：`char` `*` **`strerror`** `(` `int` `errnum` `)`
