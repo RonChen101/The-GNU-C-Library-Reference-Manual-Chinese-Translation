@@ -1246,25 +1246,6 @@ Preliminary: | MT-Safe | AS-Unsafe i18n | AC-Unsafe |参考[POSIX Safety Concept
 `strerror_r`函数是GNU扩展，他在`string.h`中声明。有一个他的POSIX变体，接下来会讲。
 </div>
 
-<div style="margin: 0 0 1em 2em;">
-
-```c
-#define _GNU_SOURCE
-#include<errno.h>
-#include<stdio.h>
-#include<stdlib.h>
-#include<string.h>
-int main() {
-    FILE *f = fopen("./nofile", "r");
-    char *buf = malloc(100);
-    char *res = strerror_r(errno, buf, sizeof(buf));
-    printf("buf是：%s\n", buf);
-    printf("res是：%s\n", res); 
-    return 0;
-}
-```
-</div>
-
 函数：`int` `strerror_r` `(` `int` *`errnum`* `,` `char` `*` *`buf`* `,` `size_t` *`n`* `)`
 
 <div style="margin: 0 0 1em 2em;">
