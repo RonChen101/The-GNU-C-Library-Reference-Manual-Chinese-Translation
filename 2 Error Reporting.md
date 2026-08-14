@@ -1293,18 +1293,18 @@ ERANGE
 如果你想在`_GNU_SOURCE`定义了的程序中，使用总是复制的POSIX的`strerror_r`，你可以使用带‘`%m`’转换说明符的`snprintf`，比如这样：
 </div>
 
-<div style="margin: 0 0 1em 2em;">
+<div style="margin: 0 0 1em 4em;">
 
 ```c
-    int saved_errno = errno;
-    errno = errnum;
-    int ret = snprintf (buf, n, "%m");
-    errno = saved_errno;
-    if (strerrorname_np (errnum) == NULL)
-    return EINVAL;
-    if (ret >= n)
-    return ERANGE:
-    return 0;
+int saved_errno = errno;
+errno = errnum;
+int ret = snprintf (buf, n, "%m");
+errno = saved_errno;
+if (strerrorname_np (errnum) == NULL)
+return EINVAL;
+if (ret >= n)
+return ERANGE:
+return 0;
 ```
 </div>
 
@@ -1350,4 +1350,108 @@ The function `perror` is declared in `stdio.h`.函数`perror`在`stdio.h`中声�
 <div style="margin: 0 0 1em 2em;">
 
 此函数返回描述错误*errnum*的名称，或者，如果没有已知常量对应该值，则返回`NULL`（例如，传入`EINVAL`，返回"EINVAL"）。返回的字符串在剩余的程序执行中不能修改。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数是GNU扩展，他在`string.h`中声明。
+</div>
+
+函数：`const` `char` `*` `strerrordesc_np` `(` `int` *`errnum`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+| MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数返回描述错误*errnum*的名称，或者，如果没有已知常量对应该值，则返回`NULL`（例如，传入`EINVAL`，返回"Invalid argument"）。与`strerror`不同的是，返回的描述信息不会被翻译，返回的字符串在剩余的程序执行中不能修改。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数是GNU扩展，他在`string.h`中声明。
+</div>
+
+在同一个区域，`strerror`和`perror`对于任何给定的错误码，输出相同的消息；具体的文本在不同系统上会不同。在the GNU C Library中，这些消息相当简短；没有多行消息或嵌入的换行符。每条错误消息都以一个大写字母开头，且不包含任何结尾标点符号。
+
+许多不从终端读取输入的程序被设计成，如果系统调用失败，则退出。按照惯例，来自这类程序的错误信息应该开头有程序名称，不包含目录路径。你可以在变量`program_invocation_short_name`中找到该名称；完整名称在变量`program_invocation_name`中储存。
+
+变量：`char` `*` `program_invocation_name`
+
+<div style="margin: 0 0 1em 2em;">
+
+这个变量的值是调用当前进程运行的程序用的名称。他和`argv[0]`相同。注意，这不需要是一个可用的文件名（AI解释是，这个文件名不是绝对路径，所以不可用）；通常不包含目录。参考[Program Arguments](https://sourceware.org/glibc/manual/latest/html_node/Program-Arguments.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此变量是一个GNU扩展，他在`errno.h`中声明。
+</div>
+
+变量：`char` `*` `program_invocation_short_name`
+
+<div style="margin: 0 0 1em 2em;">
+
+这个变量的值是调用当前进程运行的程序用的名称，不带目录。（也就是说，这就是`program_invocation_name`去掉第一个斜杠之前的所有内容，如果有的话。）
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此变量是一个GNU扩展，他在`errno.h`中声明。
+</div>
+
+库的初始化代码会在调用`main`函数之前，设置好这两个变量。
+
+<strong>可移植性声明：</strong>如果你想要你的程序能够在非GNU库的情况下运行，你必须在`main`中保存`argv[0]`的值，并手动去掉目录部分。我们增加这些扩展，是为了你能够编写自包含的错误报告子程序，这些子程序不需要`main`函数的显示配合。
+
+这里有一个示例，展示了如何正确处理打开文件失败的情况。`open_sesame`函数尝试打开指定的文件，如果成功则返回一个流。`fopen`库函数如果一些原因不能打开文件，则返回一个空指针。在那种情况下，`open_sesame`调用`strerror`函数构造一个适当的错误信息，并终止程序。如果我们在向`strerror`传入错误码之前调用了一些其他库函数，我们必须把他保存到一个局部变量中，因为其他库函数可能会在此期间覆盖`errno`的值。
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+#define _GNU_SOURCE
+
+#include <errno.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+FILE *
+open_sesame (char *name)
+{
+  FILE *stream;
+
+  errno = 0;
+  stream = fopen (name, "r");
+  if (stream == NULL)
+    {
+      fprintf (stderr, "%s: Couldn't open file %s; %s\n",
+               program_invocation_short_name, name, strerror (errno));
+      exit (EXIT_FAILURE);
+    }
+  else
+    return stream;
+}
+```
+</div>
+
+使用`perror`的优势是，该函数是可移植的，在所有实现ISO C的系统上可用。但是，`perror`生成的文本并不是我们想要的，并且没有办法扩展或改变`perror`的行为。例如，GNU编码标准需要错误信息前面要有程序名称，并且在读取输入文件发生错误时，程序需要提供输入文件和行号的信息。针对这两种情况，下面有两个可用函数，他们在整个GNU项目中广泛使用。这些函数在`error.h`中声明。
+
+函数：`void` `error` `(` `int` *`status`* `,` `int` *`errnum`* `,` `const` `char` `*` *`format`* `,` `…` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`error`函数用于在程序执行过程中报告一般问题。*format*参数是一个格式字符串，与传给`printf`系列函数的类似。格式需要的参数跟在*format*后面。就像`perror`，`error`也可以以文本形式报告错误码。但是，与`perror`不同的是，错误值是通过*errnum*参数显式传递给函数的。这消除了上文提到的问题，即函数造成错误后，必须马上调用错误报告函数，否则`errno`可能会变成不同的值。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`error` prints first the program name.  If the application defined a global variable `error_print_progname` and points it to a function this function will be called to print the program name. Otherwise the string from the global variable `program_name` is used.  The program name is followed by a colon and a space which in turn is followed by the output produced by the format string.  If the *errnum* parameter is non-zero the format string output is followed by a colon and a space, followed by the error message for the error code *errnum*.  In any case is the output terminated with a newline.
 </div>
