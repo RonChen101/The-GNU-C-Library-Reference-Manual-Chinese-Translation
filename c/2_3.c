@@ -1,4 +1,4 @@
-//	#define _GNU_SOURCE
+#define _GNU_SOURCE
 
 
 #include<errno.h>
@@ -45,7 +45,25 @@ int main() {
 //	void perror (const char *message);
 //	perror("");
 
+//	string.h
+//	const char * strerrorname_np (int errnum)
+//	需要定义宏_GNU_SOURCE
+//	printf("errno的名字是：%s\n", strerrorname_np(errno));
 
+//	string.h
+//	const char * strerrordesc_np (int errnum)
+//	需要定义宏_GNU_SOURCE
+//	printf("errno的意思是：%s\n", strerrordesc_np(errno));
+
+//	errno.h
+//	char * program_invocation_name
+//	需要定义宏_GNU_SOURCE
+//	printf("当前的程序是这样调用的：%s\n", program_invocation_name);
+
+//	errno.h
+//	char * program_invocation_short_name
+//	需要定义宏_GNU_SOURCE
+//	printf("当前的程序是：%s\n", program_invocation_short_name);
 
 	return 0;
 }
