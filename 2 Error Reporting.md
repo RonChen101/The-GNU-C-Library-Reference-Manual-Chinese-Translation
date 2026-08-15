@@ -1453,5 +1453,73 @@ Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Safe |参考[PO
 
 <div style="margin: 0 0 1em 2em;">
 
-`error` prints first the program name.  If the application defined a global variable `error_print_progname` and points it to a function this function will be called to print the program name. Otherwise the string from the global variable `program_name` is used.  The program name is followed by a colon and a space which in turn is followed by the output produced by the format string.  If the *errnum* parameter is non-zero the format string output is followed by a colon and a space, followed by the error message for the error code *errnum*.  In any case is the output terminated with a newline.
+`error`先打印程序名称。如果应用定义了一个全局变量`error_print_progname`，并指向一个函数，则该函数将打印程序名称。否则，将使用全局变量`program_name`。程序名后接一个冒号和空格，紧接着由格式字符串产生的输出。如果*errnum*参数是非零的，格式字符串输出后接一个冒号和空格，后接错误码*errnum*对应的错误信息。无论哪种情况，输出最后都是换行。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+输出被定向到`stderr`流。如果调用前，`stderr`没有定向，那么之后将会是窄定向。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+除非*status*参数非零，否则函数将会返回。在这种情况，函数将会用*status*的值作为参数调用`exit`，因此不会返回。也就是这样：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+if(status) exit(status);
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果`error`返回了，全局变量`error_message_count`加一，以记录已报告的错误数量。
+</div>
+
+函数：`void` `error_at_line` `(` `int` `status` `,` `int` `errnum` `,` `const` `char` `*` `fname` `,` `unsigned` `int` `lineno` `,` `const` `char` `*` `format` `,` `…` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe race:error_at_line/error_one_per_line locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt/error_one_per_line |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`error_at_line`函数与`error`函数非常相似。唯一的区别是额外的*fname*和*lineno*参数。其他参数的处理与`error`相同，除了在程序名和格式字符串生成的字符串中间插入了额外的文本。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+紧接着程序名有一个冒号，后接*fname*指向的文件名，再接一个冒号，最后打印*lineno*。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此额外的输出当然是意味着被用来定位输入文件中的错误（比如一个编程语言源代码文件等）。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果全局变量`error_one_per_line`设置成非零值，`error_at_line`将避免为同一个文件和行号连续打印重复信息。但不是直接相邻的重复信息不会被检测到。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+就像`error`一样，此函数只有`status`为零时才会返回。否则，将会以该非零值调用`exit`。如果`error`返回了，全局变量`error_message_count`会加一，用于跟踪已报告的错误数量。
+</div>
+
+如上所述，`error`和`error_at_line`函数都可以通过定义`error_print_progname`变量客制化。
+
+宏：`void` `(` `*` `error_print_progname` `)` `(` `void` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+如果`error_print_progname`变量被定义为非零值，则`error`或`error_at_line`将会调用他指向的函数。他应该用于打印函数名或做一些一样有用的事。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数应该向`stderr`流打印，并且必须能够处理任何流的方向。
 </div>
