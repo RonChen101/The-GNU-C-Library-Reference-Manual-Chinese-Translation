@@ -1246,7 +1246,7 @@ Preliminary: | MT-Safe | AS-Unsafe i18n | AC-Unsafe |参考[POSIX Safety Concept
 `strerror_r`函数是GNU扩展，他在`string.h`中声明。有一个他的POSIX变体，接下来会讲。
 </div>
 
-函数：`int` `strerror_r` `(` `int` *`errnum`* `,` `char` `*` *`buf`* `,` `size_t` *`n`* `)`
+函数：`int` **`strerror_r`** `(` `int` *`errnum`* `,` `char` `*` *`buf`* `,` `size_t` *`n`* `)`
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1340,7 +1340,7 @@ Preliminary: | MT-Unsafe race:stderr | AS-Unsafe corrupt i18n heap lock | AC-Uns
 The function `perror` is declared in `stdio.h`.函数`perror`在`stdio.h`中声明。
 </div>
 
-函数：`const` `char` `*` `strerrorname_np` `(` `int` *`errnum`* `)`
+函数：`const` `char` `*` **`strerrorname_np`** `(` `int` *`errnum`* `)`
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1357,7 +1357,7 @@ The function `perror` is declared in `stdio.h`.函数`perror`在`stdio.h`中声�
 此函数是GNU扩展，他在`string.h`中声明。
 </div>
 
-函数：`const` `char` `*` `strerrordesc_np` `(` `int` *`errnum`* `)`
+函数：`const` `char` `*` **`strerrordesc_np`** `(` `int` *`errnum`* `)`
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1378,7 +1378,7 @@ The function `perror` is declared in `stdio.h`.函数`perror`在`stdio.h`中声�
 
 许多不从终端读取输入的程序被设计成，如果系统调用失败，则退出。按照惯例，来自这类程序的错误信息应该开头有程序名称，不包含目录路径。你可以在变量`program_invocation_short_name`中找到该名称；完整名称在变量`program_invocation_name`中储存。
 
-变量：`char` `*` `program_invocation_name`
+变量：`char` `*` **`program_invocation_name`**
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1390,7 +1390,7 @@ The function `perror` is declared in `stdio.h`.函数`perror`在`stdio.h`中声�
 此变量是一个GNU扩展，他在`errno.h`中声明。
 </div>
 
-变量：`char` `*` `program_invocation_short_name`
+变量：`char` `*` **`program_invocation_short_name`**
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1439,7 +1439,7 @@ open_sesame (char *name)
 
 使用`perror`的优势是，该函数是可移植的，在所有实现ISO C的系统上可用。但是，`perror`生成的文本并不是我们想要的，并且没有办法扩展或改变`perror`的行为。例如，GNU编码标准需要错误信息前面要有程序名称，并且在读取输入文件发生错误时，程序需要提供输入文件和行号的信息。针对这两种情况，下面有两个可用函数，他们在整个GNU项目中广泛使用。这些函数在`error.h`中声明。
 
-函数：`void` `error` `(` `int` *`status`* `,` `int` *`errnum`* `,` `const` `char` `*` *`format`* `,` `…` `)`
+函数：`void` **`error`** `(` `int` *`status`* `,` `int` *`errnum`* `,` `const` `char` `*` *`format`* `,` `…` `)`
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1478,7 +1478,7 @@ if(status) exit(status);
 如果`error`返回了，全局变量`error_message_count`加一，以记录已报告的错误数量。
 </div>
 
-函数：`void` `error_at_line` `(` `int` `status` `,` `int` `errnum` `,` `const` `char` `*` `fname` `,` `unsigned` `int` `lineno` `,` `const` `char` `*` `format` `,` `…` `)`
+函数：`void` **`error_at_line`** `(` `int` *`status`* `,` `int` *`errnum`* `,` `const` `char` `*` *`fname`* `,` `unsigned` `int` *`lineno`* `,` `const` `char` `*` *`format`* `,` `…` `)`
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1512,7 +1512,7 @@ Preliminary: | MT-Unsafe race:error_at_line/error_one_per_line locale | AS-Unsaf
 
 如上所述，`error`和`error_at_line`函数都可以通过定义`error_print_progname`变量客制化。
 
-宏：`void` `(` `*` `error_print_progname` `)` `(` `void` `)`
+变量：`void` `(` `*` `error_print_progname` `)` `(` **`void`** `)`
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1522,4 +1522,23 @@ Preliminary: | MT-Unsafe race:error_at_line/error_one_per_line locale | AS-Unsaf
 <div style="margin: 0 0 1em 2em;">
 
 此函数应该向`stderr`流打印，并且必须能够处理任何流的方向。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此变量是全局的，与所有线程共享。
+</div>
+
+变量：`unsigned` `int` **`error_message_count`**
+
+<div style="margin: 0 0 1em 2em;">
+
+函数`error`或`error_at_line`返回，则`error_message_count`变量增加。此变量是全局的，与所有线程共享。
+</div>
+
+变量：`int` **`error_one_per_line`**
+
+<div style="margin: 0 0 1em 2em;">
+
+变量`error_one_per_line`只影响`error_at_line`。通常，`error_at_line`函数在每次调用都会输出。如果`error_one_per_line`是非零值，`error_at_line`会记录上次的文件名和错误被报告的行号，并避免相同的文件和行后紧接着消息。此变量是全局的，与所有线程共享。
 </div>
