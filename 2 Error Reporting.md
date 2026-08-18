@@ -1540,5 +1540,69 @@ Preliminary: | MT-Unsafe race:error_at_line/error_one_per_line locale | AS-Unsaf
 
 <div style="margin: 0 0 1em 2em;">
 
-变量`error_one_per_line`只影响`error_at_line`。通常，`error_at_line`函数在每次调用都会输出。如果`error_one_per_line`是非零值，`error_at_line`会记录上次的文件名和错误被报告的行号，并避免相同的文件和行后紧接着消息。此变量是全局的，与所有线程共享。
+变量`error_one_per_line`只影响`error_at_line`。通常，`error_at_line`函数在每次调用都会输出。如果`error_one_per_line`是非零值，`error_at_line`会记录上次的文件名和错误被报告的行号，并避免输出相同的文件和行的错误消息。此变量是全局的，与所有线程共享。
 </div>
+
+下面是一个读取输入文件并报错的程序：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+{
+  char *line = NULL;
+  size_t len = 0;
+  unsigned int lineno = 0;
+
+  error_message_count = 0;
+  while (! feof_unlocked (fp))
+    {
+      ssize_t n = getline (&line, &len, fp);
+      if (n <= 0)
+        /* End of file or error.  */
+        break;
+      ++lineno;
+
+      /* Process the line.  */
+      ...
+
+      if (Detect error in line)
+        error_at_line (0, errval, filename, lineno,
+                       "some error text %s", some_variable);
+    }
+
+  if (error_message_count != 0)
+    error (EXIT_FAILURE, 0, "%u errors found", error_message_count);
+}
+```
+</div>
+
+`error`和`error_at_line`当然是最佳函数，让程序员可以写出符合GNU代码标准的程序。The GNU C Library额外包含了一些用于USD的相同目的的函数。这些函数在`err.h`中声明。一般不建议使用这些函数。他们只是因为兼容性才存在的。
+
+函数：`void` **`warn`** `(` `const` `char` `*` *`format`* `,` `…` `)`
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+
+<div style="margin: 0 0 1em 2em;">
+
+`warn`函数几乎相当于
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+`error` `(` `0` `,` `errno` `,` `format` `,` 参数 `)`
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+除了全局变量`error`（这里指的就是`error`函数）相关的和修改了的东西（例如，error_message_count）没用上。
+</div>
+
+函数：`void` **`vwarn`** `(` `const` `char` `*` *`format`* `,` `va_list` *`ap`* `)`
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+
+<div style="margin: 0 0 1em 2em;">
+
+`vwarn`函数就像`warn`一样，除了处理*format*字符串的参数是通过`va_list`的值传入的。关于`va_list`，参考[Argument Access Macros](https://sourceware.org/glibc/manual/latest/html_node/Argument-Macros.html)。
+</div>
+
