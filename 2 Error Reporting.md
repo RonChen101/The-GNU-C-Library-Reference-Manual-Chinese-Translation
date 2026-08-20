@@ -1665,7 +1665,7 @@ Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt 
 
 <div style="margin: 0 0 1em 2em;">
 
-除了全局变量`error`（这里指的就是`error`函数）相关的和修改了的东西（例如，error_message_count）没用上，并且，如果*status*为零，程序会退出。
+除了全局变量`error`（这里指的就是`error`函数）相关的和修改了的东西（例如，error_message_count）没用上，并且，即使*status*为零，程序也会退出。
 </div>
 
 函数：`void` **`verr`** `(` `int` *`status`* `,` `const` `char` `*` *`format`* `,` `va_list` *`ap`* `)`
