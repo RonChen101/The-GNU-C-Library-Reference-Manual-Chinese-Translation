@@ -1580,7 +1580,10 @@ Preliminary: | MT-Unsafe race:error_at_line/error_one_per_line locale | AS-Unsaf
 
 函数：`void` **`warn`** `(` `const` `char` `*` *`format`* `,` `…` `)`
 
+<div style="margin: 0 0 1em 2em;">
+
 Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -1599,10 +1602,116 @@ Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt 
 
 函数：`void` **`vwarn`** `(` `const` `char` `*` *`format`* `,` `va_list` *`ap`* `)`
 
+<div style="margin: 0 0 1em 2em;">
+
 Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
 
 <div style="margin: 0 0 1em 2em;">
 
 `vwarn`函数就像`warn`一样，除了处理*format*字符串的参数是通过`va_list`的值传入的。关于`va_list`，参考[Argument Access Macros](https://sourceware.org/glibc/manual/latest/html_node/Argument-Macros.html)。
 </div>
 
+函数：`void` **`warnx`** `(` `const` `char` `*` *`format`* `,` `…` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`warnx`函数几乎相当于
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+`error` `(` `0` `,` `0` `,` `format` `,` 参数 `)`
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+除了全局变量`error`（这里指的就是`error`函数）相关的和修改了的东西（例如，error_message_count）没用上。和`warn`的区别是不会打印错误信息。
+</div>
+
+函数：`void` **`vwarnx`** `(` `const` `char` `*` *`format`* `,` `va_list` *`ap`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`vwarnx`函数就像`warnx`一样，除了处理*format*字符串的参数是通过`va_list`的值传入的。
+</div>
+
+函数：`void` **`err`** `(` `int` *`status`* `,` `const` `char` `*` *`format`* `,` `…` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`err`函数几乎相当于
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+`error` `(` `status` `,` `errno` `,` `format` `,` 参数 `)`
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+除了全局变量`error`（这里指的就是`error`函数）相关的和修改了的东西（例如，error_message_count）没用上，并且，如果*status*为零，程序会退出。
+</div>
+
+函数：`void` **`verr`** `(` `int` *`status`* `,` `const` `char` `*` *`format`* `,` `va_list` *`ap`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap i18n | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`verr`函数就像`err`一样，除了处理*format*字符串的参数是通过`va_list`的值传入的。
+</div>
+
+函数：`void` **`errx`** `(` `int` *`status`* `,` `const` `char` `*` *`format`*`,` `…` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap | AC-Unsafe corrupt lock mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`errx`函数几乎相当于
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+`error` `(` `status` `,` 0 `,` `format` `,` 参数 `)`
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+除了全局变量`error`（这里指的就是`error`函数）相关的和修改了的东西（例如，error_message_count）没用上，并且，如果*status*为零，程序会退出。和`err`的区别是不会打印错误信息。
+</div>
+
+函数：`void` **`verrx`** `(` `int` *`status`* `,` `const` `char` `*` *`format`* `,` `va_list` *`ap`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap | AC-Unsafe corrupt lock mem | See POSIX Safety Concepts.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`verrx`函数就像`errx`一样，除了处理*format*字符串的参数是通过`va_list`的值传入的。
+</div>
+
+这是The GNU C Library Reference Manual，版本2.44。
