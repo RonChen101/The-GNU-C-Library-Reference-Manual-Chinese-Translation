@@ -123,4 +123,135 @@ the GNU C Library中的`malloc`实现源自ptmalloc（pthreads malloc），ptmal
 
 与其他版本不同，the GNU C Library中的`malloc`不会向上取整到二的幂，无论大小。相邻的chunk可能会因`free`合并，无论他们的大小。这让实现在没有通过碎片遭受大量内存浪费的情况下，适应所有类型的分配模式。多个arena的存在允许多个线程在不同的arena中同时分配内存，因此提高了性能。
 
-The other way of memory allocation is for very large blocks, i.e. much larger than a page. These requests are allocated with `mmap` (anonymous or via `/` `dev` `/` `zero`; see [Memory-mapped I/O](https://sourceware.org/glibc/manual/latest/html_node/Memory_002dmapped-I_002fO.html)). This has the great advantage that these chunks are returned to the system immediately when they are freed. Therefore, it cannot happen that a large chunk becomes “locked” in between smaller ones and even after calling `free` wastes memory. The size threshold for `mmap` to be used is dynamic and gets adjusted according to allocation patterns of the program. `mallopt` can be used to statically adjust the threshold using `M_MMAP_THRESHOLD` and the use of `mmap` can be disabled completely with `M_MMAP_MAX`; see [Malloc Tunable Parameters](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Tunable-Parameters.html).另一种内存分配方式是给超大块的，例如，比一页（page）还大（通常为4KB）。这些请求是通过`mmap`分配的（匿名的或通过`/` `dev` `/` `zero`；参考[Memory-mapped I/O](https://sourceware.org/glibc/manual/latest/html_node/Memory_002dmapped-I_002fO.html)）。这有相当大的好处，这些chunk被释放后会瞬间返回系统。因此，不会发生一个大chunk被小chunk锁定的情况
+另一种内存分配方式是给超大块的，例如，比一页（page）还大（通常为4KB）。这些请求是通过`mmap`分配的（匿名的或通过`/` `dev` `/` `zero`；参考[Memory-mapped I/O](https://sourceware.org/glibc/manual/latest/html_node/Memory_002dmapped-I_002fO.html)）。这有相当大的好处，这些chunk被释放后会瞬间返回系统。因此，不会发生一个大chunk被小chunk锁定，即使在调用`free`后仍然浪费内存的情况。使用`mmap`的大小门槛是动态的，由程序的分配模式调整。`mallopt`可以使用`M_MMAP_THRESHOLD`静态调整门槛，并且`M_MMAP_MAX`可以完全警用`mmap`；参考[Malloc Tunable Parameters](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Tunable-Parameters.html)。
+
+the GNU内存分配器 更多细节技术描述在the GNU C Library wiki上保存。参考[https://sourceware.org/glibc/wiki/MallocInternals]。
+
+你可以使用你自己客制化的`malloc`替换the GNU C Library提供的内置分配器。参考[Replacing malloc](https://sourceware.org/glibc/manual/latest/html_node/Replacing-malloc.html)。
+
+### 3.2.3 不受限制的内存分配器
+
+最普遍的动态分配功能是`malloc`。他允许你在任何时间分配任意大小的内存块，让他们变大或变小，并且分别释放那些块（或从不释放）。
+
+- [Basic Memory Allocation](https://sourceware.org/glibc/manual/latest/html_node/Basic-Allocation.html)
+
+- [Examples of `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Examples.html)
+
+- [Portable Memory Allocation](https://sourceware.org/glibc/manual/latest/html_node/Portable-Allocation.html)
+
+- [Freeing Memory Allocated with `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Freeing-after-Malloc.html)
+
+- [Changing the Size of a Block](https://sourceware.org/glibc/manual/latest/html_node/Changing-Block-Size.html)
+
+- [Allocating Cleared Space](https://sourceware.org/glibc/manual/latest/html_node/Allocating-Cleared-Space.html)
+
+- [Allocating Aligned Memory Blocks](https://sourceware.org/glibc/manual/latest/html_node/Aligned-Memory-Blocks.html)
+
+- [Malloc Tunable Parameters](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Tunable-Parameters.html)
+
+- [Heap Consistency Checking](https://sourceware.org/glibc/manual/latest/html_node/Heap-Consistency-Checking.html)
+
+- [Statistics for Memory Allocation with `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Statistics-of-Malloc.html)
+
+- [Summary of `malloc`-Related Functions](https://sourceware.org/glibc/manual/latest/html_node/Summary-of-Malloc.html)
+
+#### 3.2.3.1 基础内存分配
+
+分配一块内存，调用`malloc`。此函数原型在`stdlib.h`中。
+
+函数：`void` `*` **`malloc`** `(` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+This function returns a pointer to a newly allocated block *size* bytes long, or a null pointer (setting `errno`) if the block could not be allocated.此函数返回一个指向新分配的*size*字节长的块的指针，或者一个空指针（设置`errno`），如果块无法分配的话。
+</div>
+
+块的内容是未定义的；你必须手动初始化他（或者使用`calloc`代替；参考[Allocating Cleared Space](https://sourceware.org/glibc/manual/latest/html_node/Allocating-Cleared-Space.html)）。通常，你会将该值转换为指向你想要在块中存储的对象类型的指针。这里我们展示了一个做这事的例子，然后使用库函数`memset`以零来初始化那片空间（参考[Copying Strings and Arrays](https://sourceware.org/glibc/manual/latest/html_node/Copying-Strings-and-Arrays.html)）：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+struct foo *ptr = malloc (sizeof *ptr);
+if (ptr == 0) abort ();
+memset (ptr, 0, sizeof (struct foo));
+```
+</div>
+
+你可以将`malloc`的结果保存为任意指针变量，无需转换，因为ISO C在必要时，会自动的将`void` `*`转换成另一种类型。然而，如果上下文未指定类型但又需要该类型时，则必须使用强制类型转换。
+
+记住，当给字符串分配空间时，传入`malloc`的参数必须是一加字符串的长度。这是因为字符串是以一个空字符截止的，那个空字符不算字符串的长度，但是需要空间。例如：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+char *ptr = malloc (length + 1);
+```
+</div>
+
+参考[Representation of Strings](https://sourceware.org/glibc/manual/latest/html_node/Representation-of-Strings.html)，以获取更多信息。
+
+#### 3.2.3.2 `malloc`例子
+
+如果空间不足，`malloc`返回一个空指针。你每次调用`malloc`，都应该检测值。写一个子程序来调用`malloc`并在值为空指针是报告错误，仅当值为非空是返回，是有用的。此函数一般称为`xmalloc`。这就是：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+void *
+xmalloc (size_t size)
+{
+  void *p = malloc (size);
+  if (p == NULL)
+    fatal ("virtual memory exhausted");
+  return p;
+}
+```
+</div>
+
+这是一个使用`malloc`（以`xmaaloc`）的实际例子。`savestring`将会复制一系列字符到一个新分配的空截止（null-terminated）的字符串：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+char *
+savestring (const char *ptr, size_t len)
+{
+  char *p = xmalloc (len + 1);
+  p[len] = '\0';
+  return memcpy (p, ptr, len);
+}
+```
+</div>
+
+在当前的the GNU C Library版本，`malloc`给你的块是对齐的，所以他的地址是`alignof` `(` `max_align_t` `)`整数倍，所以他能容纳带有任意基础对齐和无更严格对齐说明符的对象类型。只有少数情况下，更高的边界（例如页（page）边界）是需要的；在这类情况下，使用`aligned_alloc`或`posix_memalign`（参考[Allocating Aligned Memory Blocks](https://sourceware.org/glibc/manual/latest/html_node/Aligned-Memory-Blocks.html)）。在未来的the GNU C Library版本，可能会放松对小内存分配的对齐，只要任何具有基础对齐要求且能放入该小内存分配中的对象能够被正确对齐即可。例如，一个未来的`malloc` `(` `1` `)`可能会返回一个具有奇数对齐的指针。
+
+（AI生成：大多数CPU要求多字节数据按地址的倍数对齐访问：
+
+|data type		|需要的对齐|
+|-				|-|
+|char(1Byte)	||
+|short(2Byte)	|地址必须是2的倍数|
+|int(4Byte)		|地址必须是4的倍数|
+|double(8Byte)	|地址必须是8的倍数|
+|pointer(8Byte)	|地址必须是8的倍数|
+
+）
+
+注意，块结尾后面的内存可能用来存其他东西；可能是另一个调用`malloc`分配的块。如果你尝试以你原本请求的大小更长的大小对待块，你很可能会破坏`malloc`用于管理其内存块的数据结构，或者破坏其他块的内容。如果你已经分配一个块，然后发现你需要他变大，使用`realloc`（参考[Changing the Size of a Block](https://sourceware.org/glibc/manual/latest/html_node/Changing-Block-Size.html)）。
+
+### 3.2.3.3 可移植的内存分配
+
+当在即要在GNU和非GNU系统上运行的代码中分配内存时，或使用非GNU的替代分配器时（参考[Replacing malloc](https://sourceware.org/glibc/manual/latest/html_node/Replacing-malloc.html)），需要更加小心。当存储区小或者奇怪的大，或存储区被分配成一个不常见的类型，POSIX和ISO C标准允许多种行为。
+
+- 在大多数系统中，一个成功的`malloc` `(` `0` `)`会返回一个非空指针到一个新分配的大小为零的块。然而，IBM AIX是不常见的，一个成功的`malloc` `(` `0` `)`会返回一个空指针，并且这会破坏常见代码，例如这个手册中给出的`xmalloc`实现。参考[Examples of `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Examples.html)。想要移植到IBM AIX的代码可以使用`p` `=` `malloc` `(` `size` `|` `(` `size` `==` `0` `)` `)`替代`p` `=` `malloc` `(` `size` `)`，或者如果在成功时他不介意一个空指针，它可以用`if` `(` `p` `==` `NULL` `&&` `size` `!=` `0` `)` `fatal` `(` `...` `)` `;`替换下面的`if` `(` `p` `==` `NULL` `)` `fatal` `(` `...` `)` `;`。
+
+- 在the GNU C Library中，一个失败的`malloc`调用会设置`errno`，但是ISO C不要求这个，并且非POSIX实现在失败时不需要设置`errno`。
+
+- 在the GNU C Library中，`malloc`在*size*超过`PTRDIFF_MAX`时总是失败，为了避免程序减指针或使用符号索引时发生问题。其他实现可能在这种情况下成功，然后导致未定义行为。
+
+- In the GNU C Library, `malloc` `(` *`size`* `)` returns a pointer that when converted to an integer is a multiple of `alignof` `(` `max_align_t` `)`. Some other implementations may align the result only to what is needed for fundamentally-aligned objects of size at most `max` `(` *`size`* `,` `1` `)`. For example, if `alignof` `(` `max_align_t` `)` is 16 but smaller fundamentally-aligned objects all have alignment of at most 4, other implementations of `malloc` `(` `15` `)` might return a pointer that is a multiple of 4 but not of 16 or even of 8. Portable code should therefore use a function like `aligned_alloc` if it needs `alignof` `(` `max_align_t` `)` alignment even for small allocations.在the GNU C Library中，`malloc` `(` `size` `)`返回一个指针，当转换成整数时是`alignof` `(` `max_align_t` `)`的倍数。一些其他的实现可能只会以包含的基础对齐对象中最大的那个大小需求对齐，`max` `(` *`size`* `,` `1` `)`。例如，如果`alignof` `(` `max_align_t` `)`是16，但是较小的基础对齐对象都有不超过4的对齐，那么其他`malloc` `(` `15` `)`实现可能会返回一个是4的倍数的指针，而不是16或8。
