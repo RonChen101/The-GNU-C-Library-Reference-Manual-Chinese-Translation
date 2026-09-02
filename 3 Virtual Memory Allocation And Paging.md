@@ -254,4 +254,88 @@ savestring (const char *ptr, size_t len)
 
 - 在the GNU C Library中，`malloc`在*size*超过`PTRDIFF_MAX`时总是失败，为了避免程序减指针或使用符号索引时发生问题。其他实现可能在这种情况下成功，然后导致未定义行为。
 
-- In the GNU C Library, `malloc` `(` *`size`* `)` returns a pointer that when converted to an integer is a multiple of `alignof` `(` `max_align_t` `)`. Some other implementations may align the result only to what is needed for fundamentally-aligned objects of size at most `max` `(` *`size`* `,` `1` `)`. For example, if `alignof` `(` `max_align_t` `)` is 16 but smaller fundamentally-aligned objects all have alignment of at most 4, other implementations of `malloc` `(` `15` `)` might return a pointer that is a multiple of 4 but not of 16 or even of 8. Portable code should therefore use a function like `aligned_alloc` if it needs `alignof` `(` `max_align_t` `)` alignment even for small allocations.在the GNU C Library中，`malloc` `(` `size` `)`返回一个指针，当转换成整数时是`alignof` `(` `max_align_t` `)`的倍数。一些其他的实现可能只会以包含的基础对齐对象中最大的那个大小需求对齐，`max` `(` *`size`* `,` `1` `)`。例如，如果`alignof` `(` `max_align_t` `)`是16，但是较小的基础对齐对象都有不超过4的对齐，那么其他`malloc` `(` `15` `)`实现可能会返回一个是4的倍数的指针，而不是16或8。
+- 在the GNU C Library中，`malloc` `(` `size` `)`返回一个指针，当转换成整数时是`alignof` `(` `max_align_t` `)`的倍数。一些其他的实现可能只会以包含的基础对齐对象中最大的那个大小需求对齐，`max` `(` *`size`* `,` `1` `)`。例如，如果`alignof` `(` `max_align_t` `)`是16，但是较小的基础对齐对象都有不超过4的对齐，那么其他`malloc` `(` `15` `)`实现可能会返回一个是4的倍数的指针，而不是16或8。可移植的代码因此应该使用类似`aligned_alloc`的函数，如果他甚至需要小分配也以`alignof` `(` `max_align_t` `)`对齐。
+
+- 虽然the GNU C Library的头文件只写了具有基础对齐方式的类型，C和POSIX标准仅要求下面的类型（如果可以）具有基础对齐。
+
+<div style="margin: 0 0 1em 4em;">
+
+`char`；所有的整数类型（包括`bool`）；`float`，`double`，`long` `double`；`_Decimal32`，`_Decimal64`，`_Decimal128`；`float` `_Complex`，`double` `_Complex`，`long` `double` `_Complex`；所有枚举类型；所有指针类型；所有元素类型具有基础对齐需求的数组；所有成员类型具有基础对齐需求且没有严格对齐标识符的结构体和联合体；`va_list`（在`<` `stdarg.h` `>`中）；`fpos_t`（在`<` `stdio.h` `>`中）；`cnd_t`，`thrd_t`，`tss_t`，`mtx_t`，`once_flag`（在`<` `threads.h` `>`中）；`mbstate_t`（在`<` `wchar.h` `>`中）。
+</div>
+
+
+<div style="margin: 0 0 1em 2em;">
+
+理论上，可移植代码不应该使用`malloc`分配包含不在上述列表的类型的存储区；应该用`aligned_alloc`类似的函数代替。实践中，然而，其他实现通常跟随the GNU C Library的领导，并且只定义了具有基础对齐方式的类型，并且通常使用`malloc`分配具有the C library定义的类型的对象是可移植的。
+</div>
+
+#### 3.2.3.4 释放`malloc`分配的内存
+
+当你不需要从`malloc`获取的块时，使用`free`让块能够重新分配。函数原型在`stdlib.h`中。
+
+函数：`void` **`free`** `(` `void` `*` *`ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`free`函数释放*ptr*指向的内存块。
+</div>
+
+释放块会改变块的内容。<strong>在释放后，不要想在块中找到任何数据（例如链表中指向下一个块的指针）。</strong>在释放前，复制你所有需要的！这里有一个例子，是释放链中的所有块，以及他们指向的字符串的正确方式：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+struct chain
+  {
+    struct chain *next;
+    char *name;
+  }
+
+void
+free_chain (struct chain *chain)
+{
+  while (chain != 0)
+    {
+      struct chain *next = chain->next;
+      free (chain->name);
+      free (chain);
+      chain = next;
+    }
+}
+```
+</div>
+
+按照传统，`free`可以将内存返回给系统，并且使进程更小。但是通常，他所有能做到的就是允许`malloc`回收利用那片空间。同时，那片空间仍保留在你的程序中，作为一个空闲表给内部的`malloc`使用。
+
+`free`函数会保留`errno`的值，所以清理代码的调用`free`部分周围无需担心保存和恢复`errno`。尽管ISO C和POSIX.1-2017都不要求`free`保留`errno`的值，未来POSIX计划要求他。
+
+在程序的结尾释放块是没有意义的，因为当程序结束时，所有程序空间都返回给系统了。
+
+函数：`void` **`free_sized`** `(` `void` `*` *`ptr`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`free_sized`函数会释放*ptr*指向的先前由`malloc`，`calloc`，`realloc`分配的内存块。大小*size*必须对应先前提供给`malloc`，`calloc`，`realloc`的需求大小。尝试释放`aligned_alloc`，`memalign`，`posix_memalign`，`valloc`，`pvalloc`分配的内存是未定义行为。对于`aligned_alloc`，`memalign`，`posix_memalign`，请使用`free_aligned_sized`替代。此外，对于并非调用者直接分配内存而且还需要释放的，例如`strdup`或`strndup`的结果，调用`free_sized`也是未定义行为。对于这些情况，请继续使用`free`代替。
+</div>
+
+函数：`void` **`free_aligned_sized`** `(` `void` `*` *`ptr`* `,` `size_t` *`alignment`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The free_aligned_sized function deallocates the block of memory pointed at by ptr that was previously allocated by aligned_alloc, memalign or posix_memalign. The size size and alignment alignment must match the previously requested size and alignment provided to aligned_alloc, memalign or posix_memalign.
+</div>
