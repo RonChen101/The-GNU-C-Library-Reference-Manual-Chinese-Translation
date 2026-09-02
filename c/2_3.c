@@ -10,7 +10,9 @@
 #include <string.h>
 
 
-int main () {
+int
+main ()
+{
 	FILE *f = fopen ("./nofile", "r");	
 
 //	string.h
@@ -132,6 +134,8 @@ int main () {
 	return 0;
 }
 
-//	void my_error_print () {
+//	void
+//	my_error_print ()
+//	{
 //		fprintf (stderr, "我的错误: ");
 //	}

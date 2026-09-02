@@ -2,7 +2,9 @@
 #include <stdio.h>
 
 
-int main () {
+int
+main ()
+{
 //	errno.h
 //	volatile int errno;
 	printf ("errno为%d\n", errno);
