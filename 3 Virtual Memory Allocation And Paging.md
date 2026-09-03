@@ -244,7 +244,7 @@ savestring (const char *ptr, size_t len)
 
 注意，块结尾后面的内存可能用来存其他东西；可能是另一个调用`malloc`分配的块。如果你尝试以你原本请求的大小更长的大小对待块，你很可能会破坏`malloc`用于管理其内存块的数据结构，或者破坏其他块的内容。如果你已经分配一个块，然后发现你需要他变大，使用`realloc`（参考[Changing the Size of a Block](https://sourceware.org/glibc/manual/latest/html_node/Changing-Block-Size.html)）。
 
-### 3.2.3.3 可移植的内存分配
+#### 3.2.3.3 可移植的内存分配
 
 当在即要在GNU和非GNU系统上运行的代码中分配内存时，或使用非GNU的替代分配器时（参考[Replacing malloc](https://sourceware.org/glibc/manual/latest/html_node/Replacing-malloc.html)），需要更加小心。当存储区小或者奇怪的大，或存储区被分配成一个不常见的类型，POSIX和ISO C标准允许多种行为。
 
@@ -337,5 +337,100 @@ Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Sa
 
 <div style="margin: 0 0 1em 2em;">
 
-The free_aligned_sized function deallocates the block of memory pointed at by ptr that was previously allocated by aligned_alloc, memalign or posix_memalign. The size size and alignment alignment must match the previously requested size and alignment provided to aligned_alloc, memalign or posix_memalign.
+`free_aligned_sized`函数会释放*ptr*指向的先前由`aligned_alloc`，`memalign`，`posix_memalign`分配的内存块。大小*size*和对齐方式*alignment*必须对应先前提供给`aligned_alloc`，`memalign`，`posix_memalign`的需求大小和对齐方式。
 </div>
+
+#### 3.2.3.5 改变块的大小
+
+当你开始使用块时，你经常不知道你最终需要具体多大的块。例如，你有一个块作为缓冲区，用来保存从一个文件读取的一行；无论你如何初始化那个缓冲区，你都可能遇到行更长的情况。
+
+你可以调用`reaaloc`或`reallocarray`使块更长。这些函数在`stdlib.h`中声明。
+
+函数：`void` `*` **`realloc`** `(` `void` `*` *`ptr`* `,` `size_t` *`newsize`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`realloc`函数改变以*ptr*为地址的块的大小成*newsize*。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+因为块后面的空间可能在使用，`realloc`可能会复制块到有更多空间的新地址。`realloc`的值是块的新地址。如果块需要被移动，`realloc`复制旧的内容。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果你*ptr*传了一个空指针，`realloc`的行为就会和‘`malloc` `(` *`newsize`* `)`’一样。另外，如果*newsize*为零，`realloc`会释放块，然后返回`NULL`。另外，如果`realloc`不能重新分配需求的大小，他会返回`NULL`并且设置`errno`；原块不会改变。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+任何由`realloc`返回的非空指针都和相同大小下`malloc`返回的指针类似，满足相同的对齐限制。任何由`aligned_alloc`和类似函数创建的特殊对齐都会在调用`realloc`后丢失。
+</div>
+
+函数：`void` `*` **`reallocarray`** `(` `void` `*` *`ptr`* `,` `size_t` *`nmemb`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`reallocarray`函数改变以*ptr*为地址的块的大小成足以装下*nmemb*个元素的数组，每个元素大小为*size*。他等价于‘`realloc` `(` *`ptr`* `,` *`nmemb`* `*` *`size`* `)`’，区别是，如果乘法溢出，`reallocarray`会安全的失败，通过设置`errno`为`ENOMEM`，返回一个空指针，不改变原块。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+当块被分配的新大小，即乘法的结果可能会溢出时，`reallocarray`应该替代`realloc`。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+在the GNU C Library中，数组对齐的方式和`malloc`对齐他返回的值一样。在其他实现，对于由基础对齐的元素，每个元素大小最大为`max` `(` *`size`* `,` `1` `)`，组成的数组，他可能仅仅适当对齐。任何由`aligned_alloc`和类似函数创建的特殊对齐都会在调用`reallocarray`后丢失。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+该函数最初源自OpenBSD 5.6，但已加入POSIX.1-2024。
+</div>
+
+和`malloc`一样，如果空间不足以使块更大，`realloc`和`reallocarray`可能会返回一个空指针。当这发生了，原块不会被碰；他从未被修改或重定位。
+
+在大多数情况下，当`realloc`失败时，原块不会有任何改变，因为当没有内存时，应用程序不会继续，唯一会做的是给出一个致命错误信息。写和使用子进程通常是方便的，传统上称为`xrealloc`和`xreallocarray`，关心错误信息，就像`xmalloc`为`malloc`做的一样：
+
+<div style="margin: 0 0 1em 2em;">
+
+第一个函数的返回值应该是`p`。
+```c
+void *
+xreallocarray (void *ptr, size_t nmemb, size_t size)
+{
+  void *p = reallocarray (ptr, nmemb, size);
+  if (p == NULL)
+    fatal ("Virtual memory exhausted");
+  return value;
+}
+
+void *
+xrealloc (void *ptr, size_t size)
+{
+  return xreallocarray (ptr, 1, size);
+}
+```
+</div>
+
+你也可以使用`realloc`或`reallocarray`来让一个块更小。你这样做的原因是，避免只需要一点空间时，占用大量内存空间。在多种分配实现中，让一个块更小有时需要复制他，所以如果没有其他可用空间时，他可能会失败。
+
+<strong>可移植性声明：</strong>
+
+- Portable programs should not attempt to reallocate blocks to be size zero. On other implementations if *ptr* is non-null, `realloc` `(` `ptr` `,` `0` `)` might free the block and return a non-null pointer to a size-zero object, or it might fail and return `NULL` without freeing the block. The ISO C17 standard allows these variations.
+
+- In the GNU C Library, reallocation fails if the resulting block would exceed `PTRDIFF_MAX` in size, to avoid problems with programs that subtract pointers or use signed indexes. Other implementations may succeed, leading to undefined behavior later.
+
+- In the GNU C Library, if the new size is the same as the old, `realloc` and `reallocarray` are guaranteed to change nothing and return the same address that you gave. However, POSIX and ISO C allow the functions to relocate the object or fail in this situation.
