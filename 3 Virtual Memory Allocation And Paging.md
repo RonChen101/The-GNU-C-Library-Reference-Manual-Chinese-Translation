@@ -429,8 +429,101 @@ xrealloc (void *ptr, size_t size)
 
 <strong>可移植性声明：</strong>
 
-- Portable programs should not attempt to reallocate blocks to be size zero. On other implementations if *ptr* is non-null, `realloc` `(` `ptr` `,` `0` `)` might free the block and return a non-null pointer to a size-zero object, or it might fail and return `NULL` without freeing the block. The ISO C17 standard allows these variations.
+- 可移植的程序不应该尝试重新分配块为大小零。在其他实现中，如果*ptr*非空，`realloc` `(` `ptr` `,` `0` `)`可能会释放块并返回一个非空指针指向一个大小零的对象，或他可能会失败并返回`NULL`，并且不释放块。ISO C17标准允许这些变体。
 
-- In the GNU C Library, reallocation fails if the resulting block would exceed `PTRDIFF_MAX` in size, to avoid problems with programs that subtract pointers or use signed indexes. Other implementations may succeed, leading to undefined behavior later.
+- 在the GNU C Library中，如果结果块的大小超过了`PTRDIFF_MAX`，重分配失败，这是为了避免程序进行指针减法或有符号索引时出问题。其他实现可能成功，导致未定义行为。
 
-- In the GNU C Library, if the new size is the same as the old, `realloc` and `reallocarray` are guaranteed to change nothing and return the same address that you gave. However, POSIX and ISO C allow the functions to relocate the object or fail in this situation.
+- 在the GNU C Library中，如果新块大小和旧的一样，`realloc`和`reallocarray`保证不会改变任何事，并且返回你给的相同的地址。然而，POSIX和ISO C允许程序重定位对象或在这种情况失败。
+
+#### 3.2.3.6 分配干净的内存
+
+`calloc`函数分配内存并且将他清理为零。他在`stdlib.h`中声明。
+
+函数：`void` `*` **`calloc`** `(` `size_t` *`count`* `,` `size_t` *`eltsize`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+该函数分配一个清零的数组。他和`reallocarray` `(` `NULL` `,` *`count`* `,` *`eltsize`* `)`的行为类似，除了在`calloc`返回前，数组内容会被清理为零。
+</div>
+
+你可以这样定义`calloc`：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+void *
+calloc (size_t count, size_t eltsize)
+{
+  void *p = reallocarray (0, count, eltsize);
+  if (p != NULL)
+    memset (p, 0, count * eltsize);
+  return p;
+}
+```
+</div>
+
+但是一般来说，并不保证`calloc`内部会调用`reallocarray`和`memset`。例如，如果`calloc`实现知道一些其他原因导致新内存块就是零，他可能不再用`memset`再次清零那个块。又，如果应用程序从the C library之外提供他自己的`reallocarray`，`calloc`可能不会使用那个重定义。参考[Replacing malloc](https://sourceware.org/glibc/manual/latest/html_node/Replacing-malloc.html)。
+
+#### 3.2.3.7 分配对齐的内存块
+
+在GNU系统中，`malloc`或`realloc`返回的块的地址总是八（或者，64位系统上，十六）的倍数。如果你需要一个比那个更高的，二的幂的倍数的块，使用`aligned_alloc`或`posix_memalign`。`stdlib.h`声明了`aligned_alloc`和`posix_memalign`。
+
+函数：`void` `*` **`aligned_alloc`** `(` `size_t` *`alignment`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`aligned_alloc`函数分配一个*size*字节大小的块，地址是*alignment*的倍数。*alignment*必须是二的幂。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+发生错误时，`aligned_alloc`返回一个空指针，并且设置`errno`为下面的值之一：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOMEM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+无法满足请求，可用内存不足。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+*alignment*不是二的幂。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此程序在ISO C11中引入，因此对于现代非POSIX系统，移植性可能会比*posix_memalign*更好。（原文的缩进是两个，我感觉只应该只有一个。）
+</div>
+
+函数：`void` `*` `memalign` `(` `size_t` `boundary` `,` `size_t` `size` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The `memalign` function allocates a block of *size* bytes whose address is a multiple of *boundary*. The *boundary* must be a power of two! The function *memalign* works by allocating a somewhat larger block, and then returning an address within the block that is on the specified boundary.
+
+</div>
