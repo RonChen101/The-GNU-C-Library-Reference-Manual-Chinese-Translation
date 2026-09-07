@@ -95,7 +95,7 @@ C语言支持两种通过C程序的变量来分配内存的方式：
 
 *Dynamic* *memory* *allocation*是一个技术，程序在运行时可以决定把信息存储在哪里。当你需要定量内存，或你需要定时内存，取决于在程序启动前未知的因素，则你需要动态分配。
 
-例如，你可能需要1个块来保存从输入文件读取到的一行；因为一行的长度是没有限制的，你必须动态的分配内存，以确保你读取行的过程中内存能动态的变大。
+例如，你可能需要一个块来保存从输入文件读取到的一行；因为一行的长度是没有限制的，你必须动态的分配内存，以确保你读取行的过程中内存能动态的变大。
 
 或者，你可能需要为输入数据的每条记录或每条定义分配一个块；因为你不能提前知道有多少条，你必须在读取过程中为每条记录或定义分配块。
 
@@ -121,9 +121,9 @@ C变量不支持动态分配；没有存储类型“dynamic”，并且永远不
 
 the GNU C Library中的`malloc`实现源自ptmalloc（pthreads malloc），ptmalloc（pthreads malloc）又源自dlmalloc（Doug Lea malloc）。此`malloc`根据他们的大小和用户控制的某些参数，可能会以两种不同的方式分配内存。最普通的方式是从一大片连续的内存区域中分配一部分内存（称为chunk），且管理这部分区域来优化他们的使用，且减少无用的chunk形式的浪费。传统上，系统的堆区是一个大的内存区域，但是the GNU C Library `malloc`实现会维护多个这样的区域来优化他们在多线程应用中的使用。每一个这样的区域在内部称为*arena*。
 
-与其他版本不同，the GNU C Library中的`malloc`不会向上取整到二的幂，无论大小。相邻的chunk可能会因`free`合并，无论他们的大小。这让实现在没有通过碎片遭受大量内存浪费的情况下，适应所有类型的分配模式。多个arena的存在允许多个线程在不同的arena中同时分配内存，因此提高了性能。
+与其他版本不同，the GNU C Library中的`malloc`不会让chunk向上取整到二的幂，无论大小。相邻的chunk可能会因`free`合并，无论他们的大小。这让实现在没有通过碎片遭受大量内存浪费的情况下，适应所有类型的分配模式。多个arena的存在允许多个线程在不同的arena中同时分配内存，因此提高了性能。
 
-另一种内存分配方式是给超大块的，例如，比一页（page）还大（通常为4KB）。这些请求是通过`mmap`分配的（匿名的或通过`/` `dev` `/` `zero`；参考[Memory-mapped I/O](https://sourceware.org/glibc/manual/latest/html_node/Memory_002dmapped-I_002fO.html)）。这有相当大的好处，这些chunk被释放后会瞬间返回系统。因此，不会发生一个大chunk被小chunk锁定，即使在调用`free`后仍然浪费内存的情况。使用`mmap`的大小门槛是动态的，由程序的分配模式调整。`mallopt`可以使用`M_MMAP_THRESHOLD`静态调整门槛，并且`M_MMAP_MAX`可以完全警用`mmap`；参考[Malloc Tunable Parameters](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Tunable-Parameters.html)。
+另一种内存分配方式是给超大块的，例如，比一页（page）还大（通常为4KB）。这些请求是通过`mmap`分配的（匿名的或通过`/` `dev` `/` `zero`；参考[Memory-mapped I/O](https://sourceware.org/glibc/manual/latest/html_node/Memory_002dmapped-I_002fO.html)）。这有相当大的好处，这些chunk被释放后会瞬间返回系统。因此，不会发生一个大chunk被小的锁定，即使在调用`free`后仍然浪费内存的情况。使用`mmap`的大小门槛是动态的，由程序的分配模式调整。`mallopt`可以使用`M_MMAP_THRESHOLD`静态调整门槛，并且`M_MMAP_MAX`可以完全警用`mmap`；参考[Malloc Tunable Parameters](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Tunable-Parameters.html)。
 
 the GNU内存分配器 更多细节技术描述在the GNU C Library wiki上保存。参考[https://sourceware.org/glibc/wiki/MallocInternals]。
 
@@ -285,7 +285,7 @@ Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Sa
 `free`函数释放*ptr*指向的内存块。
 </div>
 
-释放块会改变块的内容。<strong>在释放后，不要想在块中找到任何数据（例如链表中指向下一个块的指针）。</strong>在释放前，复制你所有需要的！这里有一个例子，是释放链中的所有块，以及他们指向的字符串的正确方式：
+释放块会改变块的内容。<strong>在释放后，不要想在块中找到任何数据（例如链表中指向下一个块的指针）。</strong>在释放前，从块中复制你所有需要的！这里有一个例子，是释放链中的所有块，以及他们指向的字符串的正确方式：
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -433,7 +433,7 @@ xrealloc (void *ptr, size_t size)
 
 - 在the GNU C Library中，如果结果块的大小超过了`PTRDIFF_MAX`，重分配失败，这是为了避免程序进行指针减法或有符号索引时出问题。其他实现可能成功，导致未定义行为。
 
-- 在the GNU C Library中，如果新块大小和旧的一样，`realloc`和`reallocarray`保证不会改变任何事，并且返回你给的相同的地址。然而，POSIX和ISO C允许程序重定位对象或在这种情况失败。
+- 在the GNU C Library中，如果新大小和旧的一样，`realloc`和`reallocarray`保证不会改变任何事，并且返回你给的相同的地址。然而，POSIX和ISO C允许程序重定位对象或在这种情况失败。
 
 #### 3.2.3.6 分配干净的内存
 
@@ -524,6 +524,235 @@ Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Sa
 
 <div style="margin: 0 0 1em 2em;">
 
-The `memalign` function allocates a block of *size* bytes whose address is a multiple of *boundary*. The *boundary* must be a power of two! The function *memalign* works by allocating a somewhat larger block, and then returning an address within the block that is on the specified boundary.
+`memalign`函数分配一个*size*字节大小，地址为*boundary*的倍数的块。*boundary*必须为二的幂！`memalign`函数运作原理是分配一个稍大的块，然后返回一个该块中位于特定边界的地址。
+</div>
 
+<div style="margin: 0 0 1em 2em;">
+
+发生错误时，`memalign`返回一个空指针，并且设置`errno`为下面的值之一：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOMEM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+无法满足请求，可用内存不足。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+*alignment*不是二的幂。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`memalign`函数已过时，请使用`aligned_alloc`或`posix_memalign`代替。
+</div>
+
+函数：`int` **`posix_memalign`** `(` `void` `**` *`memptr`* `,` `size_t` *`alignment`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`posix_memalign`函数与`memalign`函数类似，它们都会返回一个按*alignment*的倍数对齐的，大小为*size*字节的缓冲区。但它对参数*alignment*增加了一个限制要求：该值必须是二的幂，且是`sizeof` `(` `void` `*` `)`的倍数。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果函数成功分配内存，指向分配的内存的指针通过`*` `memptr`返回，并且返回值（注意，返回值指的是返回值）为零。此外，函数返回错误值来指出错误。可能的返回的错误值是：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOMEM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+无法满足请求，可用内存不足。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+*alignment*不满足，二的幂，且是`sizeof` `(` `void` `*` `)`的倍数。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数在POSIX 1003.1d中引进。虽然此函数被`aligned_alloc`取代，但是他在不支持ISO C11的老POSIX系统上可移植性更强。
+</div>
+
+函数：`void` `*` **`valloc`** `(` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe init | AS-Unsafe init lock | AC-Unsafe init lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+使用`valloc`像使用`memalign`，并且传入页面大小作为第一个参数。他是这样实现的：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+void *
+valloc (size_t size)
+{
+  return memalign (getpagesize (), size);
+}
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+[How to get information about the memory subsystem?](https://sourceware.org/glibc/manual/latest/html_node/Query-Memory-Parameters.html)有关内存子系统的更多信息。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`valloc`函数过时了，使用`aligned_alloc`或`posix_memalign`代替。
+</div>
+
+你可以使用`memalignment`函数查明一个指针的对齐方式。
+
+函数：`size_t` **`memalignment`** `(` `void` `*` *`p`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数，在C23中定义，返回*p*的对齐方式，作为二的幂。如果*p*是一个空指针，他返回零。C23要求*p*是指向一个对象的可用指针或一个空指针；作为一个GNU扩展，the GNU C Library支持该函数用于指针类型的任意位模式。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数被加入到C23标准，以支持那些指针的低位和对齐方式无关的非传统平台。对于传统平台，你可以瞬间将指针转换成`uintptr_t`，然后测试低位：这个可以移植到C23前，并且通常更快一点。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+例如，如果你像读取一个被可能未对齐的指针`p`取地址的`int`，下面的C23前的代码在所有传统平台上可用：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+int i;
+if (((uintptr_t) p & (alignof (int) - 1)) != 0)
+  memcpy (&i, p, sizeof i);
+else
+  i = *p;
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+然而，在非传统平台上，他可能不生效，你需要下面的C23代码：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+int i;
+if (memalignment (p) < alignof (int))
+  memcpy (&i, p, sizeof i);
+else
+  i = *p;
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+然而，对于这种特定的情况，如果对齐和未对齐的指针使用不同的代码，性能也不会提升，因此更好的：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+int i;
+memcpy (&i, p, sizeof i);
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+编译器会生成当前架构下，效率最高的方式来访问未对齐的数据，将`memcpy`优化掉。（AI生成：他只是通过计算*p*的二进制末尾有多少个零来得到该地址的最大对齐度。如果地址刚好落在更大粒度的边界上（例如Cache Line或Page边界），它就会返回更大的对齐值。）
+</div>
+
+#### 3.2.3.8 Malloc可调参数
+
+关于动态内存分配，你可以通过`mallopt`函数，调节一些参数。此函数是通用SVID/XPG接口，在`malloc.h`中定义。
+
+函数：`int` **`mallopt`** `(` `int` *`param`* `,` `int` *`value`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe init lock |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+当调用`mallopt`时，*param*参数（argument）指定需要设置的参数（parameter），*value*指定需要设置的值。关于*param*可能的选项，就在`malloc.h`中定义，如下：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`M_MMAP_MAX`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+使用`mmap`可分配的chunk的最大数量。设置为零，可以禁用`mmap`。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这个参数（parameter）的默认值为`65536`。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_MMAP_MAX_`为想要的值来设置。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`M_MMAP_THRESHOLD`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+所有比此值更大的chunk，通过使用系统调用`mmap`分配到常规堆之外。这种方式保证了这些chunk的内存在调用`free`时可以返回系统。注意，比此值更小的请求可能还是会通过`mmap`被分配。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+如果此参数（parameter）没有设置，默认值为128KiB，并且门槛会动态调整，以适应程序的分配模式。如果此参数（parameter），动态调整被禁用，并且此值被静态的设置成输入值。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_MMAP_THRESHOLD_`为想要的值来设置。
 </div>
