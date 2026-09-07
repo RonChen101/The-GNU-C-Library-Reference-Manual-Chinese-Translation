@@ -1,32 +1,67 @@
 #include <stdio.h>
-#include <stdarg.h>
+#include <stdlib.h>
 
 
-void print (int count, ...);
-
-
-int main () {
-	print (4, 10, 5, 3, 21);
-
-	return 0;
-}
-
-
-void print (int count, ...) {
-//	stdarg.h
-	va_list ap;
-
-//	void va_start (va_list ap, last-required)
-	va_start (ap, count);
-
-	for (int i = 0; i < count; i++) {
-	//	type va_arg (va_list ap, type)
-		int t = va_arg (ap, int);
-		printf ("%d\t", t);
+int
+main ()
+{
+	char * a	= malloc (2 * sizeof (char));
+	a[0]		= 1;
+	printf ("a\t\t= %p\n",			a);
+	for (int i = -16; i <= 16; i++)
+	{
+		if (i < 0)
+		{
+			printf ("* (a - %d)\t= %d\n", -i, * (a + i));
+		}
+		else if (i == 0)
+		{
+			printf ("* a\t\t= %d\n", * a);
+		}
+		else
+		{
+			printf ("* (a + %d)\t= %d\n", i, * (a + i));
+		}
 	}
 
-	printf ("\n");
+	short * b	= malloc (sizeof (short));
+	b[0]		= 1;
+	printf ("b\t\t= %p\n",			b);
+	for (int i = -16; i <= 16; i++)
+	{
+		if (i < 0)
+		{
+			printf ("* (b - %d)\t= %d\n", -i, * (b + i));
+		}
+		else if (i == 0)
+		{
+			printf ("* b\t\t= %d\n", * b);
+		}
+		else
+		{
+			printf ("* (b + %d)\t= %d\n", i, * (b + i));
+		}
+	}
 
-//	void va_end (va_list ap)
-	va_end (ap);
+
+	int * c	= malloc (sizeof (int));
+	c[0]	= 1;
+	printf ("c\t\t= %p\n",			c);
+	for (int i = -16; i <= 16; i++)
+	{
+		if (i < 0)
+		{
+			printf ("* (c - %d)\t= %d\n", -i, * (c + i));
+		}
+		else if (i == 0)
+		{
+			printf ("* c\t\t= %d\n", * c);
+		}
+		else
+		{
+			printf ("* (c + %d)\t= %d\n", i, * (c + i));
+		}
+	}
+
+	return 0;
 }
