@@ -515,7 +515,7 @@ Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Sa
 此程序在ISO C11中引入，因此对于现代非POSIX系统，移植性可能会比*posix_memalign*更好。（原文的缩进是两个，我感觉只应该只有一个。）
 </div>
 
-函数：`void` `*` `memalign` `(` `size_t` `boundary` `,` `size_t` `size` `)`
+函数：`void` `*` **`memalign`** `(` `size_t` *`boundary`* `,` `size_t` *`size`* `)`
 
 <div style="margin: 0 0 1em 2em;">
 
@@ -729,7 +729,7 @@ Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe in
 
 <div style="margin: 0 0 1em 4em;">
 
-这个参数（parameter）的默认值为`65536`。
+此参数（parameter）的默认值为`65536`。
 </div>
 
 <div style="margin: 0 0 1em 4em;">
@@ -755,4 +755,406 @@ Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe in
 <div style="margin: 0 0 1em 4em;">
 
 此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_MMAP_THRESHOLD_`为想要的值来设置。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`M_PERTURB`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+如果非零，当内存被分配（除了用`calloc`分配）或释放时，内存块的值会根据此参数（parameter）的某些低位来填充，这可以用来调试未初始化或已释放的堆内存的使用。注意，此选项不保证释放的块会为特定值。他只保证该块在被释放之前的内容会被覆盖。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）的默认值为`0`。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_PERTURB_`为想要的值来设置。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`M_TOP_PAD`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）决定了当一个arena需要扩展时，从系统中获得的额外内存量是多少。同时，当缩小一个arena时，他也指定了需要保留的字节数。这在堆大小方面提供了必要的滞后性，从而过多的系统调用可以被避免。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）的默认值为`0`。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_TOP_PAD_`为想要的值来设置。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`M_TRIM_THRESHOLD`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是为了返回内存给系统，会触发系统调用的，位于最顶部的，可释放的chunk的最小大小（字节）。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+如果此参数（parameter）没有设置，默认值为128KiB，并且门槛会动态调整，以适应程序的分配模式。如果此参数（parameter），动态调整被禁用，并且此值被静态的设置成输入值。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_TRIM_THRESHOLD_`为想要的值来设置。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`M_ARENA_TEST`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）决定了在arena的限制测试实施之前，可创建的arenas数量。如果`M_ARENA_MAX`设置了，此值会被忽略。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+在32位系统上，此参数（parameter）的默认值为2，然后在64位系统上，为8。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_ARENA_TEST`为想要的值来设置。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`M_ARENA_MAX`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）设置arena的数量，不管系统中的核心数量是多少。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此可调参数的默认值为`0`，意味着限制为get_nprocs()报告的在线CPU核心数量。
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_ARENA_MAX`为想要的值来设置。
+</div>
+
+#### 3.2.3.9 堆一致性检查
+
+你可以要求`malloc`检查动态内存的一致性，通过使用`mcheck`函数和用*LD_PRELOAD*环境变量预载malloc的调试库`libc_malloc_debug`。此函数是一个GNU扩展，在`mcheck.h`中声明。
+
+函数：`int` **`mcheck`** `(` `void` `(` `*` *`abortfn`* `)` `(` `enum` `mcheck_status` *`status`* `)` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe race:mcheck const:malloc_hooks | AS-Unsafe corrupt | AC-Unsafe corrupt |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+调用`mcheck`会使`malloc`偶尔执行一致性检查。这会捕获诸如在由`malloc`分配的块的末端以外的地方的写的操作。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+*abortfn*参数（argument）是当不一致性找到时，调用的函数。如果你提供一个空指针，那么`mcheck`会使用默认的函数，打印信息并且调用`abort`（参考[Aborting a Program](https://sourceware.org/glibc/manual/latest/html_node/Aborting-a-Program.html)）。你提供的函数会被以一个参数调用，说明了哪一类的不一致性被检测到了；他的类型在下文描述。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+当你已经用`malloc`分配了东西后，再开始分配检查就太迟了。所以，在那种情况下，`malloc`什么事都不会做。如果你调用他太迟了，函数返回`-1`，反之返回`0`（当他成功时）。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+最简单的方式来安排调用`mcheck`足够早，是当你链接你的程序时，使用‘`-lmcheck`’选项；然后你就不用修改你的源代码了。或者，每当程序启动时，你可以使用调试器来插入一个`mcheck`调用，例如，每当程序启动时，这些gdb命令可以自动调用`mcheck`：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```
+(gdb) break main
+Breakpoint 1, main (argc=2, argv=0xbffff964) at whatever.c:10
+(gdb) command 1
+Type commands for when breakpoint 1 is hit, one per line.
+End with a line saying just "end".
+>call mcheck(0)
+>continue
+>end
+(gdb) ...
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+然而，只有在没有任何包含调用`malloc`的任何对象的初始化程序的情况下，这才会有用，因为`mcheck`必须在第一个这样的函数之前调用。
+</div>
+
+函数：`enum` `mcheck_status` **`mprobe`** `(` `void` `*` *`pointer`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe race:mcheck const:malloc_hooks | AS-Unsafe corrupt | AC-Unsafe corrupt |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`mprobe`函数让你显式检查一个特定的分配的块中的不一致性。你必须已经在程序的开头调用了`mcheck`，来进行他的偶尔检查；调用`mprobe`会在调用时，请求一次额外的一致性检查。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+参数（argument）*pointer*必须是一个由`malloc`或`realloc`返回的指针。`mprobe`返回一个值来说明什么不一致性被找到了，如果有的话。值在下文描述。
+</div>
+
+数据类型：**`enum`** **`mcheck_status`**
+
+<div style="margin: 0 0 1em 2em;">
+
+此枚举类型描述了在一个分配的块中什么类型的不一致性被检测到了，如果有的话。这里是可能的值：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`MCHECK_DISABLED`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+`mcheck`不是在第一次分配前调用的。没有一致性检查可被执行。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`MCHECK_OK`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+没有不一致性被检测到。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`MCHECK_HEAD`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+块前的数据被修改。这通常发生在一个数组的索引或指针被减的太多了。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`MCHECK_TAIL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+块后的数据被修改。这通常发生在一个数组的索引或指针被加的太多了。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`MCHECK_FREE`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+块已经被释放。
+</div>
+
+另一种检查和防范在使用`malloc`，`realloc`，`free`过程中的bug的可选方式是，设置环境变量`MALLOC_CHECK_`。当`MALLOC_CHECK_`被设置成小于4的非零值，一个特殊的（效率较低的）实现被使用，他被设计成可容忍一些简单错误，例如两次使用相同的参数调用`free`，或者单字节溢出（差一错误）。不是所有的此类错误都能被防护，并且会导致内存溢出。就像`mcheck`，你需要预载`libc_malloc_debug`库来启用`MALLOC_CHECK_`功能。不预载此库的话，设置`MALLOC_CHECK_`不会有效果。
+
+任何检测到的堆损坏都会导致进程的瞬间中断。
+
+`MALLOC_CHECK_`有一个问题：在SUID（设置用户ID）或SGID（设置组ID）的二进制程序中，他可能被利用，因为偏离了正常的程序行为，他会向标准错误描述符中写入一些内容。因此，对于SUID和SGID的二进制程序，`MALLOC_CHECK_`默认禁用。
+
+那么，使用`MALLOC_CHECK_`和用‘`-lmcheck`’链接之间的区别是什么？`MALLOC_CHECK_`相对于‘`-lmcheck`’是正交的。‘`-lmcheck`’是为了向后兼容才添加的。`MALLOC_CHECK_`和‘`-lmcheck`’两者都能发现相同错误——但是使用`MALLOC_CHECK_`的话，你无需重新编译你的程序。
+
+#### 3.2.3.10 使用`malloc`进行内存分配的统计信息
+
+你可以通过调用`mallinfo2`函数来获取动态内存分配的信息。此函数和他相关的数据类型在`malloc.h`中声明；他们是一个标准SVID/XPG版本的扩展。
+
+数据类型：<strong>`struct mallinfo2`</strong>
+
+<div style="margin: 0 0 1em 2em;">
+
+此结构体类型是用来返回动态内存分配器的信息的。他包含以下成员：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `arena`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是`malloc`通过`sbrk`分配的内存的大小，字节。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `ordblks`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是不在使用的chunk的数量。（内存分配器内部从操作系统获取多块内存，然后划分他们，以满足每个`malloc`请求；参考[The GNU Allocator](https://sourceware.org/glibc/manual/latest/html_node/The-GNU-Allocator.html)。）
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `smblks`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+该区域未使用。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `hblks`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是`mmap`分配的chunk的总数。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `hblkhd`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是`mmap`分配的内存的总大小，字节。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `usmblks`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+此字段未使用，始终为0.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `fsmblks`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+该区域未使用。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `uordblks`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是`mmap`分配的块占用的内存的总大小。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `fordblks`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是通过释放chunk（未使用）获得的内存的总大小。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`size_t` `keepcost`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+这是最顶部的可释放chunk的大小，通常紧接着堆的末端（即，虚拟地址空间的数据段的高端）。
+</div>
+
+函数：`struct` `mallinfo2` **`mallinfo2`** `(` `void` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe init lock |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数通过结构体`struct` `mallinfo2`返回当前动态内存使用情况。
+</div>
+
+#### 3.2.3.11 `malloc`相关函数总结
+
+这里是和`malloc`一起工作的函数的总结：
+
+`void` `*` `malloc` `(` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配一个*size*字节的块。参考[Basic Memory Allocation](https://sourceware.org/glibc/manual/latest/html_node/Basic-Allocation.html)。
+</div>
+
+`void` `free` `(` `void` `*` *`addr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+释放一个先前用`malloc`分配的块。参考[Freeing Memory Allocated with `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Freeing-after-Malloc.html)。
+</div>
+
+`void` `*` `realloc` `(` `void` `*` *`addr`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+让一个先前用`malloc`分配的块更大或更小，可能需要复制他到一个新区域。参考[Changing the Size of a Block](https://sourceware.org/glibc/manual/latest/html_node/Changing-Block-Size.html)。
+</div>
+
+`void` `*` `reallocarray` `(` `void` `*` *`ptr`* `,` `size_t` *`nmemb`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+就像`realloc`一样，将一个先前用`malloc`分配的块的大小改成*`nmemb`* * *`size`*字节。参考[Changing the Size of a Block](https://sourceware.org/glibc/manual/latest/html_node/Changing-Block-Size.html)。
+</div>
+
+`void` `*` `calloc` `(` `size_t` *`count`* `,` `size_t` *`eltsize`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+使用`malloc`分配一个*count* * *eltsize*字节的块，并且设置他的内容为零。参考[Allocating Cleared Space](https://sourceware.org/glibc/manual/latest/html_node/Allocating-Cleared-Space.html)
+</div>
+
+`void` `*` `valloc` `(` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配一个*size*字节的块，在页（page）的边界开始。参考[Allocating Aligned Memory Blocks](https://sourceware.org/glibc/manual/latest/html_node/Aligned-Memory-Blocks.html)。
 </div>
