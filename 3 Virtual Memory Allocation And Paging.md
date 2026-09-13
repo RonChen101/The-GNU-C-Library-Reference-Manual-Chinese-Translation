@@ -1158,3 +1158,110 @@ Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe in
 
 分配一个*size*字节的块，在页（page）的边界开始。参考[Allocating Aligned Memory Blocks](https://sourceware.org/glibc/manual/latest/html_node/Aligned-Memory-Blocks.html)。
 </div>
+
+`void` `*` `aligned_alloc` `(` `size_t` *`alignment`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配一个*size*字节的块，在*alignment*的整数倍的地址开始。参考[Allocating Aligned Memory Blocks](https://sourceware.org/glibc/manual/latest/html_node/Aligned-Memory-Blocks.html)。
+</div>
+
+`int` `posix_memalign` `(` `void` `**` *`memptr`* `,` `size_t` *`alignment`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配一个*size*字节的块，在*alignment*的整数倍的地址开始。参考[Allocating Aligned Memory Blocks](https://sourceware.org/glibc/manual/latest/html_node/Aligned-Memory-Blocks.html)。
+</div>
+
+`void` `*` `memalign` `(` `size_t` *`boundary`* `,` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配一个*size*字节的块，在*boundary*的整数倍的地址开始。参考[Allocating Aligned Memory Blocks](https://sourceware.org/glibc/manual/latest/html_node/Aligned-Memory-Blocks.html)。
+</div>
+
+`int` `mallopt` `(` `int` *`param`* `,` `int` *`value`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+调整一个可调参数。参考[Malloc Tunable Parameters](https://sourceware.org/glibc/manual/latest/html_node/Malloc-Tunable-Parameters.html)。
+</div>
+
+`int` `mcheck` `(` `void` `(` `*` *`abortfn`* `)` `(` `void` `)` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+告诉`malloc`对动态分配的内存执行偶尔的一致性检查，并且当一个不一致性被找到时，调用*abortfn*，参考[Heap Consistency Checking](https://sourceware.org/glibc/manual/latest/html_node/Heap-Consistency-Checking.html)。
+</div>
+
+`struct` `mallinfo2` `mallinfo2` `(` `void` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+然会当前动态内存使用情况的信息。参考[Statistics for Memory Allocation with `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Statistics-of-Malloc.html)。
+</div>
+
+### 3.2.4 分配调试
+
+在使用不使用垃圾回收的动态内存分配的编程语言时，查找内存泄漏是一个复杂的任务。长时间运行的程序必须保证动态分配的对象在他们的生命周期结束时被释放。如果这不发生，系统迟早会用完内存。
+
+the GNU C Library中的`malloc`实现提供一些简单方法来检测这种泄露，并且获得一些信息以找到位置。为了做到这个，程序必须在一个特别的模式下启动，这个模式通过一个环境变量启用。如果未启动调试模式，程序不会有速度损失。
+
+- [How to install the tracing functionality](https://sourceware.org/glibc/manual/latest/html_node/Tracing-malloc.html)
+
+- [Example program excerpts](https://sourceware.org/glibc/manual/latest/html_node/Using-the-Memory-Debugger.html)
+
+- [Some more or less clever ideas](https://sourceware.org/glibc/manual/latest/html_node/Tips-for-the-Memory-Debugger.html)
+
+- [Interpreting the traces](https://sourceware.org/glibc/manual/latest/html_node/Interpreting-the-traces.html)
+
+#### 3.2.4.1 如何安装跟踪功能
+
+函数：`void` **`mtrace`** `(` `void` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe env race:mtrace init | AS-Unsafe init heap corrupt lock | AC-Unsafe init corrupt lock fd mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`mtrace`函数提供一种方式来追踪在调用他的程序中的内存分配事件。在库中，他是默认禁用的，他可以通过使用`LD_PRELOAD`环境变量来预载调试库`libc_malloc_debug`来启用。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+当调用`mtrace`函数时，他会查找一个叫`MALLOC_TRACE`的环境变量。此变量此变量应该会包含一个有效文件名。用户必须有写权限。如果文件已存在，他会被截断。若环境变量没有设置，或者他没有指定一个可用的文件，可打开写的文件，不会发生任何事。`malloc`等的行为不会被改变。出于显而易见的原因，如果程序安装时设置了SUID或SGID位，也会发生这种情况。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果指定的文件成功打开了，`mtrace`会为`malloc`，`realloc`，`free`函数安装特殊的处理程序。从那时起，这些函数的所有使用都被跟踪，并且经协议记录到文件。当然，现在，对跟踪函数的所有调用都有速度损失，所以追踪不应该在正常使用中启用。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数是一个GNU扩展，并且通常在其他系统上不可用。函数原型可以在`mcheck.h`中找到。
+</div>
+
+函数：`void` **`muntrace`** `(` `void` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Unsafe race:mtrace locale | AS-Unsafe corrupt heap | AC-Unsafe corrupt mem lock fd |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+在`mtrace`启用对`malloc`调用的追踪后，`muntrace`函数可以被调用。若没有`mtrace`的（成功）调用，`muntrace`不会做事。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+否则，他会卸载`malloc`，`realloc`，`free`的处理程序，并且关闭记录文件。没有调用被记录，并且程序重新全速运行。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+This function is a GNU extension and generally not available on other systems. The prototype can be found in `mcheck.h`.
+</div>
