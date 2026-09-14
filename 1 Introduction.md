@@ -184,7 +184,7 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
 - `const`
 
-  标记`const`的函数意味着MT-Safe的问题，他们以非原子方式修改内部对象，但这些应该是常量，因为相当一部分函数访问这些对象时未进行同步。不像`race`，这个标记只会影响写。写还是有MT-和AS-Unsafe，但是他们修改的对象随后保持不变，这让写变得MT-Safe和AS-Safe（只要没其他问题）。
+  标记`const`的函数意味着MT-Safe的问题，他们以非原子方式修改内部对象，但这些应该是常量，因为相当一部分函数访问这些对象时未进行同步。不像`race`，这个标记只会影响写。写还是有MT-和AS-Unsafe，但是他们修改的对象随后保持不变，这让写变的MT-Safe和AS-Safe（只要没其他问题）。
 
   读的安全说明说，`const`标记后的标识符将单独出现。写的时候若想规避安全问题，可以使用一个与标识符有关的非递归的`rwlock`。锁解决了MT-Safety问题，但是带来了一个AS-Safety问题，所以在异步信号处理中运行仍是未定义的。
 
@@ -216,13 +216,13 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
   标记`locale`的函数有MT-Safety问题，在读取locale对象时没有采用任何同步机制。在执行期间，标记`locale`的函数在locale对象改变时并发的调用，可能不会操作对应的任何locale，而是表现为这些locale之间不可预测的混合状态。
 
-  然而，我们不曾标记那些函数为MT-和AS-Unsafe，因为那些会修改locale对象的函数被标记了`const:locale`并被视为不安全。既然是不安全的，后者不应该在多线程或者异步信号启用时调用，因此locale可以被视为常量，这让前者（不会修改locale对象的函数）变得安全了。
+  然而，我们不曾标记那些函数为MT-和AS-Unsafe，因为那些会修改locale对象的函数被标记了`const:locale`并被视为不安全。既然是不安全的，后者不应该在多线程或者异步信号启用时调用，因此locale可以被视为常量，这让前者（不会修改locale对象的函数）变的安全了。
 
 - `env`
 
   标记`env`的函数有MT-Safety的问题，在通过`getenv`或类似的方式访问环境时，在并发修改情况下，没有任何保护措施确保安全。
 
-  然而，我们不曾标记那些函数为MT-和AS-Unsafe，因为那些会修改environment对象的函数被标记了`const:env`并被视为不安全。既然是不安全的，后者不应该在多线程或者异步信号启用时调用，因此environment对象可以被视为常量，这让前者（不会修改environment对象的函数）变得安全了。
+  然而，我们不曾标记那些函数为MT-和AS-Unsafe，因为那些会修改environment对象的函数被标记了`const:env`并被视为不安全。既然是不安全的，后者不应该在多线程或者异步信号启用时调用，因此environment对象可以被视为常量，这让前者（不会修改environment对象的函数）变的安全了。
 
 - `hostid`
 
@@ -232,7 +232,7 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
   标记`sigintr`的函数有MT-Safety问题，并发修改`_sigintr`内部数据结构情况下，没有任何保护措施确保安全。
 
-  然而，我们不曾标记那些函数为MT-和AS-Unsafe，因为那些会修改`_sigintr`对象的函数被标记了`const:sigintr`并被视为不安全。既然是不安全的，后者不应该在多线程或者异步信号启用时调用，因此`_sigintr`对象可以被视为常量，这让前者（不会修改`_sigintr`对象的函数）变得安全了。
+  然而，我们不曾标记那些函数为MT-和AS-Unsafe，因为那些会修改`_sigintr`对象的函数被标记了`const:sigintr`并被视为不安全。既然是不安全的，后者不应该在多线程或者异步信号启用时调用，因此`_sigintr`对象可以被视为常量，这让前者（不会修改`_sigintr`对象的函数）变的安全了。
 
 - `fd`
 
@@ -546,7 +546,7 @@ int h (int *i) { return abs (++*i); }
 
 <div style="margin: 0 0 1em 2em;">
 
-如果这个宏被定义了，一些额外的函数就可用了，这些函数弥补了以往所有标准中的一些不足。具体的，`fseeko`和`ftello`函数将会变得可用。若缺少这些函数，ISO C接口（`fseek`，`ftell`）和底层POSIX接口（`lseek`）之间的差异将会引发问题。
+如果这个宏被定义了，一些额外的函数就可用了，这些函数弥补了以往所有标准中的一些不足。具体的，`fseeko`和`ftello`函数将会变的可用。若缺少这些函数，ISO C接口（`fseek`，`ftell`）和底层POSIX接口（`lseek`）之间的差异将会引发问题。
 </div>
 
 <div style="margin: 0 0 1em 2em;">

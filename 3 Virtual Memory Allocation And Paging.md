@@ -1263,5 +1263,146 @@ Preliminary: | MT-Unsafe race:mtrace locale | AS-Unsafe corrupt heap | AC-Unsafe
 
 <div style="margin: 0 0 1em 2em;">
 
-This function is a GNU extension and generally not available on other systems. The prototype can be found in `mcheck.h`.
+此函数是一个GNU扩展，并且通常在其他系统上不可用。函数原型可以在`mcheck.h`中找到。
 </div>
+
+#### 3.2.4.2 示例程序片段
+
+就算跟踪功能不会影响程序的运行时行为，在所有程序中调用`mtrace`也不是一个好主意。设想一下，你用`mtrace`调试一个程序，并且在调试过程中用到的所有其他程序都会追踪他们的`malloc`调用。所有的程序的输出文件都是同一个，因此就不可用了。因此，你应该只在为了调试而编译时启用`mtrace`。因此，一个程序可以这样开头：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+#include <mcheck.h>
+
+int
+main (int argc, char *argv[])
+{
+#ifdef DEBUGGING
+  mtrace ();
+#endif
+  ...
+}
+```
+</div>
+
+如果你想在整个程序的运行期间追踪那些调用，这就是所有需要做的。或者，你也可以在任何时间调用`muntrace`来停止追踪。甚至可以调用`mtrace`来重新追踪。但这可能导致一些不可靠结果，因为可能有些函数调用没有被追踪（原文是called，AI说应该是写错了，应该是traced）。请注意，不仅程序会使用追踪功能，库（包括the C library本身）也会使用这些功能。
+
+最后一点也是在程序结束前调用`muntrace`不是一个好主意的原因。库只有在程序从`main`中返回或调用`exit`之后，才会被通知程序的结束，并且因此，在此之前，他们无法释放他们使用的内存。
+
+所以你最好的方式是在程序中尽早调用`mtrace`并且不调用`muntrace`。所以程序追踪几乎所有`malloc`函数的使用（除了那些由程序的或使用的库的构造器执行的调用）。
+
+#### 3.2.4.3 一些更聪明或更不聪明的想法
+
+你知道这种情况。程序是为调试准备的，并且在所有调试会话中，他运行的很好。但是当他离开调试，错误就发生了。一个经典的例子是一个只有关闭调试时才可见的内存泄露。如果你遇见了这种情况，你仍能赢。只需要使用下面小程序等效做法：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+#include <mcheck.h>
+#include <signal.h>
+
+static void
+enable (int sig)
+{
+  mtrace ();
+  signal (SIGUSR1, enable);
+}
+
+static void
+disable (int sig)
+{
+  muntrace ();
+  signal (SIGUSR2, disable);
+}
+
+int
+main (int argc, char *argv[])
+{
+  ...
+
+  signal (SIGUSR1, enable);
+  signal (SIGUSR2, disable);
+
+  ...
+}
+```
+</div>
+
+也就是说，如果程序启动时环境变量中设置了`MALLOC_TRACE`，用户可以在任何时间启用内存调试器，只要他/她想。当然，输出不会有第一个信号前的分配，但如果存在内存泄露，他仍会显示出来。
+
+#### 3.2.4.4 解读追踪
+
+如果你看一下输出，他大概是这样：
+
+<div style="margin: 0 0 1em 2em;">
+
+```
+= Start
+  [0x8048209] - 0x8064cc8
+  [0x8048209] - 0x8064ce0
+  [0x8048209] - 0x8064cf8
+  [0x80481eb] + 0x8064c48 0x14
+  [0x80481eb] + 0x8064c60 0x14
+  [0x80481eb] + 0x8064c78 0x14
+  [0x80481eb] + 0x8064c90 0x14
+= End
+```
+</div>
+
+这些是什么意思不是特别重要，因为追踪文件不是给人读的。因此，不考虑可读性。取而代之的是，the GNU C Library中有一个程序，他会解读追踪，并且输出一个对用户友好的摘要。这个程序叫`mtrace`（他实际上是一个Perl脚本），他接收一个或两个参数。无论如何，追踪输出的文件名必须被指定。如果在追踪文件名前还有一个参数，他必须是生成追踪的程序的名称。
+
+<div style="margin: 0 0 1em 2em;">
+
+```
+drepper$ mtrace tst-mtrace log
+No memory leaks.
+```
+</div>
+
+在这个例子中，程序`tst-mtrace`运行了，并且生成了追踪文件`log`。`mtrace`打印的信息显示代码没有问题，所有分配的内存后来都被释放了。
+
+如果我们对上文的示例追踪调用`mtrace`，我们可以得到一个不同的输出：
+
+<div style="margin: 0 0 1em 2em;">
+
+```
+drepper$ mtrace errlog
+- 0x08064cc8 Free 2 was never alloc'd 0x8048209
+- 0x08064ce0 Free 3 was never alloc'd 0x8048209
+- 0x08064cf8 Free 4 was never alloc'd 0x8048209
+
+Memory not freed:
+-----------------
+   Address     Size     Caller
+0x08064c48     0x14  at 0x80481eb
+0x08064c60     0x14  at 0x80481eb
+0x08064c78     0x14  at 0x80481eb
+0x08064c90     0x14  at 0x80481eb
+```
+</div>
+
+我们只用了一个参数调用`mtrace`，所以脚本不知道追踪文件中给出的地址是什么意思。我们可以做的更好：
+
+<div style="margin: 0 0 1em 2em;">
+
+```
+drepper$ mtrace tst errlog
+- 0x08064cc8 Free 2 was never alloc'd /home/drepper/tst.c:39
+- 0x08064ce0 Free 3 was never alloc'd /home/drepper/tst.c:39
+- 0x08064cf8 Free 4 was never alloc'd /home/drepper/tst.c:39
+
+Memory not freed:
+-----------------
+   Address     Size     Caller
+0x08064c48     0x14  at /home/drepper/tst.c:33
+0x08064c60     0x14  at /home/drepper/tst.c:33
+0x08064c78     0x14  at /home/drepper/tst.c:33
+0x08064c90     0x14  at /home/drepper/tst.c:33
+```
+</div>
+
+Suddenly the output makes much more sense and the user can see immediately where the function calls causing the trouble can be found.
+
+
+Interpreting this output is not complicated. There are at most two different situations being detected. First, `free` was called for pointers which were never returned by one of the allocation functions. This is usually a very bad problem and what this looks like is shown in the first three lines of the output. Situations like this are quite rare and if they appear they show up very drastically: the program normally crashes.
