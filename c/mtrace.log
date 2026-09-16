@@ -1,0 +1,5 @@
+= Start
+@ /usr/lib/x86_64-linux-gnu/libc.so.6:(_IO_file_doallocate+8c)[0x8ba0c] + 0x5cb914351510 0x400
+@ ./a.out:[0x1201] + 0x5cb914351010 0xc
+@ ./a.out:[0x122c] - 0x5cb914351010
+@ /usr/lib/x86_64-linux-gnu/libc.so.6:[0x9e34c] - 0x5cb914351510
