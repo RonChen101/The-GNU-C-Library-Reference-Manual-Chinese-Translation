@@ -6,6 +6,8 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 
 (a) The FSF’s Back-Cover Text is: “You have the freedom to copy and modify this GNU manual. Buying copies from the FSF supports it in developing GNU and promoting software freedom.”
 
+---
+
 # 3 虚拟内存分配与分页
 
 此章节描述了在使用the GNU C Library的系统中，进程如何管理和使用内存。
@@ -23,6 +25,8 @@ The GNU C Library有多个函数通过多种的方式实现动态分配虚拟内
 - [Memory Protection](https://sourceware.org/glibc/manual/latest/html_node/Memory-Protection.html)
 
 - [Locking Pages](https://sourceware.org/glibc/manual/latest/html_node/Locking-Pages.html)
+
+---
 
 ## 3.1 进程内存概念
 
@@ -56,6 +60,8 @@ exec是为进程创建虚拟地址空间的操作，将基础程序装载进去�
 
 - *stack* *segment*包含程序的栈区。当栈增长时，他也会增长，但是栈缩小时，他不会缩小。
 
+---
+
 ## 3.2 为程序数据分配存储区
 
 此章节包含普通程序如何管理他们数据的存储区，包括著名的`malloc`函数和一些the GNU C Library和GNU编译器特有的更花哨的功能。
@@ -74,6 +80,8 @@ exec是为进程创建虚拟地址空间的操作，将基础程序装载进去�
 
 - [Automatic Storage with Variable Size](https://sourceware.org/glibc/manual/latest/html_node/Variable-Size-Automatic.html)
 
+---
+
 ### 3.2.1 C程序的内存分配
 
 C语言支持两种通过C程序的变量来分配内存的方式：
@@ -90,6 +98,8 @@ C语言支持两种通过C程序的变量来分配内存的方式：
 第三个重要的内存分配方式，动态分配，不是由C变量支持，但是通过GNU C Library函数支持。
 
 - [Dynamic Memory Allocation](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation-and-C.html#Dynamic-Memory-Allocation)
+
+---
 
 #### 3.2.1.1 动态内存分配
 
@@ -117,6 +127,8 @@ C变量不支持动态分配；没有存储类型“dynamic”，并且永远不
 ```
 </div>
 
+---
+
 ### 3.2.2 The GNU内存分配器
 
 the GNU C Library中的`malloc`实现源自ptmalloc（pthreads malloc），ptmalloc（pthreads malloc）又源自dlmalloc（Doug Lea malloc）。此`malloc`根据他们的大小和用户控制的某些参数，可能会以两种不同的方式分配内存。最普通的方式是从一大片连续的内存区域中分配一部分内存（称为chunk），且管理这部分区域来优化他们的使用，且减少无用的chunk形式的浪费。传统上，系统的堆区是一个大的内存区域，但是the GNU C Library `malloc`实现会维护多个这样的区域来优化他们在多线程应用中的使用。每一个这样的区域在内部称为*arena*。
@@ -128,6 +140,8 @@ the GNU C Library中的`malloc`实现源自ptmalloc（pthreads malloc），ptmal
 the GNU内存分配器 更多细节技术描述在the GNU C Library wiki上保存。参考[https://sourceware.org/glibc/wiki/MallocInternals]。
 
 你可以使用你自己客制化的`malloc`替换the GNU C Library提供的内置分配器。参考[Replacing malloc](https://sourceware.org/glibc/manual/latest/html_node/Replacing-malloc.html)。
+
+---
 
 ### 3.2.3 不受限制的内存分配器
 
@@ -154,6 +168,8 @@ the GNU内存分配器 更多细节技术描述在the GNU C Library wiki上保�
 - [Statistics for Memory Allocation with `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Statistics-of-Malloc.html)
 
 - [Summary of `malloc`-Related Functions](https://sourceware.org/glibc/manual/latest/html_node/Summary-of-Malloc.html)
+
+---
 
 #### 3.2.3.1 基础内存分配
 
@@ -194,6 +210,8 @@ char *ptr = malloc (length + 1);
 </div>
 
 参考[Representation of Strings](https://sourceware.org/glibc/manual/latest/html_node/Representation-of-Strings.html)，以获取更多信息。
+
+---
 
 #### 3.2.3.2 `malloc`例子
 
@@ -244,6 +262,8 @@ savestring (const char *ptr, size_t len)
 
 注意，块结尾后面的内存可能用来存其他东西；可能是另一个调用`malloc`分配的块。如果你尝试以你原本请求的大小更长的大小对待块，你很可能会破坏`malloc`用于管理其内存块的数据结构，或者破坏其他块的内容。如果你已经分配一个块，然后发现你需要他变大，使用`realloc`（参考[Changing the Size of a Block](https://sourceware.org/glibc/manual/latest/html_node/Changing-Block-Size.html)）。
 
+---
+
 #### 3.2.3.3 可移植的内存分配
 
 当在即要在GNU和非GNU系统上运行的代码中分配内存时，或使用非GNU的替代分配器时（参考[Replacing malloc](https://sourceware.org/glibc/manual/latest/html_node/Replacing-malloc.html)），需要更加小心。当存储区小或者奇怪的大，或存储区被分配成一个不常见的类型，POSIX和ISO C标准允许多种行为。
@@ -268,6 +288,8 @@ savestring (const char *ptr, size_t len)
 
 理论上，可移植代码不应该使用`malloc`分配包含不在上述列表的类型的存储区；应该用`aligned_alloc`类似的函数代替。实践中，然而，其他实现通常跟随the GNU C Library的领导，并且只定义了具有基础对齐方式的类型，并且通常使用`malloc`分配具有the C library定义的类型的对象是可移植的。
 </div>
+
+---
 
 #### 3.2.3.4 释放`malloc`分配的内存
 
@@ -339,6 +361,8 @@ Preliminary: | MT-Safe | AS-Unsafe lock | AC-Unsafe lock fd mem |参考[POSIX Sa
 
 `free_aligned_sized`函数会释放*ptr*指向的先前由`aligned_alloc`，`memalign`，`posix_memalign`分配的内存块。大小*size*和对齐方式*alignment*必须对应先前提供给`aligned_alloc`，`memalign`，`posix_memalign`的需求大小和对齐方式。
 </div>
+
+---
 
 #### 3.2.3.5 改变块的大小
 
@@ -435,6 +459,8 @@ xrealloc (void *ptr, size_t size)
 
 - 在the GNU C Library中，如果新大小和旧的一样，`realloc`和`reallocarray`保证不会改变任何事，并且返回你给的相同的地址。然而，POSIX和ISO C允许程序重定位对象或在这种情况失败。
 
+---
+
 #### 3.2.3.6 分配干净的内存
 
 `calloc`函数分配内存并且将他清理为零。他在`stdlib.h`中声明。
@@ -468,6 +494,8 @@ calloc (size_t count, size_t eltsize)
 </div>
 
 但是一般来说，并不保证`calloc`内部会调用`reallocarray`和`memset`。例如，如果`calloc`实现知道一些其他原因导致新内存块就是零，他可能不再用`memset`再次清零那个块。又，如果应用程序从the C library之外提供他自己的`reallocarray`，`calloc`可能不会使用那个重定义。参考[Replacing malloc](https://sourceware.org/glibc/manual/latest/html_node/Replacing-malloc.html)。
+
+---
 
 #### 3.2.3.7 分配对齐的内存块
 
@@ -701,6 +729,8 @@ memcpy (&i, p, sizeof i);
 编译器会生成当前架构下，效率最高的方式来访问未对齐的数据，将`memcpy`优化掉。（AI生成：他只是通过计算*p*的二进制末尾有多少个零来得到该地址的最大对齐度。如果地址刚好落在更大粒度的边界上（例如Cache Line或Page边界），它就会返回更大的对齐值。）
 </div>
 
+---
+
 #### 3.2.3.8 Malloc可调参数
 
 关于动态内存分配，你可以通过`mallopt`函数，调节一些参数。此函数是通用SVID/XPG接口，在`malloc.h`中定义。
@@ -857,6 +887,8 @@ Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe in
 此参数（parameter）也可以，在进程启动时，通过设置环境变量`MALLOC_ARENA_MAX`为想要的值来设置。
 </div>
 
+---
+
 #### 3.2.3.9 堆一致性检查
 
 你可以要求`malloc`检查动态内存的一致性，通过使用`mcheck`函数和用*LD_PRELOAD*环境变量预载malloc的调试库`libc_malloc_debug`。此函数是一个GNU扩展，在`mcheck.h`中声明。
@@ -990,6 +1022,8 @@ Preliminary: | MT-Unsafe race:mcheck const:malloc_hooks | AS-Unsafe corrupt | AC
 
 那么，使用`MALLOC_CHECK_`和用‘`-lmcheck`’链接之间的区别是什么？`MALLOC_CHECK_`相对于‘`-lmcheck`’是正交的。‘`-lmcheck`’是为了向后兼容才添加的。`MALLOC_CHECK_`和‘`-lmcheck`’两者都能发现相同错误——但是使用`MALLOC_CHECK_`的话，你无需重新编译你的程序。
 
+---
+
 #### 3.2.3.10 使用`malloc`进行内存分配的统计信息
 
 你可以通过调用`mallinfo2`函数来获取动态内存分配的信息。此函数和他相关的数据类型在`malloc.h`中声明；他们是一个标准SVID/XPG版本的扩展。
@@ -1113,6 +1147,8 @@ Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe in
 此函数通过结构体`struct` `mallinfo2`返回当前动态内存使用情况。
 </div>
 
+---
+
 #### 3.2.3.11 `malloc`相关函数总结
 
 这里是和`malloc`一起工作的函数的总结：
@@ -1201,6 +1237,8 @@ Preliminary: | MT-Unsafe init const:mallopt | AS-Unsafe init lock | AC-Unsafe in
 然会当前动态内存使用情况的信息。参考[Statistics for Memory Allocation with `malloc`](https://sourceware.org/glibc/manual/latest/html_node/Statistics-of-Malloc.html)。
 </div>
 
+---
+
 ### 3.2.4 分配调试
 
 在使用不使用垃圾回收的动态内存分配的编程语言时，查找内存泄漏是一个复杂的任务。长时间运行的程序必须保证动态分配的对象在他们的生命周期结束时被释放。如果这不发生，系统迟早会用完内存。
@@ -1214,6 +1252,8 @@ the GNU C Library中的`malloc`实现提供一些简单方法来检测这种泄�
 - [Some more or less clever ideas](https://sourceware.org/glibc/manual/latest/html_node/Tips-for-the-Memory-Debugger.html)
 
 - [Interpreting the traces](https://sourceware.org/glibc/manual/latest/html_node/Interpreting-the-traces.html)
+
+---
 
 #### 3.2.4.1 如何安装跟踪功能
 
@@ -1266,6 +1306,8 @@ Preliminary: | MT-Unsafe race:mtrace locale | AS-Unsafe corrupt heap | AC-Unsafe
 此函数是一个GNU扩展，并且通常在其他系统上不可用。函数原型可以在`mcheck.h`中找到。
 </div>
 
+---
+
 #### 3.2.4.2 示例程序片段
 
 就算跟踪功能不会影响程序的运行时行为，在所有程序中调用`mtrace`也不是一个好主意。设想一下，你用`mtrace`调试一个程序，并且在调试过程中用到的所有其他程序都会追踪他们的`malloc`调用。所有的程序的输出文件都是同一个，因此就不可用了。因此，你应该只在为了调试而编译时启用`mtrace`。因此，一个程序可以这样开头：
@@ -1291,6 +1333,8 @@ main (int argc, char *argv[])
 最后一点也是在程序结束前调用`muntrace`不是一个好主意的原因。库只有在程序从`main`中返回或调用`exit`之后，才会被通知程序的结束，并且因此，在此之前，他们无法释放他们使用的内存。
 
 所以你最好的方式是在程序中尽早调用`mtrace`并且不调用`muntrace`。所以程序追踪几乎所有`malloc`函数的使用（除了那些由程序的或使用的库的构造器执行的调用）。
+
+---
 
 #### 3.2.4.3 一些更聪明或更不聪明的想法
 
@@ -1330,6 +1374,8 @@ main (int argc, char *argv[])
 </div>
 
 也就是说，如果程序启动时环境变量中设置了`MALLOC_TRACE`，用户可以在任何时间启用内存调试器，只要他/她想。当然，输出不会有第一个信号前的分配，但如果存在内存泄露，他仍会显示出来。
+
+---
 
 #### 3.2.4.4 解读追踪
 
@@ -1402,7 +1448,214 @@ Memory not freed:
 ```
 </div>
 
-Suddenly the output makes much more sense and the user can see immediately where the function calls causing the trouble can be found.
+突然之间，输出就合理了很多，用户可以立即看到是哪里的函数调用造成了可被发现的问题。
 
+解读此输出不复杂。最多会检测两种不同的情况。第一，调用`free`给不是分配函数之一返回的指针使用。这通常是一个非常严重的问题，这看上去就像输出的前三行展示的那样。这种情况有点少见，并且一旦出现，会非常剧烈：程序一般会崩溃。
 
-Interpreting this output is not complicated. There are at most two different situations being detected. First, `free` was called for pointers which were never returned by one of the allocation functions. This is usually a very bad problem and what this looks like is shown in the first three lines of the output. Situations like this are quite rare and if they appear they show up very drastically: the program normally crashes.
+The other situation which is much harder to detect are memory leaks. As you can see in the output the `mtrace` function collects all this information and so can say that the program calls an allocation function from line 33 in the source file `/home/drepper/tst-mtrace.c` four times without freeing this memory before the program terminates. Whether this is a real problem remains to be investigated.
+另一种情况是内存泄露，这更难被检测。正如你在输出文件中看到的，`mtrace`函数收集所有信息，所以可以指出程序在源文件`/home/drepper/tst-mtrace.c`的33行中调用了一个分配函数四次，但是在程序结束前没有释放内存。这是否是一个问题，还有待商榷。
+
+---
+
+### 3.2.5 替换`malloc`
+
+The GNU C Library支持使用一个相同接口的不同分配器替换内置的`malloc`实现。对于动态链接的程序，这是通过ELF符号介入实现的，可以使用共享对象依赖或`LD_PRELOAD`。对于静态链接，`malloc`代替库必须在链接`libc.a`之前链接进来（显示或隐式的）。
+
+注意不要使用the GNU C Library中在内部使用`malloc`的函数。例如，`fopen`，`opendir`，`dlopen`，`pthread_setspecific`目前内部使用了`malloc`子系统。如果替换的`malloc`或他的依赖使用了线程局部存储（TLS），他必须使用the initial-exec TLS模型，而不能使用任何动态TLS变体。
+
+<strong>注意：</strong>如果未能提供一套完整的替换函数（即应用程序，the GNU C Library，其他链接进来的库所用到的函数），可能会导致静态链接错误，并且在运行时，导致堆损坏或程序崩溃。替换函数应该实现他们对应函数在the GNU C Library中记录的行为；例如，`malloc`的替换函数应该仅在失败时返回一个空指针，他应该返回关于`alignof` `(` `max_align_t` `)`对齐的指针，`free`的替换函数应该保留`errno`。
+
+自定义`malloc`必须提供的最小函数集如下表所示。
+
+`malloc`
+
+`free`
+
+`calloc`
+
+`realloc`
+
+the GNU C Library需要这些`malloc`相关函数来运行。<a href="#3.2.5note1" id="3.2.5note1ref">1</a>
+
+the GNU C Library中，`malloc`的实现提供库本身不使用的额外的功能，但是经常被其他系统库和程序使用。一个通用的替换`malloc`实现也应该提供下面函数的定义。他们的名字如下表所示。
+
+`aligned_alloc`
+
+`free_aligned_sized`
+
+`free_sized`
+
+`malloc_usable_size`
+
+`memalign`
+
+`posix_memalign`
+
+`pvalloc`
+
+`valloc`
+
+此外，非常旧的程序可能会使用过时的`cfree`函数。
+
+诸如`mallopt`或`mallinfo2`这类进一步与`malloc`相关的函数，在使用一个`malloc`的替换函数时，不会有任何效果，或者返回错误的统计信息。然而，未能替换这些函数通常不会导致崩溃或其他错误程序行为，但是可能导致静态链接错误。
+
+the GNU C Library中还有其他函数（`reallocarray`，`strdup`等）未在上面列出，但是会返回新分配的内存给调用者。这些函数的替换函数不被支持，并且可能产生错误的结果。这些函数的The GNU C Library实现会在可用时调用替换的分配器，所以他们能正确的运行`malloc`替换函数。
+
+---
+
+**脚注**
+
+<a id="3.2.5note1" href="#3.2.5note1ref">(1)</a>
+
+the GNU C Library 2.25版本之前，需要自定义`malloc`定义`__libc_memalign`（和`memalign`函数有一样的接口）。
+
+---
+
+### 3.2.6 Obstacks（对象栈）
+
+一个obstack时一个内存池，包含一个对象栈。你可以创建任意数量的独立obstack，然后再指定的obstack中分配对象。再每个obstack中，最后一个分配的对象必须是第一个被释放的，但是不同的obstack之间互相独立。
+
+除了这个释放顺序的限制，obstack是完全通用的：一个obstack可以包含任意数量的任意大小的对象。他们是通过宏实现的，所以只要对象非常小，分配会非常快。并且，每个对象的唯一的空间开销，就是让每个对象在合适边界上开始所需的填充。
+
+- [Creating Obstacks](https://sourceware.org/glibc/manual/latest/html_node/Creating-Obstacks.html)
+
+- [Preparing for Using Obstacks](https://sourceware.org/glibc/manual/latest/html_node/Preparing-for-Obstacks.html)
+
+- [Allocation in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Allocation-in-an-Obstack.html)
+
+- [Freeing Objects in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Freeing-Obstack-Objects.html)
+
+- [Obstack Functions and Macros](https://sourceware.org/glibc/manual/latest/html_node/Obstack-Functions.html)
+
+- [Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Growing-Objects.html)
+
+- [Extra Fast Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Extra-Fast-Growing.html)
+
+- [Status of an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Status-of-an-Obstack.html)
+
+- [Alignment of Data in Obstacks](https://sourceware.org/glibc/manual/latest/html_node/Obstacks-Data-Alignment.html)
+
+- [Obstack Chunks](https://sourceware.org/glibc/manual/latest/html_node/Obstack-Chunks.html)
+
+- [Summary of Obstack Functions](https://sourceware.org/glibc/manual/latest/html_node/Summary-of-Obstacks.html)
+
+---
+
+#### 3.2.6.1 创建obstack
+
+用于操作obstack的工具在头文件`obstack.h`中声明。
+
+数据类型：**`struct`** **`obstack`**
+
+<div style="margin: 0 0 1em 2em;">
+
+一个obstack是由`struct` `obstack`类型的数据结构表示的。此结构有一个小的固定的大小；他记录了obstack的状态，还有怎么找到对象被分配的地址。他不包含任何对象本身。你不应该尝试直接访问结构的内容；只使用此章节中描述的函数。
+</div>
+
+你可以声明`struct` `obstack`类型的变量，并且当成obstack使用他们，或者你可以动态的分配obstack，就像其他类型的对象一样。obstack动态分配允许你的程序有数量可变的不同栈。（你甚至可以在一个obstack中分配一个obstack结构，但这很少有用。）
+
+所有用obstack允许的函数需要你指定使用哪个obstack。你通过一个`struct` `obstack` `*`类型的指针来做这个。接下来，我们经常说“一个obstack”，但严格来说，手头的对象是一个指针。
+
+obstack中的对象被打包进大的块，他称为chunk。`struct` `obstack`结构指向一个当前正在使用的chunk链。
+
+当你分配一个对象，他无法放入前一个chunk中时，obstack库会得到一个新的chunk。因为obstack库会自动管理chunk，你不需要关心他们，但是你需要提供一个函数，使obstack库使用他来获取一个chunk。通常，你提供的一个函数会直接或间接使用`malloc`。你也必须提供一个函数来释放一个chunk。这些事情在下节中描述。
+
+---
+
+#### 3.2.6.2 使用obstack的准备工作
+
+你计划使用obstack函数的每个源文件都必须包含`obstack.h`头文件，比如这样：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+#include <obstack.h>
+```
+</div>
+
+此外，如果源文件使用了宏`obstack_init`，他必须声明或定义两个函数或宏，用来给obstack库调用。一个是，`obstack_chunk_alloc`，用来分配对象所打包到的内存chunk。另一个是，`obstack_chunk_free`，用来在他们中的对象被释放时返回chunk。这些宏需要在源文件中的任何obstack使用前出现。
+
+通常，他们被定义成通过中间人`xmalloc`来使用`malloc`（参考[Unconstrained Allocation](https://sourceware.org/glibc/manual/latest/html_node/Unconstrained-Allocation.html)）。这可以通过下面这对宏定义来实现：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+#define obstack_chunk_alloc xmalloc
+#define obstack_chunk_free free
+```
+</div>
+
+尽管你使用obstack时获得的内存实际上来自于`malloc`，使用obstack还是更快，因为`malloc`更少被调用，每次分配的是更大的内存块。参考[Obstack Chunks](https://sourceware.org/glibc/manual/latest/html_node/Obstack-Chunks.html)，以获得完整的细节。
+
+在运行时，在程序使用一个`struct` `obstack`对象作为一个obstack之前，他必须调用`obstack_init`初始化obstack。
+
+函数：`int` **`obstack_init`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Safe mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+为了对象的分配，初始化obstack *`obstack-ptr`*。此函数调用obstack的`obstack_chunk_alloc`函数。如果内存分配失败，`obstack_alloc_failed_handler`指向的函数被调用，`obstack_init`函数总是返回1（兼容性说明：早期的obstack版本在分配失败时返回0）。
+</div>
+
+这里有两个如何给一个obstack分配空间并初始化他的例子。第一，一个作为一个静态变量的obstack：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+static struct obstack myobstack;
+...
+obstack_init (&myobstack);
+```
+</div>
+
+第二，是一个本身动态分配的obstack：
+<div style="margin: 0 0 1em 2em;">
+
+```c
+struct obstack *myobstack_ptr
+  = (struct obstack *) xmalloc (sizeof (struct obstack));
+
+obstack_init (myobstack_ptr);
+```
+</div>
+
+变量：**`obstack_alloc_failed_handler`**
+
+<div style="margin: 0 0 1em 2em;">
+
+此变量的值是一个函数指针，obstack在`obstack_chunk_alloc`分配内存失败时使用他。默认行为是打印一条信息并中止。你应该提供一个函数，要么调用`exit`（参考[Program Termination](https://sourceware.org/glibc/manual/latest/html_node/Program-Termination.html)），要么调用`longjmp`（参考[Non-Local Exits](https://sourceware.org/glibc/manual/latest/html_node/Non_002dLocal-Exits.html)），不要返回。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+void my_obstack_alloc_failed (void);
+...
+obstack_alloc_failed_handler = &my_obstack_alloc_failed;
+```
+</div>
+
+#### 3.2.6.3 在一个obstack中分配
+
+The most direct way to allocate an object in an obstack is with `obstack_alloc`, which is invoked almost like `malloc`.
+
+函数：`void` `*` **`obstack_alloc`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+This allocates an uninitialized block of *size* bytes in an obstack and returns its address. Here *obstack-ptr* specifies which obstack to allocate the block in; it is the address of the `struct` `obstack` object which represents the obstack. Each obstack function or macro requires you to specify an *obstack-ptr* as the first argument.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+This function calls the obstack’s `obstack_chunk_alloc` function if it needs to allocate a new chunk of memory; it calls `obstack_alloc_failed_handler` if allocation of memory by `obstack_chunk_alloc` failed.
+</div>

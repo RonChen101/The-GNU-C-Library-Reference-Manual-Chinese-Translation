@@ -6,6 +6,8 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 
 (a) The FSF’s Back-Cover Text is: “You have the freedom to copy and modify this GNU manual. Buying copies from the FSF supports it in developing GNU and promoting software freedom.”
 
+---
+
 # 1 介绍
 
 C语言内置的功能不提供输入/输出，内存管理，字符串操作等简单的操作。这些功能都定义在标准库中，你需要编译并同你的程序链接。
@@ -14,6 +16,8 @@ The GNU C Library定义了所有ISO C标准指定的函数，并同时满足POSI
 
 这个手册的目的是告诉你他和使用the GNU C Library的功能。文档中会指出哪些特性属于哪些标准，以帮助你鉴别哪些内容可能无法移植到其他系统。但是这个手册的重点不是严格的可移植性。
 
+---
+
 ## 1.1 入门
 
 这个手册的内容是假设你已经了解了类似C语言的语言和基本的编程概念。具体而言，是ISO标准C（参考[ISO C](https://sourceware.org/glibc/manual/latest/html_node/ISO-C.html)），而不是其他的C。
@@ -21,6 +25,8 @@ The GNU C Library定义了所有ISO C标准指定的函数，并同时满足POSI
 The GNU C Library包含几个头文件，分别提供相关功能的定义和声明；运行你的程序时，你的编译器会用到这些信息。比如，`stdio.h`头文件声明了输入和输出的功能，`string.h`头文件声明了字符操作的功能。这个手册的组织会遵循和头文件同样的分类。
 
 如果你第一次看这个手册，你应该看所有的引言或基础介绍，并快速浏览所有章节。the GNU C Library中有很多函数，记住每个函数是怎么用是不现实的。重要的是对the library提供的功能有整体的概念，这样写程序的时候你能知道什么时候使用library的函数，这个手册可以找到关于他们的更多信息。
+
+---
 
 ## 1.2 不同的标准和可移植性
 
@@ -42,6 +48,8 @@ The GNU C Library包含几个头文件，分别提供相关功能的定义和声
 
 - [Linux (The Linux Kernel)](https://sourceware.org/glibc/manual/latest/html_node/Linux-Kernel.html)
 
+---
+
 ### 1.2.1 ISO C标准
 
 The GNU C Library兼容the American National Standards Institute (ANSI)采纳的C标准：American National Standard X3.159-1989—“ANSI C”，和后来被the International Standardization Organization (ISO)采纳的C标准：ISO/IEC 9899:1990, “Programming languages—C”。我们在本文中将其统称为ISO C，因为在采纳层面上，它是一个更为通用的标准。the GNU C Library的头文件和库方法是ISO C指定的那内容的超集。
@@ -52,6 +60,8 @@ The GNU C Library兼容the American National Standards Institute (ANSI)采纳的
 
 手册不会尝试给你完整的细节关于ISO C和其他的区别。手册会给你可移植性高的写法建议，但不会追求完美。
 
+---
+
 ### 1.2.2 POSIX (The Portable Operating System Interface)
 
 The GNU C Library同时兼容ISO POSIX系列标准，更正式的说法是the Portable Operating System Interface for Computer Environments (ISO/IEC 9945)。他们也出版了ANSI/IEEE Std 1003。POSIX标准主要衍生自各种版本的Unix操作系统。
@@ -61,6 +71,8 @@ POSIX标准指定的功能是ISO C标准的超集；POSIX对ISO C标准的函数
 The GNU C Library实现了ISO/IEC 9945-1:1996指定的所有功能，即the POSIX System Application Program Interface，简称为POSIX.1。在ISO C标准功能上的主要扩展包括file system interface primitives（参考[File System Interface](https://sourceware.org/glibc/manual/latest/html_node/File-System-Interface.html)），device-specific terminal control functions（参考[Low-Level Terminal Interface](https://sourceware.org/glibc/manual/latest/html_node/Low_002dLevel-Terminal-Interface.html)），以及process control functions（参考[Processes](https://sourceware.org/glibc/manual/latest/html_node/Processes.html)）。
 
 the GNU C Library也实现了ISO/IEC 9945-2:1993和the POSIX Shell and Utilities standard (POSIX.2)中的有些功能。这些包括正则表达式和其他的条件匹配功能（参考[Pattern Matching](https://sourceware.org/glibc/manual/latest/html_node/Pattern-Matching.html)）。
+
+---
 
 #### 1.2.2.1 POSIX安全概念
 
@@ -103,6 +115,8 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
   随着时间的推移，我们计划将这些初步的安全说明逐步发展为稳定的承诺，其稳定性将与我们的接口承诺保持一致。到时候，我们会移除`Preliminary`标签。然而，只要该关键字仍然存在，它们就不应被视为对未来行为的承诺。
 
 其他关键字出现在安全标注中的，定义在后面的章节。
+
+---
 
 #### 1.2.2.2 不安全的特性
 
@@ -147,6 +161,8 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 - `timer`
 
   标记`timer`的函数会使用`alarm`函数，或类似给系统设置超时回调，或一个长时间运行的操作。在多线程程序中，超时信号可能会送到其他线程上，导致无法关闭正确的线程。除了MT-Unsafe，这些函数总是AS-Unsafe，因为信号处理器中调用他们可能会干扰到被中断代码中设置的定时器，还有AC-Unsafe，因为无法保证先设置的定时器会不会被一个异步取消重置。
+
+---
 
 #### 1.2.2.3 条件下的安全特性
 
@@ -207,6 +223,8 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
   标记`term`的函数有AC-Safety问题，应该在退出时将终端设置恢复成原来的状态，但是取消他们可能会导致无法恢复。
 
   除了为规避MT-和AS-Safety问题而建议的措施外，为了避免取消问题，还建议禁用异步取消，并安装一个清理处理程序，将终端设置恢复至原来的状态以及释放互斥锁。
+
+---
 
 #### 1.2.2.4 其他安全标记
 
@@ -278,11 +296,15 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |
 
   当函数所有不安全标记都附加了条件，并且这些条件都不成立时，函数被视为安全的。
 
+---
+
 ### 1.2.3 Berkeley Unix（Berkeley是专有名词）
 
 The GNU C Library定义了一些功能，这些功能设施并不是标准，来自4.2 BSD，4.3 BSD和4.4 BSD Unix系统（也就是Berkeley Unix），还有SunOS（一个受欢迎的4.2 BSD的衍生版本，包含一些Unix System V的功能）。这些系统支持大多数ISO C和POSIX功能，4.4BSD和更新的SunOS系统事实上完全支持。
 
 BSD功能包括符号链接（参考[Symbolic Links](https://sourceware.org/glibc/manual/latest/html_node/Symbolic-Links.html)），select函数（参考[Waiting for Input or Output](https://sourceware.org/glibc/manual/latest/html_node/Waiting-for-I_002fO.html)），BSD信号函数（参考[BSD Signal Handling](https://sourceware.org/glibc/manual/latest/html_node/BSD-Signal-Handling.html)），sockets（参考[Sockets](https://sourceware.org/glibc/manual/latest/html_node/Sockets.html)）。
+
+---
 
 ### 1.2.4 SVID (The System V Interface Description)
 
@@ -292,6 +314,8 @@ The GNU C Library为了兼容System V Unix和其他Unix系统（比如SunOS）�
 
 System V中支持的功能有，进程间通信与内存共享，`hsearch`和`drand48`系列函数，`fmtmsg`和若干数学函数。
 
+---
+
 ### 1.2.5 XPG (The X/Open Portability Guide)
 
 The X/Open Portability Guide，由X/Open有限公司出版，是一个比POSIX更广泛的标准。X/Open拥有Unix版权，XPG明确了想要称为Unix系统所需要的东西。
@@ -299,6 +323,8 @@ The X/Open Portability Guide，由X/Open有限公司出版，是一个比POSIX�
 The GNU C Library遵循X/Open Portability Guide，第4.2版，还有XSI (X/Open System Interface)兼容系统所共用的扩展功能，以及全部X/Open UNIX的扩展功能。
 
 在POSIX基础之上新增的功能，主要是System V和BSD系统已有的特性衍生出来的。不过，System V中真正的错误已经被修正。因为满足XPG标准和Unix扩展是活的Unix品牌认证的前提条件，这些功能大概率也会出现在商业Unix系统上。
+
+---
 
 ### 1.2.6 Linux (The Linux Kernel)
 
@@ -315,6 +341,8 @@ The GNU C Library援引收录了Linux手册页6.9.1版本文档，记录了Linux
 
 有关Linux系统调用接口的更多内容，可在[System Calls](https://sourceware.org/glibc/manual/latest/html_node/System-Calls.html)查看。
 
+---
+
 ## 1.3 使用库
 
 本节描述了在使用the GNU C Library涉及的一些实际问题。
@@ -326,6 +354,8 @@ The GNU C Library援引收录了Linux手册页6.9.1版本文档，记录了Linux
 - [Reserved Names](https://sourceware.org/glibc/manual/latest/html_node/Reserved-Names.html)
 
 - [Feature Test Macros](https://sourceware.org/glibc/manual/latest/html_node/Feature-Test-Macros.html)
+
+---
 
 ### 1.3.1 头文件
 
@@ -357,6 +387,8 @@ The GNU C Library提供多个头文件，每个都包含了与一组相关功能
 <strong>兼容性说明：</strong>在任何ISO C实现中，按任何顺序引用任何标准头文件，引用任意次数，都能正常运行。然而，传统上并非如此，在一些老的C实现中。
 
 严格来说，你没必要为了使用一个头文件中声明的函数去引用那个头文件；你可以自己显式的声明那个函数，根据规范。但是，通常，更建议引用头文件，因为头文件可能定义了类型和宏，而其他地方没有，又，头文件可能给某些函数定义了更高效的宏替代版本。使用头文件也是一种确保声明无误的做法。
+
+---
 
 ### 1.3.2 函数的宏定义
 
@@ -396,6 +428,8 @@ int h (int *i) { return abs (++*i); }
 ```
 
 由于兼作函数的宏定义在行为上与真正的函数版本完全一致，因此通常没有必要使用上述任何一种方法。通常，移除宏定义会让你的程序更慢。
+
+---
 
 ### 1.3.3 保留名
 
@@ -446,6 +480,8 @@ int h (int *i) { return abs (++*i); }
 - 头文件`sys/times.h`保留了以‘`tms_`’开头的名称。
 
 - 头文件`termios.h`保留了以‘`c_`’，‘`V`’，‘`I`’，‘`O`’和‘`TC`’开头的名称；还有以‘`B`’开头，后接一个数字的名称。
+
+---
 
 ### 1.3.4 功能测试宏
 
@@ -763,6 +799,8 @@ int h (int *i) { return abs (++*i); }
 
 当你定义了一个功能测试宏以请求更大范围的功能时，再定义一个功能测试宏以请求这些功能的子集时无害的。比如，你定义了`_POSIX_C_SOURCE`，再定义`_POSIX_SOURCE`则没有影响。又或者，你定义了`_GNU_SOURCE`，那么定义`_POSIX_SOURCE`或者`_POSIX_C_SOURCE`也没用。
 
+---
+
 ## 1.4 手册路线图
 
 这里是这个手册中剩余其他章节内容的总览。
@@ -830,5 +868,7 @@ int h (int *i) { return abs (++*i); }
 - [Library Maintenance](https://sourceware.org/glibc/manual/latest/html_node/Maintenance.html)，介绍了如何增加新函数，或将此库移植到新系统。
 
 如果你已经知道你感兴趣的功能的名称，你可以在[Summary of Library Facilities](https://sourceware.org/glibc/manual/latest/html_node/Library-Summary.html)中查找。该附录提供相关语法的概览，以及哪里可以找到更详细的描述。当你只想知道参数的顺序和类型时，该附录尤为实用。该附录还介绍了每一个函数，变量，或宏所来自的标准或系统。
+
+---
 
 这是The GNU C Library Reference Manual，版本2.44。

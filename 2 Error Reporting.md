@@ -6,6 +6,8 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 
 (a) The FSF’s Back-Cover Text is: “You have the freedom to copy and modify this GNU manual. Buying copies from the FSF supports it in developing GNU and promoting software freedom.”
 
+---
+
 # 2 错误报告
 
 许多the GNU C Library的函数会检测和报告错误情况，有时，你的程序也需要检查错误情况。例如，当你打开一个输入文件，你应该验证那个文件是否被正确打开了，并且，如果调用库函数失败，打印错误信息并采取其他适当的处理措施。
@@ -17,6 +19,8 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 - [Error Codes](https://sourceware.org/glibc/manual/latest/html_node/Error-Codes.html)
 
 - [Error Messages](https://sourceware.org/glibc/manual/latest/html_node/Error-Messages.html)
+
+---
 
 ## 2.1 错误检查
 
@@ -69,6 +73,8 @@ Copyright © 1993–2026 Free Software Foundation, Inc.
 除了在GNU/Hurd系统上，几乎所有的系统调用接受了无效指针作为参数，都可以返回`EFAULT`。由于这种情况只可能是由你程序中的bug所导致的，并且在GNU/Hurd上不会发生，因此为了节省篇幅，我们在各个函数的单独描述中不在逐一提及`EFAULT`。
 
 在某些Unix系统上，很多系统调用接收了指向栈的指针也都会返回`EFAULT`，而内核出于某种晦涩难明的原因在试图扩展栈时失败了。万一真遇到这种情况，在该系统上你或许应当改用静态分配或动态分配的内存，而不要使用栈内存。
+
+---
 
 ## 2.2 错误码
 
@@ -1161,6 +1167,8 @@ AI生成：GNU/Hurd采用了一种独特的微内核+用户态服务器架构。
 “Memory page has hardware error.”
 </div>
 
+---
+
 ## 2.3 错误信息
 
 库提供了一些函数和变量，为了方便你的程序可以客制化格式输出有关库调用失败的详细错误信息。`strerror`和`perror`函数可以根据传入的错误码，返回标准的错误信息；`program_invocation_short_name`变量可以让你获取发生错误的函数的名称。
@@ -1713,5 +1721,7 @@ Preliminary: | MT-Safe locale | AS-Unsafe corrupt heap | AC-Unsafe corrupt lock 
 
 `verrx`函数就像`errx`一样，除了处理*format*字符串的参数是通过`va_list`的值传入的。
 </div>
+
+---
 
 这是The GNU C Library Reference Manual，版本2.44。
