@@ -1511,7 +1511,7 @@ the GNU C Library 2.25版本之前，需要自定义`malloc`定义`__libc_memali
 
 ---
 
-### 3.2.6 Obstacks（对象栈）
+### 3.2.6 对象栈
 
 一个obstack时一个内存池，包含一个对象栈。你可以创建任意数量的独立obstack，然后再指定的obstack中分配对象。再每个obstack中，最后一个分配的对象必须是第一个被释放的，但是不同的obstack之间互相独立。
 
@@ -1639,9 +1639,11 @@ obstack_alloc_failed_handler = &my_obstack_alloc_failed;
 ```
 </div>
 
+---
+
 #### 3.2.6.3 在一个obstack中分配
 
-The most direct way to allocate an object in an obstack is with `obstack_alloc`, which is invoked almost like `malloc`.
+最直接的在一个obstack分配一个对象的方式是使用`obstack_alloc`，调用几乎和`malloc`一样。
 
 函数：`void` `*` **`obstack_alloc`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`size`* `)`
 
@@ -1652,10 +1654,272 @@ Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参�
 
 <div style="margin: 0 0 1em 2em;">
 
-This allocates an uninitialized block of *size* bytes in an obstack and returns its address. Here *obstack-ptr* specifies which obstack to allocate the block in; it is the address of the `struct` `obstack` object which represents the obstack. Each obstack function or macro requires you to specify an *obstack-ptr* as the first argument.
+他在一个obstack中分配一个*size*字节大小的未初始化的块，并且返回他的地址。*obstack-ptr*指定在哪个obstack中分配块；他是`struct` `obstack`对象的地址，代表着obstack。每一个obstack函数或宏需要你指定一个*obstack-ptr*作为第一个参数。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-This function calls the obstack’s `obstack_chunk_alloc` function if it needs to allocate a new chunk of memory; it calls `obstack_alloc_failed_handler` if allocation of memory by `obstack_chunk_alloc` failed.
+如果他需要分配一个新内存chunk，此函数调用obstack的`obstack_chunk_alloc`函数；如果`obstack_chunk_alloc`分配内存失败，他调用`obstack_alloc_failed_handler`。
 </div>
+
+例如，这一个函数分配一个字符串str的副本到一个指定的obstack，也就是`string_obstack`变量中：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+struct obstack string_obstack;
+
+char *
+copystring (char *string)
+{
+  size_t len = strlen (string) + 1;
+  char *s = (char *) obstack_alloc (&string_obstack, len);
+  memcpy (s, string, len);
+  return s;
+}
+```
+</div>
+
+分配一个具有指定内容的块，使用`obstack_copy`，声明如下：
+
+函数：`void` `*` **`obstack_copy`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`address`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+他分配一个块，并复制从*address*开始的*size*字节数据初始化他。如果`obstack_chunk_alloc`分配内存失败，他调用`obstack_alloc_failed_handler`。
+</div>
+
+函数：`void` `*` **`obstack_copy0`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`address`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+类似`obstack_copy`，但是后面接一个额外的字节，包含一个空字符。此额外的字节不计算在参数*size*中。
+</div>
+
+`obstack_copy0`函数便于复制一串字符到一个obstack中，作为以空结尾的字符串。这里有一个用例：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+char *
+obstack_savestring (char *addr, int size)
+{
+  return obstack_copy0 (&myobstack, addr, size);
+}
+```
+</div>
+
+对比他和前面使用`malloc`的`savestring`的例子（参考[Basic Memory Allocation](https://sourceware.org/glibc/manual/latest/html_node/Basic-Allocation.html)）。
+
+---
+
+#### 3.2.6.4 在一个obstack中释放对象
+
+释放在一个obstack分配的一个对象，使用`obstack_free`函数。因为obstack是一个对象们的栈，释放一个对象会自动释放同一个obstack中分配的更晚的所有其他对象。
+
+函数：`void` **`obstack_free`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` `object` `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果`object`是一个空指针，所有在obstack中分配的都会被释放。否则，`object`必须是obstack中已分配的一个对象的地址。然后`object`被释放，`obstack-ptr`中所有`object`以后被分配的也会。
+</div>
+
+注意，如果*object*是一个空指针，结构是一个未初始化的obstack。释放一个obstack中的所有内存，但是使他能够继续分配，可以使用obstack中分配的第一个对象的地址来调用`obstack_free`：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+obstack_free (obstack_ptr, first_object_allocated_ptr);
+```
+</div>
+
+回忆一下，一个obstack中的对象们是按chunk分组的。当一个chunk中的所有对象都被释放时，obstack库自动释放chunk（参考[Preparing for Using Obstacks](https://sourceware.org/glibc/manual/latest/html_node/Preparing-for-Obstacks.html)）。然后其他obstack，或非obstack的分配，可以再使用那个chunk的空间。
+
+---
+
+#### 3.2.6.5 obstack函数和宏
+
+使用obstack的接口定义为函数还是宏，取决于编译器。obstack功能在所有C编译器上可用，包括ISO C和传统C，但是如果你想使用GNU C以外的编译器，你必须采取预防措施。
+
+如果你在使用一个老式的非ISO C编译器，所有obstack“函数”实际上是宏。你可以像调用函数一样调用这些宏，但是你不能以其他方式使用他们（比如说取地址）。
+
+调用宏需要一个特别的预防措施：即，第一个操作数（obstack指针）不能包含任何副作用，因为他可能不止被计算一次。例如，如果你写这个：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+obstack_alloc (get_obstack (), 4);
+```
+</div>
+
+你会发现，`get_obstack`可能被调用多次。如果你使用`*obstack_list_ptr++`作为obstack指针参数，你可能获得非常奇怪的结果，因为增加可能会发生多次。
+
+在ISO C中，每个函数都有一个宏定义和一个函数定义。函数定义是用来让你只取函数的地址但是不调用他。一个普通的调用默认会使用宏定义，但是你可以将函数名写在括号中来请求函数定义，就像这样：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+char *x;
+void *(*funcp) ();
+/* Use the macro.  */
+x = (char *) obstack_alloc (obptr, size);
+/* Call the function.  */
+x = (char *) (obstack_alloc) (obptr, size);
+/* Take the address of the function.  */
+funcp = obstack_alloc;
+```
+</div>
+
+ISO C中的标准库函数也存在相同的情况。参考[Macro Definitions of Functions](https://sourceware.org/glibc/manual/latest/html_node/Macro-Definitions.html)。
+
+<strong>警告：</strong>当你使用宏时，你必须遵循避免第一个操作数的副作用的预防措施，即使在ISO C中。
+
+若你使用GUN C编译器，此预防措施不是必要的，因为GNU C中的各种语言扩展允许定义宏时对每个参数只计算一次。
+
+---
+
+#### 3.2.6.6 Growing Objects（增长对象）
+
+因为obstack chunk中的内存是按顺序使用的，所以可能逐步构建一个对象，每次向对象的结尾添加一个或多个字节。使用这种技术，你不需要知道你需要在对象中放进多少数据，一直到他的末尾。我们称他为增长对象技术。那个用来在增长对象中添加数据的特别的函数在本章节中描述。
+
+当你开始增长一个对象时，你不需要做任何事。使用其中一个函数来向对象中添加数据会自动开始增长对象。然而，对象结束时，需要显式的说明。通过函数`obstack_finish`完成。
+
+这样构建的对象的实际地址是未知的，直到对象结束。在那之前，始终存在这种可能，你增加了太多数据，以至于对象必须被复制到一个新chunk。
+
+当obstack在作为增长对象使用时，你不能用他来普通的分配另一个对象。如果你尝试这样做，已经加入增长对象的空间可能变成另一个对象的一部分。
+
+函数：`void` **`obstack_blank`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+用来添加数据到增长对象的最基础的函数是`obstack_blank`，他只添加空间，不初始化。
+</div>
+
+函数：`void` **`obstack_grow`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`data`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+添加一块已初始化的空间，使用`obstack_grow`，增长对象版本的`obstack_copy`。他向增长对象中添加*size*字节的数据，复制*data*的内容。
+</div>
+
+函数：`void` **`obstack_grow0`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`data`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+增长对象版本的`obstack_copy0`。他从*data*中添加*size*字节，后面接一个额外的空字符。
+</div>
+
+函数：`void` **`obstack_1grow`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `char` *`c`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+要一次添加一个字符，使用`obstack_1grow`函数。他添加一个包含*c*的单一字节到增长对象。
+</div>
+
+函数：`void` **`obstack_ptr_grow`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`data`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+添加一个指针，你可以使用`obstack_ptr_grow`函数。他添加`sizeof (void *)`字节，包含着*data*的值。
+</div>
+
+函数：`void` **`obstack_int_grow`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`data`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+可以使用`obstack_int_grow`函数添加一个单一的`int`类型的值。他添加`sizeof (int)`字节到增长对象中，并用*data*的值初始化他们。
+</div>
+
+函数：`void` `*` **`obstack_finish`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+当你结束增长对象时，使用`obstack_finish`函数关闭他，并返回他的最终地址。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+当你结束了对象后，obstack可以被用于普通分配或者增长其他对象。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+在与`obstack_alloc`相同情况下，此函数可以返回一个空指针（参考[Allocation in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Allocation-in-an-Obstack.html)）。
+</div>
+
+当你通过增长构建一个对象时，你可能需要知道他最终变得多长。你不需要再增长对象时追踪他，因为你可以在使用`obstack_object_size`函数结束对象之前，直接从obstack中查出长度。声明如下：
+
+函数：`int` **`obstack_object_size`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数返回当前增长对象的大小，单位字节。记住在结束对象前调用此函数。他结束之后，`obstack_object_size`将会返回零。
+</div>
+
+如果你已经开始增长一个对象，但希望取消他，你需要结束他，再释放他，就像这样：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+obstack_free (obstack_ptr, obstack_finish (obstack_ptr));
+```
+</div>
+
+如果没有增长过对象，这样没有效果。
+
+你可以使用一个负数size参数调用`obstack_blank`来使当前对象更小。别缩小到零长度以下——没有人知道你这样做会发生什么。
