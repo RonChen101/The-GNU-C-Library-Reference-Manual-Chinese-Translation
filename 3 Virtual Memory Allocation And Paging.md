@@ -1923,3 +1923,274 @@ obstack_free (obstack_ptr, obstack_finish (obstack_ptr));
 如果没有增长过对象，这样没有效果。
 
 你可以使用一个负数size参数调用`obstack_blank`来使当前对象更小。别缩小到零长度以下——没有人知道你这样做会发生什么。
+
+---
+
+#### 3.2.6.7 超快速增长对象
+
+增长对象的常用函数需要额外开销，用于检测当前chunk中有没有新增长的空间。如果你经常以小增长来构建对象，这种开销将会很可观。
+
+你可以通过使用特殊的“快速增长”函数来减少开销，他们增长对象时不会检查。为了有一个稳定的程序，你必须自己检查。如果你每次添加对象都检查，你就没有节省任何开销，因为普通增长函数也是这样做的。但是如果你安排的检查更少，或者检查的效率更高，那么你的程序就会更快。
+
+`obstack_room`函数返回当前chunk中可用的空间。他的声明如下：
+
+函数：`int` **`obstack_room`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+他返回使用快速增长函数的obstack *obstack-ptr*中的当前增长对象（或一个即将开始的对象）可以安全添加的字节数量。
+</div>
+
+当你知道还有空间时，你可以使用这些快速增长函数来添加数据到增长对象：
+
+函数：`void` **`obstack_1grow_fast`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `char` *`c`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Unsafe corrupt mem |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`obstack_1grow_fast`函数添加一个包含字符*c*的字节到obstack *obstack-ptr*中的增长对象中。
+</div>
+
+函数：`void` **`obstack_ptr_grow_fast`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`data`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`obstack_ptr_grow_fast`函数添加包含*data*值的`sizeof (void *)`字节到obstack *obstack-ptr*中的增长对象中。
+</div>
+
+函数：`void` **`obstack_int_grow_fast`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`data`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`obstack_int_grow_fast`函数添加包含*data*值的`sizeof (int)`字节到obstack *obstack-ptr*中的增长对象中。
+</div>
+
+函数：`void` **`obstack_blank_fast`** `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`obstack_blank_fast`函数添加*size*字节到obstack *obstack-ptr*中的增长对象中，不初始化他们。
+</div>
+
+当你用`obstack_room`检查空间，然后发现你想要添加的东西没有足够空间时，快速增长函数是不安全的。在这种情况下，在这种情况下，简单的使用对应的普通增长函数代替。很快，他会复制对象到一个新chunk；然后又会有很多可用的空间。
+
+所以，你每次使用一个普通增长函数，后面用`obstack_room`检查不足的空间。当对象复制到一个新chunk，将会又有大量空间，所以程序又会开始使用快速增长函数。
+
+这里有一个例子（这个例子是真牛）：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+void
+add_string (struct obstack *obstack, const char *ptr, int len)
+{
+  while (len > 0)
+    {
+      int room = obstack_room (obstack);
+      if (room == 0)
+        {
+          /* Not enough room.  Add one character slowly,
+             which may copy to a new chunk and make room.  */
+          obstack_1grow (obstack, *ptr++);
+          len--;
+        }
+      else
+        {
+          if (room > len)
+            room = len;
+          /* Add fast as much as we have room for. */
+          len -= room;
+          while (room-- > 0)
+            obstack_1grow_fast (obstack, *ptr++);
+        }
+    }
+}
+```
+</div>
+
+---
+
+#### 3.2.6.8 一个obstack的状态
+
+这里的函数提供一个obstack中的当前的分配的状态信息。你可以使用他们了解一个对象，即使正在增长。
+
+函数：`void` `*` **`obstack_base`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe corrupt | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数返回*obstack-ptr*中正在增长的对象的暂时的开始地址。如果你紧接着直接结束了对象，他会有那个地址。如果你先把他变得更大，他可能会超出当前chunk——那么他的地址会改变！
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果没有对象在增长，此值会告诉你，你分配的下一个对象在哪里开始（再次假设他在当前chunk中装得下）。
+</div>
+
+函数：`void` `*` **`obstack_next_free`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Unsafe corrupt | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数返回obstack *obstack-ptr*的当前chunk中的第一个空闲字节的地址。这是当前增长对象的末端。如果没有对象在增长，`obstack_next_free`和`obstack_base`返回的值相同。
+</div>
+
+函数：`int` **`obstack_object_size`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe race:obstack-ptr | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+此函数返回当前增长对象的大小，单位字节。这等价于
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+obstack_next_free (obstack-ptr) - obstack_base (obstack-ptr)
+```
+</div>
+
+---
+
+#### 3.2.6.9 obstack中数据的对齐
+
+每个obstack都有一个对齐边界；obstack中分配的每个对象自动的在指定边界的整数倍的地址上开始。默认情况下，边界是对齐的，所以对象可以存储任何数据类型。
+
+用`obstack_alignment_mask`宏，访问一个obstack的对齐边界，函数原型看上去像这样：
+
+宏：`int` **`obstack_alignment_mask`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+值是一个位掩码；一位为1表示一个对象的地址中对应的位应该为0。掩码值应该是比一个2的幂少一；效果是所有对象地址是2的幂的倍数。掩码的默认值是一个允许对齐对象存储任何数据类型的值：例如，如果他的值为3（二进制下就是0011），任何数据类型可以被存储在地址为4的倍数的地方。一个掩码的值为0意味着一个对象可以在任何1的倍数上开始（也就是，没有对齐需求）。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`obstack_alignment_mask`宏的展开是一个左值，所以你可以通过赋值调整掩码。例如，以下语句：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+obstack_alignment_mask (obstack_ptr) = 0;
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+效果是在指定obstack中关闭对齐处理。
+</div>
+
+注意，在对齐掩码中的改变在下一次obstack中的一个对象被分配或结束之后才会生效。如果你没有在增长一个对象，你可以调用`obstack_finish`使新的对齐掩码立刻生效。这会结束一个长度为零的对象，然后为下一个对象做适当的对齐。
+
+---
+
+#### 3.2.6.10 obstack chunk
+
+obstack运行原理是给他们自己分配大chunk的空间，然后将这些chunk中的空间分割出来以满足你的请求。chunk一般是4096字节长，除非你指定了一个不同的chunk大小。chunk大小包含8字节的开销，他没有用来存储对象。无论指定的大小是多少，当需要容纳长对象时，更长的chunk会被分配。
+
+obstack库通过调用`obstack_chunk_alloc`函数分配chunk，你必须定义他。当一个chunk因为你释放了其中所有的对象而不再需要时，obstack库通过调用`obstack_chunk_free`函数释放chunk，你也必须定义他。
+
+这两个在每个使用`obstack_init`的源文件中必须被定义（作为宏）或被声明（作为函数）（参考[Creating Obstacks](https://sourceware.org/glibc/manual/latest/html_node/Creating-Obstacks.html)）。最常见的情况是，他们被定义成宏，像这样：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+#define obstack_chunk_alloc malloc
+#define obstack_chunk_free free
+```
+</div>
+
+注意，这些是简单宏（无参数）。带有参数的宏定义不能用！`obstack_chunk_alloc`或`obstack_chunk_free`必须各自展开成一个函数名，如果他们本身不是一个函数名的话。
+
+如果你用`malloc`分配chunk，chunk大小必须是2的幂。默认chunk大小是4096，选他的原因是他够长，满足obstack中许多典型的请求，同时又足够短，不会在最后一个块中未使用的部分里浪费太多内存。
+
+宏：`int` **`obstack_chunk_size`** `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+他返回传入的obstack的chunk大小。
+</div>
+
+因为宏展开是一个左值，你可以通过赋给他一个新值拉指定一个新chunk大小。这样做不会影响到已经分配的chunk，但是会改变未来在特定obstack中分配的chunk的大小。是chunk大小更小不太可能有用，但是使他变大可能会增加性能，如果你分配了很多对象，他们的大小和chunk大小相当。这里是干净利落的做法：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+if (obstack_chunk_size (obstack_ptr) < new-chunk-size)
+  obstack_chunk_size (obstack_ptr) = new-chunk-size;
+```
+</div>
+
+---
+
+#### 3.2.6.11 obstack函数总结
+
+这里是所有与obstack相关的函数的总结。每个都会接收一个obstack的地址（`struct` `obstack` `*`）作为他的第一个参数。
+
+`void` `obstack_init` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+初始化一个obstack的使用。参考[Creating Obstacks](https://sourceware.org/glibc/manual/latest/html_node/Creating-Obstacks.html)。
+</div>
+
+`void` `*` `obstack_alloc` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配一个*size*未初始化字节的对象。参考[Allocation in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Allocation-in-an-Obstack.html)。
+</div>
+
+`void` `*` `obstack_copy` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`address`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配一个*size*字节的对象，内容从*address*中复制。参考[Allocation in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Allocation-in-an-Obstack.html)。
+</div>
