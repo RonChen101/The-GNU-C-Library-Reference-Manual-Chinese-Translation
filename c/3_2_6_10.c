@@ -13,14 +13,12 @@ int
 main ()
 {
 	struct obstack * my_obstack = malloc (sizeof (struct obstack));
-
-//	obstack.h
-//	int obstack_init (struct obstack *obstack-ptr)
 	obstack_init (my_obstack);
 
 //	obstack.h
-//	obstack_alloc_failed_handler
-//	略
+//	int obstack_chunk_size (struct obstack *obstack-ptr)
+//	不知道为什么编译器提示我用%ld，笑哭
+	printf ("obstack_chunk_size = %ld\n", obstack_chunk_size (my_obstack));
 
 	return 0;
 }

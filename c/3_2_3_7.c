@@ -9,14 +9,14 @@ main ()
 {
 //	stdlib.h
 //	void * aligned_alloc (size_t alignment, size_t size)
-//	由下面的程序可知，aligned_alloc只会使a对齐，即a[0]的地址为8的倍数，但是数组中其他项的地址就不一定是8的倍数了！
+//	由下面的程序可知，aligned_alloc只会使a对齐，即a [0]的地址为8的倍数，但是数组中其他项的地址就不一定是8的倍数了！
 	int * a = aligned_alloc (8, 3 * sizeof (int));
 	if (errno == 0)
 	{
 		printf ("aligned_alloc成功！\terrno = %d\n", errno);
 		for (int i = 0; i < 3; i++)
 		{
-			printf ("a[%d]的地址为：\t%p\n", i, & a[i]);
+			printf ("a [%d]的地址为：\t%p\n", i, & a [i]);
 		}
 	}
 

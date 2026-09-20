@@ -18,13 +18,13 @@ main ()
 
 	int * a = malloc (3 * sizeof (int));
 
-	a[-2]	= 123;
-//	a[-1]	= 1;
-	printf ("a[-2]\t= %d\n", a[-2]);
+	a [-2]	= 123;
+//	a [-1]	= 1;
+	printf ("a [-2]\t= %d\n", a [-2]);
 
-//	a[3]	= 1;
-	a[4]	= 456;
-	printf ("a[4]\t= %d\n", a[4]);
+//	a [3]	= 1;
+	a [4]	= 456;
+	printf ("a [4]\t= %d\n", a [4]);
 
 	free (a);
 
@@ -39,7 +39,7 @@ main ()
 
 	for (int i = 0; i < 10; i++)
 	{
-		b[i] = 1;
+		b [i] = 1;
 	}
 	b_status = mprobe (b);
 	printf ("mprobe成功！\terrno = %d\n", errno);

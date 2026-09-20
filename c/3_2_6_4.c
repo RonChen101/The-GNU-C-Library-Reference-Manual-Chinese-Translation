@@ -13,14 +13,12 @@ int
 main ()
 {
 	struct obstack * my_obstack = malloc (sizeof (struct obstack));
-
-//	obstack.h
-//	int obstack_init (struct obstack *obstack-ptr)
 	obstack_init (my_obstack);
+	int * a = obstack_alloc (my_obstack, 3 * sizeof (int));
 
 //	obstack.h
-//	obstack_alloc_failed_handler
-//	略
+//	void obstack_free (struct obstack *obstack-ptr, void *object)
+	obstack_free (my_obstack, a);
 
 	return 0;
 }
