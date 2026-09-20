@@ -2194,3 +2194,332 @@ if (obstack_chunk_size (obstack_ptr) < new-chunk-size)
 
 分配一个*size*字节的对象，内容从*address*中复制。参考[Allocation in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Allocation-in-an-Obstack.html)。
 </div>
+
+`void` `*` `obstack_copy0` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`address`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配*size*+1字节的对象，从*address*中复制*size*的他们，最后接一个空字符。参考[Allocation in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Allocation-in-an-Obstack.html)。
+</div>
+
+`void` `obstack_free` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`object`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+释放*object*（还有在指定obstack中所有比*object*更晚分配的东西）。参考[Freeing Objects in an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Freeing-Obstack-Objects.html)。
+</div>
+
+`void` `obstack_blank` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+添加*size*的未初始化的字节到一个增长对象中。参考[Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Growing-Objects.html)。
+</div>
+
+`void` `obstack_grow` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`address`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+添加*size*字节到一个增长对象中，从*address*中复制。参考[Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Growing-Objects.html)。
+</div>
+
+`void` `obstack_grow0` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `void` `*` *`address`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+添加*size*字节到一个增长对象中，从*address*中复制，然后添加另一个包含一个空字符的字节。参考[Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Growing-Objects.html)。
+</div>
+
+`void` `obstack_1grow` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `char` *`data-char`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+添加一个包含*data-char*的字节到一个增长对象。参考[Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Growing-Objects.html)。
+</div>
+
+`void` `*` `obstack_finish` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+结束增长对象，并返回他的永久地址。参考[Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Growing-Objects.html)。
+</div>
+
+`int` `obstack_object_size` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+获取当前正在增长的对象的大小。参考[Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Growing-Objects.html)。
+</div>
+
+`void` `obstack_blank_fast` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `int` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+添加*size*的未初始化字节到一个增长对象，不检查是否有足够的空间。参考[Extra Fast Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Extra-Fast-Growing.html)。
+</div>
+
+`void` `obstack_1grow_fast` `(` `struct` `obstack` `*` *`obstack-ptr`* `,` `char` *`data-char`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+添加一个包含*data-char*的字节到到一个增长对象，不检查是否有足够的空间。参考[Extra Fast Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Extra-Fast-Growing.html)。
+</div>
+
+`int` `obstack_room` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+获取当前对象可以用来增长的空间。参考[Extra Fast Growing Objects](https://sourceware.org/glibc/manual/latest/html_node/Extra-Fast-Growing.html)。
+</div>
+
+`int` `obstack_alignment_mask` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+用来对齐一个对象的开头的掩码。这是一个左值。参考[Alignment of Data in Obstacks](https://sourceware.org/glibc/manual/latest/html_node/Obstacks-Data-Alignment.html)。
+</div>
+
+`int` `obstack_chunk_size` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+分配chunk的大小。这是一个左值。参考[Obstack Chunks](https://sourceware.org/glibc/manual/latest/html_node/Obstack-Chunks.html)。
+</div>
+
+`void` `*` `obstack_base` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+正在增长的对象的临时开始地址。参考[Status of an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Status-of-an-Obstack.html)。
+</div>
+
+`void` `*` `obstack_next_free` `(` `struct` `obstack` `*` *`obstack-ptr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+正在增长的对象的末端地址。参考[Status of an Obstack](https://sourceware.org/glibc/manual/latest/html_node/Status-of-an-Obstack.html)。
+</div>
+
+---
+
+### 3.2.7 可变大小的自动存储
+
+`alloca`函数支持一种半动态的分配方式，块是动态分配的，但是自动释放的。
+
+使用`alloca`分配块是一个显式操作；你可以想分配多少块就分配多少，并在运行时计算大小。但是当你退出调用了`alloca`的函数时，所有块都被释放，就像他们是在他个函数中的自动声明变量一样。无法显式的释放空间。
+
+`alloca`的原型在`stdlib.h`中。此函数是一个BSD扩展。
+
+函数：`void` `*` **`alloca`** `(` `size_t` *`size`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`alloca`的返回值是一个*size*字节的内存块的地址，分配在调用函数中的栈帧中。
+</div>
+
+不要在一个函数调用的参数中使用`alloca`——你会获得无法预测的结果，因为`alloca`的栈空间会出现在函数参数的空间的中间的栈上。需要避免的一个例子是`foo (x, alloca (4), y)`。
+
+- [`alloca` Example](https://sourceware.org/glibc/manual/latest/html_node/Alloca-Example.html)
+
+- [Advantages of `alloca`](https://sourceware.org/glibc/manual/latest/html_node/Advantages-of-Alloca.html)
+
+- [Disadvantages of `alloca`](https://sourceware.org/glibc/manual/latest/html_node/Disadvantages-of-Alloca.html)
+
+- [GNU C Variable-Size Arrays](https://sourceware.org/glibc/manual/latest/html_node/GNU-C-Variable_002dSize-Arrays.html)
+
+---
+
+#### 3.2.7.1 `alloca`例子
+
+As an example of the use of `alloca`, here is a function that opens a file name made from concatenating two argument strings, and returns a file descriptor or minus one signifying failure:
+作为一个`alloca`的使用例子，这里是一个函数，他打开一个文件，文件名由两个字符串参数拼接而成，然后返回一个文件描述符，或负一，表示失败。
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+int
+open2 (char *str1, char *str2, int flags, int mode)
+{
+  char *name = (char *) alloca (strlen (str1) + strlen (str2) + 1);
+  stpcpy (stpcpy (name, str1), str2);
+  return open (name, flags, mode);
+}
+```
+AI生成：stpcpy是字符串复制函数，它返回指向目标字符串末尾（即结尾的空字符）的指针。
+</div>
+
+这是你如何用`malloc`和`free`获得相同结果：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+int
+open2 (char *str1, char *str2, int flags, int mode)
+{
+  char *name = malloc (strlen (str1) + strlen (str2) + 1);
+  int desc;
+  if (name == 0)
+    fatal ("virtual memory exceeded");
+  stpcpy (stpcpy (name, str1), str2);
+  desc = open (name, flags, mode);
+  free (name);
+  return desc;
+}
+```
+</div>
+
+如你所见，使用`alloca`更简单。但是`alloca`由其他更重要的优点，和一些缺点。
+
+---
+
+#### 3.2.7.2 `alloca`的优点
+
+`alloca`比`malloc`更好的原因：
+
+- 使用`alloca`浪费很少空间，并且非常快。（他由GNU C编译器展开为内联代码。）
+
+- 因为`alloca`没用为不同大小的块区分单独的池，所以任何大小块的空间可以被其他任何大小再次使用。`alloca`不会造成内存碎片。
+
+- 使用`longjmp`（参考[Non-Local Exits](https://sourceware.org/glibc/manual/latest/html_node/Non_002dLocal-Exits.html)）的非局部退出在他们退出调用`alloca`的函数时，自动释放`alloca`分配的空间。这是使用`alloca`最重要的原因。
+
+<div style="margin: 0 0 1em 2em;">
+
+为了说明这个，加入你有一个函数`open_or_report_error`会在成功时，像`open`，返回一个描述符，但是，在失败时，不会返回到他的调用者。如果文件无法打开，他打印错误信息，然后使用`longjmp`跳转到你程序的命令层。让我们修改`open2`（参考[alloca Example](https://sourceware.org/glibc/manual/latest/html_node/Alloca-Example.html)来使用次子程序：
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+int
+open2 (char *str1, char *str2, int flags, int mode)
+{
+  char *name = (char *) alloca (strlen (str1) + strlen (str2) + 1);
+  stpcpy (stpcpy (name, str1), str2);
+  return open_or_report_error (name, flags, mode);
+}
+```
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+由于`alloca`的工作方式，即使一个错误发生了，他分配的内存也会释放，无需特别的操作。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+对比看来，前面的`open2`定义（使用`malloc`和`free`的那个），如果按照这种方式修改，就会导致一个内存泄露。就算你愿意做出更多改变来修复他，也没有什么更简单的方式来做到相同的事。
+</div>
+
+---
+
+#### 3.2.7.3 `alloca`的缺点
+
+`alloca`与`malloc`相比的缺点：
+
+- 如果你尝试分配比机器能提供的还更多的内存，你不会获得一条清晰的错误信息。相反，你会获得一个错误信号，就像你会从一个无限递归中获得的一样；可能是一个段错误（segmentation violation）（参考[Program Error Signals](https://sourceware.org/glibc/manual/latest/html_node/Program-Error-Signals.html)）。
+
+- 一些非GNU系统不支持`alloca`，所以可移植性更差。然而，对于存在这种缺陷的系统，可以使用一个用C编写的较慢的`alloca`仿真实现。
+
+---
+
+#### 3.2.7.4 GNU C变长数组
+
+GNU C中，你可以用变长数组替换大部分`alloca`的用法。那么`open2`看上去是这样的：
+
+<div style="margin: 0 0 1em 4em;">
+
+```c
+int open2 (char *str1, char *str2, int flags, int mode)
+{
+  char name[strlen (str1) + strlen (str2) + 1];
+  stpcpy (stpcpy (name, str1), str2);
+  return open (name, flags, mode);
+}
+```
+</div>
+
+但是`alloca`并不总是等于一个变长数组，原因：
+
+- 一个变长数组的空间在数组名称的作用域结束时释放。而`alloca`分配的空间会一直保留到函数结束。
+
+- 可以在循环中使用`alloca`，每次迭代分配一个额外的块。变长数组不可能做到。
+
+<strong>注意：</strong>如果你在一个函数中混合使用`alloca`和变长数组，退出声明了一个变长数组的一个作用域时，也会释放该作用域中使用`alloca`分配的所有块。
+
+---
+
+## 3.3 调整数据段大小
+
+本节的符号在`unistd.h`中声明。
+
+你通常不会使用本节中的函数，因为[Allocating Storage For Program Data](https://sourceware.org/glibc/manual/latest/html_node/Memory-Allocation.html)中描述的函数更易使用。那些（下面的函数）是一个GNU C Library内存分配器本身使用的函数接口。下面的函数是简单的对系统调用的接口。
+
+函数：`int` **`brk`** `(` `void` `*` *`addr`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`brk`将调用进程数据段的高端设置成*addr*。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+段末端的地址被定义为该段最后一个字节的地址加1。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果*addr*比数据段的低端更低，函数没有效果。（随便提一下，这视为成功。）
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+若他的数据段与另一个段重叠，或超出进程数据存储限制（参考[Limiting Resource Usage](https://sourceware.org/glibc/manual/latest/html_node/Limits-on-Resources.html)）。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+函数的命名源自于一个常见的历史场景，数据存储和栈在同一个段中。数据存储分配从段的底部向上增长，栈从段的顶部向下增长，他们之间的分界线称为break。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+成功时，返回值是零。失败时，返回值是`-1`，并且对应的设置`errno`。下面的`errno`指定用于对此函数：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOMEM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+请求会导致数据段与另一个段重叠，或超出进程数据存储限制。
+</div>
+
+函数：`void` `*` **`sbrk`** `(` `ptrdiff_t` *`delta`* `)`
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+This function is the same as `brk` except that you specify the new end of the data segment as an offset *delta* from the current end and on success the return value is the address of the resulting end of the data segment instead of zero.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+This means you can use ‘`sbrk(0)`’ to find out what the current end of the data segment is.
+</div>
