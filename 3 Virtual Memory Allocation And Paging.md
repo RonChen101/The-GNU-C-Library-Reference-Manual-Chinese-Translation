@@ -2516,10 +2516,218 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https:
 
 <div style="margin: 0 0 1em 2em;">
 
-This function is the same as `brk` except that you specify the new end of the data segment as an offset *delta* from the current end and on success the return value is the address of the resulting end of the data segment instead of zero.
+此函数与`brk`相同，除了你指定数据段的新端为一个相对现端的*delta*偏移，并且成功时返回值是数据段的结果端的地址，而不是零。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-This means you can use ‘`sbrk(0)`’ to find out what the current end of the data segment is.
+这意味着你可以使用‘`sbrk(0)`’找到数据段的当前端是什么。
+</div>
+
+---
+
+## 3.4 内存保护
+
+当使用`mmap`映射一个页时，可以使用页保护标志参数来指定页保护标志。参考[Memory-mapped I/O](https://sourceware.org/glibc/manual/latest/html_node/Memory_002dmapped-I_002fO.html)。
+
+下面的标志可用：
+
+`PROT_WRITE`
+
+<div style="margin: 0 0 1em 2em;">
+
+内存可写入。
+</div>
+
+`PROT_READ`
+
+<div style="margin: 0 0 1em 2em;">
+
+内存可读。在一些架构，此标志表示内存也可执行（就像`PROT_EXEC`同时被指定）。
+</div>
+
+`PROT_EXEC`
+
+<div style="margin: 0 0 1em 2em;">
+
+内存可以用来存储接下来被执行的指令。在大多数架构上，此标志说明了内存可读（就像`PROT_READ`被指定）。
+</div>
+
+`PROT_NONE`
+
+<div style="margin: 0 0 1em 2em;">
+
+此标志必须单独指定。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+内存被保留，但是不能被读，写，或执行。如果调用`mmap`时指定了此标志，一块虚拟内存区域会被保留，以备未来使用，并且，接下来的分配中，不带`MAP_FIXED`的`mmap`调用将不会使用他。对于匿名映射，在映射被创建时，内核不会为分配保留任何物理内存。
+</div>
+
+操作系统可能会单独跟踪这些标志，即使底层硬件在进行访问检查时将他们同等对待（就像在某些平台上的`PROT_READ`和`PROT_EXEC`）。在GNU系统上，`PROT_EXEC`总是表示`PROT_READ`，所以用户可以查看正在他们系统上执行的机器代码。
+
+不恰当的访问将会造成段错误（参考[Program Error Signals](https://sourceware.org/glibc/manual/latest/html_node/Program-Error-Signals.html)）。
+
+分配之后，保护标志可以通过`mprotect`函数修改。
+
+函数：`int` **`mprotect`** `(` `void` `*` *`address`* `,` `size_t` *`length`* `,` `int` *`protection`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+成功调用`mprotect`函数会修改从*address*开始，至少*length*字节的内存的保护标志。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+*address*必须对齐映射的页大小。系统页大小可以通过调用带`_SC_PAGESIZE`参数的`sysconf`获取（参考[Definition of `sysconf`](https://sourceware.org/glibc/manual/latest/html_node/Sysconf-Definition.html)）。系统页大小是匿名内存映射和大多数文件映射的页保护可以修改的粒度。从特殊文件或设备映射的内存可的页粒度可能大于系统页大小，所以需要更大的对齐。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+*length*是需要修改的保护标志的字节数量。他自动向上取整到下一个系统页大小的倍数。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+*protection*是一个上述`PROT_*`标志的组合。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`mprotect`函数成功时返回*0*，失败时返回*-1*。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+下面的`errno`错误条件时为此函数定义的：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOMEM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+系统无法分配资源以满足请求。这可能发生在系统中没有足够物理内存用于分配后备存储。当新保护标志造成了内存区域与其相邻区域被拆分，并且超过了进程关于如此不同的内存区域的数量限制，错误也有可能发生。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+*address*没用正确的对齐到映射的页边界，或*length*（在向上取整到系统页大小后）不是所适用的页大小的倍数，或*protection*中的标志组合无效。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EACCES`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+基于文件映射的文件，打开时的打开标志与*protection*不兼容。
+（AI生成：`mmap`要求：你请求的保护标志*protection*，不能超出当初用`open`打开文件时所用的访问模式 *flags*：
+|映射保护（*protection*）|打开文件时至少需要|
+|-|-|
+|`PROT_READ`|`O_RDONLY`或`O_RDWR`|
+|`PROT_WRITE`|`O_RDWR`（不能只读打开！）|
+
+核心坑点：想以可写方式（`PROT_WRITE`）映射文件，文件必须用`O_RDWR`打开，用`O_RDONLY`打开就会报 `EACCES`。）
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EPERM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+系统安全策略不允许具有指定标志的映射。例如，同时指定`PROT_EXEC`和`PROT_WRITE`的映射可能不被允许。
+</div>
+
+如果`mprotect`函数通过指定`PROT_NONE`保护标志使一片内存区域不可访问，然后又恢复了访问，内存会保留他原来的内容。
+
+在某些系统上，可能无法在映射刚创建时指定额外的不存在的标志。例如，如果一片内存区域的初始化保护标志为‘`PROT_READ` `|` `PROT_WRITE`’，尝试使他可执行可能会失败。
+
+总的来说，`mprotect`函数可能被用来修改任何进程内存，无论他如何被分配。然而，此函数的可移植的使用需要他仅用来处理`mmap`或`mmap64`返回的内存区域。
+
+函数：`int` **`mseal`** `(` `void` `*` *`address`* `,` `size_t` *`length`* `,` `unsigned` `long` *`flags`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+成功的调用`mseal`函数会保护*length*字节的*address*内存范围，他先前由`mmap`或`mremap`分配，使其免受进一步的元数据修改，例如：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+- 使用`munmap`和`mremap`，解除映射，移动到另一个位置，扩展或收缩大小。
+- 使用`mremap`，移动或扩展另一个虚拟内存地址到当前位置。
+- 使用带有`MAP_FIXED`标志的`mmap`，修改内存范围。
+- 使用`mprotect`或`pkey_mprotect`，修改保护标志。此外，对于某些破坏性的`madvise`行为（`MADV_DONTNEED`，`MADV_FREE`，`MADV_DONTNEED_LOCKED`和`MADV_WIPEONFORK`），`mseal`仅在与该内存有关的保护键拒绝写时阻止该操作。
+- Destructive behaviors on anonymous memory, such as `madvise` with `MADV_DONTNEED`.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The *address* must be an allocated virtual memory done by `mmap` or `mremap`, and it must be page-aligned. The end address (*address* plus *length*) must be within an allocated virtual memory range. There should be no unallocated memory between the start and end of the address range.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The *flags* is currently unused.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The `mseal` function returns *0* on success and *-1* on failure.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The following `errno` error conditions are defined for this function:
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EPERM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+The system blocked the operation, and the given address range is unmodified without a partial update. This error is also returned when `mseal` is issued on a 32-bit CPU (sealing is currently supported only on 64-bit CPUs, although 32-bit binaries running on a 64-bit kernel are supported).
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOMEM`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+Either the *address* is not allocated, or the end address is not within the allocation, or there is unallocated memory between the start and end address.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOSYS`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+The kernel does not support the `mseal` syscall.
 </div>
