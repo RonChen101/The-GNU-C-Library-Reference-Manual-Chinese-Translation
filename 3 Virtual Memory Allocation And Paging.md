@@ -2605,7 +2605,7 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https:
 
 <div style="margin: 0 0 1em 2em;">
 
-下面的`errno`错误条件时为此函数定义的：
+下面的`errno`错误条件是为此函数定义的：
 </div>
 
 <div style="margin: 0 0 1em 2em;">
@@ -2678,28 +2678,28 @@ Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https:
 - 使用`munmap`和`mremap`，解除映射，移动到另一个位置，扩展或收缩大小。
 - 使用`mremap`，移动或扩展另一个虚拟内存地址到当前位置。
 - 使用带有`MAP_FIXED`标志的`mmap`，修改内存范围。
-- 使用`mprotect`或`pkey_mprotect`，修改保护标志。此外，对于某些破坏性的`madvise`行为（`MADV_DONTNEED`，`MADV_FREE`，`MADV_DONTNEED_LOCKED`和`MADV_WIPEONFORK`），`mseal`仅在与该内存有关的保护键拒绝写时阻止该操作。
-- Destructive behaviors on anonymous memory, such as `madvise` with `MADV_DONTNEED`.
+- 使用`mprotect`或`pkey_mprotect`，修改保护标志。此外，对于某些破坏性的`madvise`行为（`MADV_DONTNEED`，`MADV_FREE`，`MADV_DONTNEED_LOCKED`和`MADV_WIPEONFORK`），`mseal`仅在与该内存有关的保护密钥拒绝写时阻止该操作。
+- 对匿名内存的破坏性行为，例如带`MADV_DONTNEED`的`madvise`。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-The *address* must be an allocated virtual memory done by `mmap` or `mremap`, and it must be page-aligned. The end address (*address* plus *length*) must be within an allocated virtual memory range. There should be no unallocated memory between the start and end of the address range.
+*address*逆序是一个由`mmap`或`mremap`分配的虚拟内存，并且他必须页对齐。结束地址（*address*加*length*）必须在已分配虚拟内存范围内。地址范围的起点和终点之间不应该有未分配的内存。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-The *flags* is currently unused.
+*flags*目前未使用。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-The `mseal` function returns *0* on success and *-1* on failure.
+`mseal`函数在成功时返回*0*，失败时返回*-1*。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-The following `errno` error conditions are defined for this function:
+下面的`errno`错误条件是为此函数定义的：
 </div>
 
 <div style="margin: 0 0 1em 2em;">
@@ -2709,7 +2709,7 @@ The following `errno` error conditions are defined for this function:
 
 <div style="margin: 0 0 1em 4em;">
 
-The system blocked the operation, and the given address range is unmodified without a partial update. This error is also returned when `mseal` is issued on a 32-bit CPU (sealing is currently supported only on 64-bit CPUs, although 32-bit binaries running on a 64-bit kernel are supported).
+系统阻止了操作，且给定的地址范围未被修改，没有部分更新。当在32位CPU上发出`mseal`时，此错误也会被返回（密封，当前只在64位CPU上支持，不过在64位内核上运行的32位二进制程序是受支持的）。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
@@ -2719,7 +2719,7 @@ The system blocked the operation, and the given address range is unmodified with
 
 <div style="margin: 0 0 1em 4em;">
 
-Either the *address* is not allocated, or the end address is not within the allocation, or there is unallocated memory between the start and end address.
+要么*address*未被分配，要么结束地址不在分配中，要么起点和终点地址之间有未分配的内存。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
@@ -2729,5 +2729,132 @@ Either the *address* is not allocated, or the end address is not within the allo
 
 <div style="margin: 0 0 1em 4em;">
 
-The kernel does not support the `mseal` syscall.
+内核不支持`mseal`系统调用。
+</div>
+
+<strong>注意：</strong>内存密封会改变映射的生命周期，被密封的内存在进程终止或通过`execve`函数替换进程映像之前无法解除映射。被密封的映射会通过`fork`继承。
+
+- [Memory Protection Keys](https://sourceware.org/glibc/manual/latest/html_node/Memory-Protection.html#Memory-Protection-Keys)
+
+---
+
+### 3.4.1 内存保护密钥
+
+在某些系统上，可以使用内存保护密钥对指定页添加进一步访问限制。这些限制工作原理如下：
+
+- 所有内存页都与一个保护密钥有关。默认保护密钥在内存访问期间不应用任何保护。通过`pkey_alloc`函数可以分配新密钥，使用`pkey_mprotect`应用到页。
+
+- 每个线程对于每个保护密钥都有一套独立的访问限制。这些访问限制可以使用`pkey_set`和`pkey_get`函数来操控。
+
+- 在内存访问期间，系统会获取被访问页的保护密钥，并且使用他来决定适用的根据当前线程的配置的内存访问限制。如果访问被限制，结果是一个段错误（参考[Program Error Signals](https://sourceware.org/glibc/manual/latest/html_node/Program-Error-Signals.html)）。这些检查是在`mprotect`或`pkey_mprotect`设置的`PROT_*`保护标志之外进行的。
+
+新线程和子进程会继承当前线程的访问限制。如果后来分配了一个保护密钥，现存的线程（除了当前的）将会针对与新被分配的密钥相关的访问限制，使用未指定的系统默认值。
+
+进入信号处理程序时，系统会重置当前线程的访问限制，以让带有默认密钥的页可以被访问，但是其他保护密钥的访问限制是未指定的。
+
+应用程序应该使用`pkey_alloc`分配一个密钥，并且使用`pkey_mprotect`应用密钥到需要特殊保护的内存区域：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+  int key = pkey_alloc (0, PKEY_DISABLE_ACCESS);
+  if (key < 0)
+    /* Perform error checking, including fallback for lack of support.  */
+    ...;
+
+  /* Apply the key to a special memory region used to store critical
+     data.  */
+  if (pkey_mprotect (region, region_length,
+                     PROT_READ | PROT_WRITE, key) < 0)
+    ...; /* Perform error checking (generally fatal).  */
+```
+</div>
+
+如果因为不支持内存保护密钥导致密钥分配失败，通常可以跳过`pkey_mprotect`调用。在这种情况下，内存区域默认不会被保护。结果也有可能是调用`pkey_mprotect`并返回值为*-1*的密钥，此时他的行为与`mprotect`相同。
+
+在密钥分配给内存页之后，`pkey_set`可以用来临时获取内存区域的访问，并且再次释放他：
+
+<div style="margin: 0 0 1em 2em;">
+
+```c
+  if (key >= 0 && pkey_set (key, PKEY_UNRESTRICTED) < 0)
+    ...; /* Perform error checking (generally fatal).  */
+  /* At this point, the current thread has read-write access to the
+     memory region.  */
+  ...
+  /* Revoke access again.  */
+  if (key >= 0 && pkey_set (key, PKEY_DISABLE_ACCESS) < 0)
+    ...; /* Perform error checking (generally fatal).  */
+```
+</div>
+
+在此例子中，一个负数的密钥值代表没有密钥被分配，并且不需要修改当前线程的访问限制（因为他总是有访问权限）。
+
+与使用`mprotect`来修改页保护标志相比，此方法有两个优点：他是线程安全的，意义是只修改当前线程（前者）的访问限制，所以其他线程（后者）并发的修改了他（后者）自己的访问限制以获取对映射的访问，并不会一瞬间看到他（前者）的访问限制更新。并且`pkey_set`通常不会涉及内核调用和上下文切换，所以他效率更高。
+
+函数：`int` **`pkey_alloc`** `(` `unsigned` `int` *`flags`* `,` `unsigned` `int` *`access_restrictions`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Unsafe corrupt |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+Allocate a new protection key. The *flags* argument is reserved and must be zero. The *access_restrictions* argument specifies access restrictions which are applied to the current thread (as if with `pkey_set` below). Access restrictions of other threads are not changed.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The function returns the new protection key, a non-negative number, or *-1* on error.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+The following `errno` error conditions are defined for this function:
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOSYS`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+The system does not implement memory protection keys.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+The *flags* argument is not zero.
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+The *access_restrictions* argument is invalid.
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+The system does not implement memory protection keys or runs in a mode in which memory protection keys are disabled.
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOSPC`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+All available protection keys already have been allocated.
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+The system does not implement memory protection keys or runs in a mode in which memory protection keys are disabled.
 </div>
