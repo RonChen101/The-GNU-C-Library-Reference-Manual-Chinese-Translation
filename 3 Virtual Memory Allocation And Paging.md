@@ -2801,17 +2801,17 @@ Preliminary: | MT-Safe | AS-Safe | AC-Unsafe corrupt |参考[POSIX Safety Concep
 
 <div style="margin: 0 0 1em 2em;">
 
-Allocate a new protection key. The *flags* argument is reserved and must be zero. The *access_restrictions* argument specifies access restrictions which are applied to the current thread (as if with `pkey_set` below). Access restrictions of other threads are not changed.
+分配一个新的保护密钥。*flags*参数被保留，并且必须为零。*access_restrictions*参数指定了应用到当前线程访问限制（就像使用下面的`pkey_set`）。其他线程的访问限制不会改变。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-The function returns the new protection key, a non-negative number, or *-1* on error.
+函数返回新的保护密钥，一个非负数字，或错误时返回*-1*。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
 
-The following `errno` error conditions are defined for this function:
+下面的`errno`错误条件是为此函数定义的：
 </div>
 
 <div style="margin: 0 0 1em 2em;">
@@ -2821,7 +2821,7 @@ The following `errno` error conditions are defined for this function:
 
 <div style="margin: 0 0 1em 4em;">
 
-The system does not implement memory protection keys.
+系统没有实现内存保护密钥。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
@@ -2831,17 +2831,17 @@ The system does not implement memory protection keys.
 
 <div style="margin: 0 0 1em 4em;">
 
-The *flags* argument is not zero.
+*flags*参数不是零。
 </div>
 
 <div style="margin: 0 0 1em 4em;">
 
-The *access_restrictions* argument is invalid.
+*access_restrictions*参数无效。
 </div>
 
 <div style="margin: 0 0 1em 4em;">
 
-The system does not implement memory protection keys or runs in a mode in which memory protection keys are disabled.
+系统没有实现内存保护密钥，或者运行在内存保护密钥被禁用的模式。
 </div>
 
 <div style="margin: 0 0 1em 2em;">
@@ -2851,10 +2851,214 @@ The system does not implement memory protection keys or runs in a mode in which 
 
 <div style="margin: 0 0 1em 4em;">
 
-All available protection keys already have been allocated.
+所有可用的保护密钥都已经被分配。
 </div>
 
 <div style="margin: 0 0 1em 4em;">
 
-The system does not implement memory protection keys or runs in a mode in which memory protection keys are disabled.
+系统没有实现内存保护密钥，或者运行在内存保护密钥被禁用的模式。
 </div>
+
+函数：`int` **`pkey_free`** `(` `int` *`key`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+释放保护密钥，已让他可以被`pkey_alloc`重新使用。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+调用此函数不会改变被释放的密钥的访问限制。即使他后来被重新分配了，调用线程和其他线程可能保留对他的访问。因为此原因，不推荐调用`pkey_free`函数。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOSYS`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+系统没有实现内存保护密钥。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+*key*参数不是一个可用的保护密钥。
+</div>
+
+函数：`int` **`pkey_mprotect`** `(` `void` `*` *`address`* `,` `size_t` *`length`* `,` `int` *`protection`* `,` `int` *`key`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+与`mprotect`类似，但是也将内存区域的内存保护密钥设置成`key`。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+某些系统使用内存保护密钥来模仿某些*protection*标志的组合。在这种情景下，即使使用默认保护密钥不会发生这种情况，指定一个显式的保护密钥也可能表现的像在*protection*指定附加的标志一样。例如，一些系统只有在默认保护密钥下才支持只有`PROT_EXEC`的映射，并且若指定了`PROT_EXEC`，没有指定使用`PROT_READ`，`pkey_alloc`分配的密钥仍然可读。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+如果*key*为*-1*，默认保护密钥被应用到映射，就好像`mprotect`被调用了一样。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`pkey_mprotect`函数在成功时，返回*0*，失败时，返回*-1*。关于`mprotect`的相同的`errno`错误条件也为此函数被定义了，下面是额外的：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+*key*参数不是*-1*或一个可用的通过`pkey_alloc`分配的内存保护密钥。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`ENOSYS`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+系统没有实现内粗保护密钥，并且*key*不是*-1*。
+</div>
+
+函数：`int` **`pkey_set`** `(` `int` *`key`* `,` `unsigned` `int` *`access_restrictions`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+将当前线程的带有保护密钥*key*的内存页的访问限制改成*access_restrictions*。如果*access_restrictions*是`PKEY_UNRESTRICTED`（零），不会在页保护标志上应用额外的访问限制。否则，*access_restrictions*是下面标志的组合：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`PKEY_DISABLE_READ`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+后续尝试从被指定保护密钥的内存中读取将会错误。目前只有开启了Stage 1权限覆盖特性的AArch64平台支持此限制类型。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`PKEY_DISABLE_WRITE`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+后续尝试在被指定保护密钥的内存上写入将会报错。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`PKEY_DISABLE_ACCESS`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+后续尝试在被指定保护密钥的内存上写入或读取将会报错。在开启了Stage 1权限覆盖特性的AArch64平台上，此限制值和由`PKEY_DISABLE_READ`与`PKEY_DISABLE_WRITE`组成的组合效果相同。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`PKEY_DISABLE_EXECUTE`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+后续尝试从被指定保护密钥的内存中执行将会报错。目前只有开启了Stage 1权限覆盖特性的AArch64平台支持此限制类型。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+未指定为标志的操作不会被限制。特别的，这意味着，如果该内存区域以指定`PROT_EXEC`保护标志被映射的，并且指定了`PKEY_DISABLE_ACCESS`，该内存区域将会保持可执行的。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+使用一个非`pkey_alloc`分配的保护密钥调用`pkey_set`函数会导致未定义行为。这意味着，在不支持内存保护密钥的系统上，调用此函数是未定义的。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`pkey_set`在成功时返回*0*，失败时返回*-1*。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+下面的`errno`错误条件是为此函数定义的：
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+`EINVAL`
+</div>
+
+<div style="margin: 0 0 1em 4em;">
+
+系统不支持*access_restrictions*参数中表达的访问限制。
+</div>
+
+函数：`int` **`pkey_get`** `(` `int` *`key`* `)`
+
+<div style="margin: 0 0 1em 2em;">
+
+Preliminary: | MT-Safe | AS-Safe | AC-Safe |参考[POSIX Safety Concepts](https://sourceware.org/glibc/manual/latest/html_node/POSIX-Safety-Concepts.html)。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+返回当前线程关于带有保护密钥*key*.的内存页的访问限制。返回值为零，或一个`PKEY_DISABLE_` *标志的组合；参考`pkey_set`函数。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+应使用位运算来检查返回值中是否存在或不存在特定标志。使用等于比较返回值和任何标志或他们的组合将几乎肯定失败。
+</div>
+
+<div style="margin: 0 0 1em 2em;">
+
+使用一个非`pkey_alloc`分配的保护密钥调用`pkey_get`函数会导致未定义行为。这意味着，在不支持内存保护密钥的系统上，调用此函数是未定义的。
+</div>
+
+---
+
+## 3.5 Locking Pages
+
+You can tell the system to associate a particular virtual memory page with a real page frame and keep it that way — i.e., cause the page to be paged in if it isn’t already and mark it so it will never be paged out and consequently will never cause a page fault. This is called locking a page.
+
+The functions in this chapter lock and unlock the calling process’ pages.
+
+- [Why Lock Pages](https://sourceware.org/glibc/manual/latest/html_node/Why-Lock-Pages.html)
+
+- [Locked Memory Details](https://sourceware.org/glibc/manual/latest/html_node/Locked-Memory-Details.html)
+
+- [Functions To Lock And Unlock Pages](https://sourceware.org/glibc/manual/latest/html_node/Page-Lock-Functions.html)
+
+---
