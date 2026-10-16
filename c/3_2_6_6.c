@@ -6,8 +6,7 @@
 #define obstack_chunk_alloc	xmalloc
 #define obstack_chunk_free	free
 
-void *
-xmalloc (size_t size);
+void * xmalloc (size_t size);
 
 int
 main ()

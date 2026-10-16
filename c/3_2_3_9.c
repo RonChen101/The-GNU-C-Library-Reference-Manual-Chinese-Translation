@@ -3,8 +3,7 @@
 #include <stdlib.h>
 #include <mcheck.h>
 
-void
-print_mcheck_status (enum mcheck_status status);
+void print_mcheck_status (enum mcheck_status status);
 
 int
 main ()
